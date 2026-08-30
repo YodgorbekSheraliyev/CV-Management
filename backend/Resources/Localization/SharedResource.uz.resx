@@ -121,12 +121,27 @@
     <value>Serverda kutilmagan xatolik yuz berdi</value>
   </data>
   <data name="EmailOrPasswordWrong" xml:space="preserve">
-    <value>Email yoki password xato</value>
+    <value>Email yoki Parol xato</value>
   </data>
   <data name="UserAlreadyExists" xml:space="preserve">
     <value>Foydalanuvchi allaqachon mavjud</value>
   </data>
   <data name="BuiltInAttributesNotFound" xml:space="preserve">
     <value>Attributlar topilmadi. Avval database migration qiling</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Email manzili noto'g'ri formatda.</value>
+  </data>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>Ism kiritilishi shart.</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Familiya kiritilishi shart.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email kiritilishi shart.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Parol kiritilishi shart.</value>
   </data>
 </root>

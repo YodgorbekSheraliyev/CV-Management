@@ -129,4 +129,19 @@
   <data name="BuiltInAttributesNotFound" xml:space="preserve">
     <value>Built in attributes not found. Run database seed first.</value>
   </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>The email field is not a valid e-mail address.</value>
+  </data>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>First name is required.</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Last name is required.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password is required.</value>
+  </data>
 </root>

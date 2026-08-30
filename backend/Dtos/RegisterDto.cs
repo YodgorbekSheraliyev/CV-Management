@@ -5,14 +5,14 @@ namespace backend.Dtos
 {
     public class RegisterDto
     {
-        [Required]
+        [Required(ErrorMessage = "FirstNameRequired")]
         public string FirstName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "LastNameRequired")]
         public string LastName { get; set; }
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "EmailRequired")]
+        [EmailAddress(ErrorMessage = "InvalidEmail")]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "PasswordRequired")]
         public string Password { get; set; }
     }
 }

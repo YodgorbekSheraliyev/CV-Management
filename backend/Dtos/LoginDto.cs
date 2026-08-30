@@ -4,10 +4,10 @@ namespace backend.Dtos
 {
     public class LoginDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "EmailRequired")]
+        [EmailAddress(ErrorMessage = "InvalidEmail")]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "PasswordRequired")]
         public string Password { get; set; }
     }
 }
