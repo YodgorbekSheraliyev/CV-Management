@@ -1,6 +1,7 @@
 import { useState } from "react";
 import NavBar from "../components/NavBar";
 import { useAuth } from "../hooks/auth";
+import MeSection from "../components/MeSection";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -18,8 +19,6 @@ const ProfilePage = () => {
           <div>
             <h1 className="h3 fw-bold mb-1">Personal Profile</h1>
           </div>
-
-
         </div>
 
         <div className="card border-0 shadow-sm mb-4">
@@ -29,7 +28,14 @@ const ProfilePage = () => {
                 className="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center flex-shrink-0"
                 style={{ width: 96, height: 96 }}
               >
-                <span className="fs-2 fw-semibold text-secondary">JD</span>
+                {user?.imageUrl ? (
+                  <img src={user.imageUrl} alt="Profile image" />
+                ) : (
+                  <span className="fs-2 fw-semibold text-secondary">
+                    {user?.firstName[0]}
+                    {user?.lastName[0]}
+                  </span>
+                )}
               </div>
 
               <div className="flex-grow-1">
@@ -100,7 +106,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {activeTab == "me" && <div>me</div>}
+        {activeTab == "me" && user && <MeSection user={user} />}
         {activeTab == "info" && <div>info</div>}
         {activeTab == "projects" && <div>projects</div>}
         {activeTab == "cvs" && <div>cvs</div>}

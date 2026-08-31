@@ -11,6 +11,7 @@ export interface User {
   lastName: string;
   email: string;
   role: UserRole;
+  location? : string
   imageUrl?: string;
 }
 

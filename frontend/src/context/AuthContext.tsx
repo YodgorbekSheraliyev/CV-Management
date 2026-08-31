@@ -1,4 +1,5 @@
-import { createContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useEffect, useMemo, useState, type ReactNode } from "react";
+
 import type { User } from "../models";
 import type { UserRole } from "../enums/enums";
 import type { CommonResponse } from "../api/axios";
@@ -42,7 +43,42 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const restoreUser = async () => {
+      const token = localStorage.getItem(TOKEN_KEY);
+
+      if (!token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode<DecodedType>(token);
+
+        const userId = Number(
+          decoded[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+          ],
+        );
+
+        const currentUser = await getUser(userId);
+
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Failed to restore authentication:", error);
+
+        localStorage.removeItem(TOKEN_KEY);
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    };
+
+    restoreUser();
+  }, []);
 
   const login = async ({
     email,
@@ -68,11 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ),
     );
     setUser(res);
-    console.log("USER CONTEXT" + JSON.stringify(res));
+    setIsAuthenticated(true);
 
-    setIsAuthenticated(res != null);
-
-    return response.data.data;
+    return token;
   };
 
   const register = async ({
@@ -95,24 +129,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const token = response.data.data;
     localStorage.setItem(TOKEN_KEY, token);
+
+    const decoded = jwtDecode<DecodedType>(token);
+
+    const currentUser = await getUser(
+      Number(
+        decoded[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ],
+      ),
+    );
+
+    setUser(currentUser);
     setIsAuthenticated(true);
+
     return token;
   };
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
+
+    setUser(null);
+    setIsAuthenticated(false);
+
     window.location.href = "/login";
   };
 
-  const value = useMemo(() => {
-    return {
+  const value = useMemo<AuthContextValue>(
+    () => ({
       user,
       isAuthenticated,
       login,
       register,
       logout,
-    };
-  }, [user]);
+    }),
+    [user, isAuthenticated],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
