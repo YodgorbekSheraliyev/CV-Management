@@ -144,4 +144,7 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>Parol kiritilishi shart.</value>
   </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Foydalanuvchi topilmadi</value>
+  </data>
 </root>
