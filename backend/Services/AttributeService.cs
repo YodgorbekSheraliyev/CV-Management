@@ -50,6 +50,10 @@ namespace backend.Services
 
         public async Task<AttributeDto> Create(CreateAttributeDto createAttributeDto)
         {
+            if (await _db.Attributes.AnyAsync(x => x.Name == createAttributeDto.Name))
+            {
+                throw new ConflictException(_localizer["AttributeAlreadyExists"]);
+            }
             Models.Attribute attribute = new()
             {
                 Name = createAttributeDto.Name,

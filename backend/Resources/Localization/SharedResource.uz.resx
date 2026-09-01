@@ -162,4 +162,7 @@
   <data name="AttributeTypeRequired" xml:space="preserve">
     <value>Attribute turi kiritilishi kerak</value>
   </data>
+  <data name="AttributeAlreadyExists" xml:space="preserve">
+    <value>Attribute allaqachon mavjud</value>
+  </data>
 </root>

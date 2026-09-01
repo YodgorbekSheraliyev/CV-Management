@@ -62,9 +62,13 @@ namespace backend.Controllers
             try
             {
                 var result = await _attributeService.Create(createAttributeDto);
-                return Ok(CommonResponse<AttributeDto>.Ok(result));
+                return CreatedAtAction(nameof(GetById), new { id = result.Id }, CommonResponse<AttributeDto>.Ok(result));
             }
 
+            catch (ConflictException e)
+            {
+                return BadRequest(CommonResponse<string>.Fail(e.Message));
+            }
             catch (Exception)
             {
 
