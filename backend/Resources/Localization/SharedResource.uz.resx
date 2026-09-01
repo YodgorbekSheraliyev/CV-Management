@@ -177,4 +177,7 @@
   <data name="ValueRequired" xml:space="preserve">
     <value>Qiymat kiritilishi kerak</value>
   </data>
+  <data name="AttributeValueNotFound" xml:space="preserve">
+    <value>Attribute Value topilmadi</value>
+  </data>
 </root>

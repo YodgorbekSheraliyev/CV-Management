@@ -2,7 +2,6 @@
 using backend.Exceptions;
 using backend.Localization;
 using backend.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -41,7 +40,7 @@ namespace backend.Controllers
         {
             try
             {
-                var result = await _attributeValueService.CreateAttributeValue(createAttributeValueDto);
+                var result = await _attributeValueService.Create(createAttributeValueDto);
                 return Ok(CommonResponse<AttributeValueDto>.Ok(result));
             }
             catch (NotFoundException e)
@@ -55,11 +54,16 @@ namespace backend.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update()
+        public async Task<IActionResult> Update(UpdateAttributeValueDto updateAttributeValueDto)
         {
             try
             {
-                return Ok();
+                var result = await _attributeValueService.Update(updateAttributeValueDto);
+                return Ok(CommonResponse<AttributeValueDto>.Ok(result));
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(CommonResponse<string>.Fail(e.Message));
             }
             catch (Exception)
             {
@@ -68,11 +72,16 @@ namespace backend.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> Delete(DeleteAttributeValueDto deleteAttributeValueDto)
         {
             try
             {
-                return Ok();
+                var result = await _attributeValueService.Delete(deleteAttributeValueDto);
+                return NoContent();
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(CommonResponse<string>.Fail(e.Message));
             }
             catch (Exception)
             {
@@ -81,3 +90,4 @@ namespace backend.Controllers
         }
     }
 }
+

@@ -43,68 +43,11 @@ namespace backend.Services
 
             return values;
         }
-        public async Task<AttributeValueDto> UpdateByUserAndAttributeId(int userId, int attributeId, string value)
-        {
-            var attribute = await _db.Attributes.FirstOrDefaultAsync(x => x.Id == attributeId);
-            if (attribute is null)
-            {
-                throw new NotFoundException(_localizer["AttributeNotFound"]);
-            }
-
-            var attributeValue = await _db.AttributeValues
-                .FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == attributeId);
-
-            if (attributeValue is null)
-            {
-                attributeValue = new AttributeValue
-                {
-                    UserId = userId,
-                    AttributeId = attributeId,
-                    Value = value
-                };
-                _db.AttributeValues.Add(attributeValue);
-            }
-            else
-            {
-                attributeValue.Value = value;
-            }
-
-            await _db.SaveChangesAsync();
-
-            return new AttributeValueDto
-            {
-                Id = attributeValue.Id,
-                AttributeId = attributeValue.AttributeId,
-                UserId = attributeValue.UserId,
-                Value = attributeValue.Value,
-                Attribute = new AttributeDto
-                {
-                    Id = attribute.Id,
-                    Category = attribute.Category,
-                    Description = attribute.Description,
-                    IsBuiltIn = attribute.IsBuiltIn,
-                    Name = attribute.Name,
-                    Type = attribute.AttributeType
-                }
-            };
-        }
-        public async Task<bool> DeleteByUserIdAttributeId(int userId, int attributeId)
-        {
-            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == attributeId);
-            if (attributeValue is null)
-            {
-                return false;
-            }
-            _db.AttributeValues.Remove(attributeValue);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<AttributeValueDto> CreateAttributeValue(CreateAttributeValueDto createAttributeValueDto)
+        public async Task<AttributeValueDto> Create(CreateAttributeValueDto createAttributeValueDto)
         {
             Models.Attribute attribute = await _db.Attributes.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == createAttributeValueDto.AttributeId);
-            if(attribute is null)
+            if (attribute is null)
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
@@ -134,6 +77,48 @@ namespace backend.Services
                     Type = attribute.AttributeType
                 }
             };
+        }
+
+        public async Task<AttributeValueDto> Update(UpdateAttributeValueDto updateAttributeValueDto)
+        {
+            AttributeValue attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(x => x.Id == updateAttributeValueDto.Id);
+            if (attributeValue is null)
+            {
+                throw new NotFoundException(_localizer["AttributeValueNotFound"]);
+            }
+
+            attributeValue.UserId = updateAttributeValueDto.UserId;
+            attributeValue.AttributeId = updateAttributeValueDto.AttributeId;
+            attributeValue.Value = updateAttributeValueDto.Value;
+            await _db.SaveChangesAsync();
+            return new AttributeValueDto
+            {
+                Id = attributeValue.Id,
+                AttributeId = attributeValue.AttributeId,
+                UserId = attributeValue.UserId,
+                Value = attributeValue.Value,
+                Attribute = new AttributeDto
+                {
+                    Id = attributeValue.Attribute.Id,
+                    Category = attributeValue.Attribute.Category,
+                    Description = attributeValue.Attribute.Description,
+                    IsBuiltIn = attributeValue.Attribute.IsBuiltIn,
+                    Name = attributeValue.Attribute.Name,
+                    Type = attributeValue.Attribute.AttributeType
+                }
+            };
+        }
+
+        public async Task<bool> Delete(DeleteAttributeValueDto deleteAttributeValueDto)
+        {
+            AttributeValue attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(x => x.Id == deleteAttributeValueDto.Id);
+            if (attributeValue is null)
+            {
+                throw new NotFoundException(_localizer["AttributeValueNotFound"]);
+            }
+            _db.AttributeValues.Remove(attributeValue);
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }
