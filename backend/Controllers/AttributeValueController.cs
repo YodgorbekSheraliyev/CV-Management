@@ -21,8 +21,8 @@ namespace backend.Controllers
             _localizer = localizer;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllForUserId([FromQuery] int userId)
+        [HttpGet("{userId:int}")]
+        public async Task<IActionResult> GetAllForUserId(int userId)
         {
             try
             {
