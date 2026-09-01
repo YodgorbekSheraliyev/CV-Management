@@ -70,6 +70,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AttributeService>();
+builder.Services.AddScoped<AttributeValueService>();
 
 var app = builder.Build();
 app.UseCors(builder => builder

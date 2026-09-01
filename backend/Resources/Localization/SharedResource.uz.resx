@@ -168,4 +168,13 @@
   <data name="CannotUpdateBuiltInAttribute" xml:space="preserve">
     <value>O‘rnatilgan atributlarni yangilash mumkin emas.</value>
   </data>
+  <data name="UserIdRequired" xml:space="preserve">
+    <value>User Id kiritishi shart</value>
+  </data>
+  <data name="AttributeIdRequired" xml:space="preserve">
+    <value>Attribute Id kiritishi shart</value>
+  </data>
+  <data name="ValueRequired" xml:space="preserve">
+    <value>Qiymat kiritilishi kerak</value>
+  </data>
 </root>

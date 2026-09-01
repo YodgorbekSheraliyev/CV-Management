@@ -9,6 +9,7 @@ const MeSection = ({ user }: { user: User }) => {
         title="Me"
         description="Your basic personal information."
         buttonText="Edit"
+        onClick={() => {}}
       />
 
       <div className="card border-0 shadow-sm">

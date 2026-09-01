@@ -168,4 +168,13 @@
   <data name="CannotUpdateBuiltInAttribute" xml:space="preserve">
     <value>Built in attributes cannot be updated</value>
   </data>
+  <data name="UserIdRequired" xml:space="preserve">
+    <value>User Id is required</value>
+  </data>
+  <data name="AttributeIdRequired" xml:space="preserve">
+    <value>Attribute Id is required</value>
+  </data>
+  <data name="ValueRequired" xml:space="preserve">
+    <value>Value required</value>
+  </data>
 </root>
