@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.Dtos;
+using backend.Exceptions;
 using backend.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -16,9 +17,9 @@ namespace backend.Services
             _localizer = localizer;
         }
 
-        public async Task<List<AttributeDto>> GetAllAttributes()
+        public async Task<List<AttributeDto>> GetAll()
         {
-            return await _db.Attributes.Select(x => new AttributeDto
+            return await _db.Attributes.AsNoTracking().Select(x => new AttributeDto
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -27,6 +28,84 @@ namespace backend.Services
                 IsBuiltIn = x.IsBuiltIn,
                 Type = x.AttributeType
             }).ToListAsync();
+        }
+
+        public async Task<AttributeDto> GetById(int id)
+        {
+            var attribute = await _db.Attributes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (attribute is null)
+            {
+                throw new NotFoundException(_localizer["AttributeNotFound"]);
+            }
+            return new AttributeDto
+            {
+                Id = attribute.Id,
+                Name = attribute.Name,
+                Category = attribute.Category,
+                Description = attribute.Description,
+                IsBuiltIn = attribute.IsBuiltIn,
+                Type = attribute.AttributeType
+            };
+        }
+
+        public async Task<AttributeDto> Create(CreateAttributeDto createAttributeDto)
+        {
+            Models.Attribute attribute = new()
+            {
+                Name = createAttributeDto.Name,
+                AttributeType = createAttributeDto.Type,
+                Category = createAttributeDto.Category,
+                Description = createAttributeDto.Description
+            };
+            await _db.Attributes.AddAsync(attribute);
+            await _db.SaveChangesAsync();
+
+            return new AttributeDto
+            {
+                Id = attribute.Id,
+                Name = attribute.Name,
+                Category = attribute.Category,
+                Description = attribute.Description,
+                IsBuiltIn = attribute.IsBuiltIn,
+                Type = attribute.AttributeType
+            };
+        }
+
+        public async Task<AttributeDto> Update(UpdateAttributeDto updateAttributeDto)
+        {
+            Models.Attribute attribute = await _db.Attributes.FirstOrDefaultAsync(x => x.Id == updateAttributeDto.Id);
+            if (attribute is null)
+            {
+                throw new NotFoundException(_localizer["AttributeNotFound"]);
+            }
+
+            attribute.Name = updateAttributeDto.Name;
+            attribute.Category = updateAttributeDto.Category;
+            attribute.AttributeType = updateAttributeDto.Type;
+            attribute.Description = updateAttributeDto.Description;
+            await _db.SaveChangesAsync();
+
+            return new AttributeDto
+            {
+                Id = attribute.Id,
+                Name = attribute.Name,
+                Category = attribute.Category,
+                Description = attribute.Description,
+                IsBuiltIn = attribute.IsBuiltIn,
+                Type = attribute.AttributeType
+            };
+        }
+
+        public async Task<bool> Delete(DeleteAttributeDto deleteAttributeDto)
+        {
+            var attribute = await _db.Attributes.FirstOrDefaultAsync(x => x.Id == deleteAttributeDto.Id);
+            if (attribute is null)
+            {
+                throw new NotFoundException(_localizer["AttributeNotFound"]);
+            }
+            _db.Attributes.Remove(attribute);
+            await _db.SaveChangesAsync();
+            return true;
         }
 
     }

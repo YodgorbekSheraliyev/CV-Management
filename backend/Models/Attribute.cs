@@ -8,7 +8,7 @@ namespace backend.Models
         public string Name { get; set; }
         public AttributeType AttributeType{ get; set; }
         public AttributeCategory Category { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public bool IsBuiltIn { get; set; } = false;
 
     }

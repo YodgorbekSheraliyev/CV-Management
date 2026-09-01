@@ -147,4 +147,19 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>User not found</value>
   </data>
+  <data name="AttributeNotFound" xml:space="preserve">
+    <value>Attribute not found</value>
+  </data>
+  <data name="IdRequired" xml:space="preserve">
+    <value>Id of the model is required</value>
+  </data>
+  <data name="AttributeNameRequired" xml:space="preserve">
+    <value>Attribute Name is required</value>
+  </data>
+  <data name="AttributeCategoryRequired" xml:space="preserve">
+    <value>Attribute Category is required</value>
+  </data>
+  <data name="AttributeTypeRequired" xml:space="preserve">
+    <value>Attribute Type is required</value>
+  </data>
 </root>

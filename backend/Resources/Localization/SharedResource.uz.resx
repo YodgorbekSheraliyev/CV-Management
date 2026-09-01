@@ -147,4 +147,19 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>Foydalanuvchi topilmadi</value>
   </data>
+  <data name="AttributeNotFound" xml:space="preserve">
+    <value>Attribute topilmadi</value>
+  </data>
+  <data name="IdRequired" xml:space="preserve">
+    <value>Modelning id xossasi kiritilishi shart</value>
+  </data>
+  <data name="AttributeNameRequired" xml:space="preserve">
+    <value>Attribute nomi kiritilishi shart</value>
+  </data>
+  <data name="AttributeCategoryRequired" xml:space="preserve">
+    <value>Attribute kategoriyasi kiritilishi shart</value>
+  </data>
+  <data name="AttributeTypeRequired" xml:space="preserve">
+    <value>Attribute turi kiritilishi kerak</value>
+  </data>
 </root>
