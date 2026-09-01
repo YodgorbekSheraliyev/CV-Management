@@ -165,4 +165,7 @@
   <data name="AttributeAlreadyExists" xml:space="preserve">
     <value>Attribute allaqachon mavjud</value>
   </data>
+  <data name="CannotUpdateBuiltInAttribute" xml:space="preserve">
+    <value>O‘rnatilgan atributlarni yangilash mumkin emas.</value>
+  </data>
 </root>

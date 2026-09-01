@@ -8,7 +8,7 @@ using Microsoft.Extensions.Localization;
 
 namespace backend.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AttributeController : ControllerBase
@@ -83,6 +83,14 @@ namespace backend.Controllers
             {
                 var result = await _attributeService.Update(updateAttributeDto);
                 return Ok(CommonResponse<AttributeDto>.Ok(result));
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Unauthorized(CommonResponse<string>.Fail(e.Message));
+            }
+            catch (ConflictException e)
+            {
+                return BadRequest(CommonResponse<string>.Fail(e.Message));
             }
             catch (NotFoundException e)
             {

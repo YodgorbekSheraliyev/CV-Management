@@ -165,4 +165,7 @@
   <data name="AttributeAlreadyExists" xml:space="preserve">
     <value>Attribute already exists</value>
   </data>
+  <data name="CannotUpdateBuiltInAttribute" xml:space="preserve">
+    <value>Built in attributes cannot be updated</value>
+  </data>
 </root>

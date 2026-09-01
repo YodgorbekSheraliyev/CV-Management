@@ -82,6 +82,15 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
+            if (await _db.Attributes.AnyAsync(x => x.Name == updateAttributeDto.Name))
+            {
+                throw new ConflictException(_localizer["AttributeAlreadyExists"]);
+            }
+
+            if (attribute.IsBuiltIn)
+            {
+                throw new UnauthorizedAccessException(_localizer["CannotUpdateBuiltInAttribute"]);
+            }
 
             attribute.Name = updateAttributeDto.Name;
             attribute.Category = updateAttributeDto.Category;
