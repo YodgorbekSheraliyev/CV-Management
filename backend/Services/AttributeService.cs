@@ -82,7 +82,7 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
-            if (await _db.Attributes.AnyAsync(x => x.Name == updateAttributeDto.Name))
+            if (await _db.Attributes.AnyAsync(x => x.Name == updateAttributeDto.Name && x.Id != updateAttributeDto.Id))
             {
                 throw new ConflictException(_localizer["AttributeAlreadyExists"]);
             }
