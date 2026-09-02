@@ -180,4 +180,10 @@
   <data name="AttributeValueNotFound" xml:space="preserve">
     <value>Attribute Value topilmadi</value>
   </data>
+  <data name="AttributeOptionsRequired" xml:space="preserve">
+    <value>Attribute variantlarini kiritilishi kerak</value>
+  </data>
+  <data name="DuplicateDropdownOptions" xml:space="preserve">
+    <value>Dropdown takroriy bir xil qiymatga ega bo'la olmaydi</value>
+  </data>
 </root>

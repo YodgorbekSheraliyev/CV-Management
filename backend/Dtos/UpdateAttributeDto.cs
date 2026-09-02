@@ -15,5 +15,6 @@ namespace backend.Dtos
         [Required(ErrorMessage = "AttributeTypeRequired")]
         public AttributeType Type { get; set; }
         public string? Description { get; init; }
+        public List<string>? Options { get; set; }
     }
 }

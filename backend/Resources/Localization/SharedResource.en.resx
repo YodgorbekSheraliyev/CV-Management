@@ -180,4 +180,10 @@
   <data name="AttributeValueNotFound" xml:space="preserve">
     <value>Attribute Value not found</value>
   </data>
+  <data name="AttributeOptionsRequired" xml:space="preserve">
+    <value>Attribute Options required</value>
+  </data>
+  <data name="DuplicateDropdownOptions" xml:space="preserve">
+    <value>Dropdown cannot contain duplicate values</value>
+  </data>
 </root>

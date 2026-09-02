@@ -29,7 +29,6 @@ namespace backend.Controllers
             {
                 var result = await _attributeService.GetAll();
                 return Ok(CommonResponse<List<AttributeDto>>.Ok(result));
-
             }
             catch (Exception)
             {
@@ -64,8 +63,11 @@ namespace backend.Controllers
                 var result = await _attributeService.Create(createAttributeDto);
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, CommonResponse<AttributeDto>.Ok(result));
             }
-
             catch (ConflictException e)
+            {
+                return BadRequest(CommonResponse<string>.Fail(e.Message));
+            }
+            catch (InvalidOperationException e)
             {
                 return BadRequest(CommonResponse<string>.Fail(e.Message));
             }

@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.Dtos;
+using backend.enums;
 using backend.Exceptions;
 using backend.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,8 @@ namespace backend.Services
                 Description = x.Description,
                 Category = x.Category,
                 IsBuiltIn = x.IsBuiltIn,
-                Type = x.AttributeType
+                Type = x.AttributeType,
+                Options = x.Options
             }).ToListAsync();
         }
 
@@ -37,6 +39,7 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
+
             return new AttributeDto
             {
                 Id = attribute.Id,
@@ -44,7 +47,8 @@ namespace backend.Services
                 Category = attribute.Category,
                 Description = attribute.Description,
                 IsBuiltIn = attribute.IsBuiltIn,
-                Type = attribute.AttributeType
+                Type = attribute.AttributeType,
+                Options = attribute.Options
             };
         }
 
@@ -54,12 +58,23 @@ namespace backend.Services
             {
                 throw new ConflictException(_localizer["AttributeAlreadyExists"]);
             }
+
+            if (createAttributeDto.Type == AttributeType.Dropdown && createAttributeDto.Options is null)
+            {
+                throw new InvalidOperationException(_localizer["AttributeOptionsRequired"]);
+            }
+            if (createAttributeDto.Type == AttributeType.Dropdown && createAttributeDto.Options is not null)
+            {
+                if (createAttributeDto.Options.Distinct(StringComparer.OrdinalIgnoreCase).Count() != createAttributeDto.Options.Count)
+                    throw new InvalidOperationException(_localizer["DuplicateDropdownOptions"]);
+            }
             Models.Attribute attribute = new()
             {
                 Name = createAttributeDto.Name,
                 AttributeType = createAttributeDto.Type,
                 Category = createAttributeDto.Category,
-                Description = createAttributeDto.Description
+                Description = createAttributeDto.Description,
+                Options = createAttributeDto.Options
             };
             await _db.Attributes.AddAsync(attribute);
             await _db.SaveChangesAsync();
@@ -71,7 +86,8 @@ namespace backend.Services
                 Category = attribute.Category,
                 Description = attribute.Description,
                 IsBuiltIn = attribute.IsBuiltIn,
-                Type = attribute.AttributeType
+                Type = attribute.AttributeType,
+                Options = attribute.Options
             };
         }
 
@@ -87,6 +103,16 @@ namespace backend.Services
                 throw new ConflictException(_localizer["AttributeAlreadyExists"]);
             }
 
+            if (updateAttributeDto.Type == AttributeType.Dropdown && updateAttributeDto.Options is null)
+            {
+                throw new InvalidOperationException(_localizer["AttributeOptionsRequired"]);
+            }
+            if (updateAttributeDto.Type == AttributeType.Dropdown && updateAttributeDto.Options is not null)
+            {
+                if (updateAttributeDto.Options.Distinct(StringComparer.OrdinalIgnoreCase).Count() != updateAttributeDto.Options.Count)
+                    throw new InvalidOperationException(_localizer["DuplicateDropdownOptions"]);
+            }
+
             if (attribute.IsBuiltIn)
             {
                 throw new UnauthorizedAccessException(_localizer["CannotUpdateBuiltInAttribute"]);
@@ -96,6 +122,7 @@ namespace backend.Services
             attribute.Category = updateAttributeDto.Category;
             attribute.AttributeType = updateAttributeDto.Type;
             attribute.Description = updateAttributeDto.Description;
+            attribute.Options = updateAttributeDto.Options ?? [];
             await _db.SaveChangesAsync();
 
             return new AttributeDto
@@ -105,7 +132,8 @@ namespace backend.Services
                 Category = attribute.Category,
                 Description = attribute.Description,
                 IsBuiltIn = attribute.IsBuiltIn,
-                Type = attribute.AttributeType
+                Type = attribute.AttributeType,
+                Options = attribute.Options
             };
         }
 

@@ -10,6 +10,7 @@ namespace backend.Models
         public AttributeCategory Category { get; set; }
         public string? Description { get; set; }
         public bool IsBuiltIn { get; set; } = false;
+        public List<string>? Options { get; set; }
 
     }
 }

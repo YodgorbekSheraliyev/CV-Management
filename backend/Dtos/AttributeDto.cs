@@ -10,5 +10,6 @@ namespace backend.Dtos
         public AttributeType Type { get; init; }
         public string? Description { get; init; }
         public bool IsBuiltIn { get; init; }
+        public List<string>? Options { get; init; }
     }
 }
