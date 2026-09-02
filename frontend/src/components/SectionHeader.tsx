@@ -1,11 +1,15 @@
+import type { MouseEvent } from "react";
+
 const SectionHeader = ({
   title,
   description,
   buttonText,
+  onClick,
 }: {
   title: string;
   description: string;
   buttonText?: string;
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
 }) => {
   return (
     <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -14,7 +18,11 @@ const SectionHeader = ({
         <p className="text-muted small mb-0">{description}</p>
       </div>
 
-      {buttonText && <button className="btn btn-primary">{buttonText}</button>}
+      {buttonText && (
+        <button onClick={onClick} className="btn btn-primary">
+          {buttonText}
+        </button>
+      )}
     </div>
   );
 };

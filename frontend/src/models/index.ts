@@ -18,9 +18,9 @@ export interface User {
 export interface Attribute {
   id: number;
   name: string;
-  attributeType: AttributeType;
   category: AttributeCategory;
-  description: string;
+  type: AttributeType;
+  description?: string;
   isBuiltIn: boolean;
 }
 

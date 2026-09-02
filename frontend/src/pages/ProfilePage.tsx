@@ -2,6 +2,7 @@ import { useState } from "react";
 import NavBar from "../components/NavBar";
 import { useAuth } from "../hooks/auth";
 import MeSection from "../components/MeSection";
+import InfoSection from "../components/InfoSection";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -40,8 +41,7 @@ const ProfilePage = () => {
 
               <div className="flex-grow-1">
                 <h2 className="h4 fw-bold mb-1">
-                  {user?.firstName}
-                  {user?.lastName}
+                  {user?.firstName} {user?.lastName}
                 </h2>
 
                 <p className="text-muted mb-2">Software Engineer</p>
@@ -54,7 +54,7 @@ const ProfilePage = () => {
 
                   <span>
                     <i className="bi bi-envelope me-1" />
-                    john@example.com
+                    {user?.email}
                   </span>
                 </div>
               </div>
@@ -107,7 +107,7 @@ const ProfilePage = () => {
         </div>
 
         {activeTab == "me" && user && <MeSection user={user} />}
-        {activeTab == "info" && <div>info</div>}
+        {activeTab == "info" && <InfoSection />}
         {activeTab == "projects" && <div>projects</div>}
         {activeTab == "cvs" && <div>cvs</div>}
       </main>
