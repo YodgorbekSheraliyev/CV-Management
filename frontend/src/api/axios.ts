@@ -22,6 +22,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<CommonResponse<unknown>>) => {
+    if(!error.response){
+      throw new Error("The server is unavailable. Please check your connection or try again later.")
+    }
     throw new Error(error.response?.data.error);
   },
 );

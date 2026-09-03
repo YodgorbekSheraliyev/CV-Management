@@ -22,6 +22,7 @@ export interface Attribute {
   type: AttributeType;
   description?: string;
   isBuiltIn: boolean;
+  options?: string[];
 }
 
 export interface AttributeValue {
@@ -30,6 +31,7 @@ export interface AttributeValue {
   attributeId: number;
   value: string;
   attribute: Attribute;
+  periodEnd?: string;
 }
 
 export interface CV {

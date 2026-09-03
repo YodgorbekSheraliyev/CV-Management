@@ -186,4 +186,13 @@
   <data name="DuplicateDropdownOptions" xml:space="preserve">
     <value>Dropdown cannot contain duplicate values</value>
   </data>
+  <data name="PeriodStartInvalid" xml:space="preserve">
+    <value>The start date is not a valid date.</value>
+  </data>
+  <data name="PeriodEndInvalid" xml:space="preserve">
+    <value>The end date is not a valid date.</value>
+  </data>
+  <data name="PeriodEndBeforeStart" xml:space="preserve">
+    <value>The end date cannot be before the start date.</value>
+  </data>
 </root>

@@ -1,35 +1,13 @@
 import { useMemo, useState } from "react";
 import type { Attribute } from "../models";
-import { AttributeCategory, AttributeType } from "../enums/enums";
+import { AttributeCategory } from "../enums/enums";
+import { ATTRIBUTE_TYPE_LABELS, CATEGORY_LABELS } from "../constants";
 
 interface AttributePickerModalProps {
   attributes: Attribute[];
   onSelect: (attribute: Attribute) => void;
   onClose: () => void;
 }
-
-const CATEGORY_LABELS: Record<AttributeCategory, string> = {
-  [AttributeCategory.Certification]: "Certification",
-  [AttributeCategory.DomainKnowledge]: "Domain Knowledge",
-  [AttributeCategory.PersonalInformation]: "Personal Information",
-  [AttributeCategory.SoftSkills]: "Soft Skills",
-  [AttributeCategory.TechnicalSkills]: "Technical Skills",
-  [AttributeCategory.Education]: "Education",
-  [AttributeCategory.WorkAuthorization]: "Work Authorization",
-  [AttributeCategory.WorkPreference]: "Work Preference",
-  [AttributeCategory.Salary]: "Salary",
-};
-
-const ATTRIBUTE_TYPE_LABELS: Record<AttributeType, string> = {
-  [AttributeType.String]: "String",
-  [AttributeType.Text]: "Text",
-  [AttributeType.Image]: "Image",
-  [AttributeType.Numeric]: "Numeric",
-  [AttributeType.Date]: "Date",
-  [AttributeType.Period]: "Period",
-  [AttributeType.Boolean]: "Boolean",
-  [AttributeType.Dropdown]: "Dropdown",
-};
 
 const RECENT_ATTRIBUTE_IDS = [1, 3, 5];
 
@@ -39,8 +17,7 @@ export default function AttributePickerModal({
   onClose,
 }: AttributePickerModalProps) {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<
-    AttributeCategory | "all"
+  const [category, setCategory] = useState<AttributeCategory | "all"
   >("all");
 
   const recentlyUsed = useMemo(() => {
@@ -121,7 +98,7 @@ export default function AttributePickerModal({
           <div className="px-4 pt-3">
             <div className="input-group">
               <span className="input-group-text bg-white">
-                🔍
+                <i className="bi bi-search"/>
               </span>
 
               <input

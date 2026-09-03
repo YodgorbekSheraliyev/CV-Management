@@ -1,10 +1,12 @@
-﻿using backend.Models;
-using backend.Data;
+﻿using backend.Data;
 using backend.Dtos;
+using backend.enums;
 using backend.Exceptions;
 using backend.Localization;
+using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using System.Text.Json;
 
 namespace backend.Services
 {
@@ -51,11 +53,39 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
+            string valueToStore = createAttributeValueDto.Value;
+            if (attribute.AttributeType == AttributeType.Period)
+            {
+                if (!DateTime.TryParse(createAttributeValueDto.Value, out var start))
+                {
+                    throw new InvalidDataException(_localizer["PeriodStartInvalid"]);
+                }
+
+                DateTime? end = null;
+                if (createAttributeValueDto.PeriodEnd is not null)
+                {
+                    if (!DateTime.TryParse(createAttributeValueDto.PeriodEnd, out var parsedEnd))
+                    {
+                        throw new InvalidDataException(_localizer["PeriodEndInvalid"]);
+                    }
+                    end = parsedEnd;
+
+                    if (end < start)
+                    {
+                        throw new InvalidDataException(_localizer["PeriodEndBeforeStart"]);
+                    }
+
+
+                    valueToStore = JsonSerializer.Serialize(new { start = createAttributeValueDto.Value, end = createAttributeValueDto.PeriodEnd });
+                }
+
+            }
+
             AttributeValue attributeValue = new AttributeValue
             {
                 AttributeId = createAttributeValueDto.AttributeId,
                 UserId = createAttributeValueDto.UserId,
-                Value = createAttributeValueDto.Value
+                Value = valueToStore
             };
 
             await _db.AttributeValues.AddAsync(attributeValue);
@@ -81,15 +111,42 @@ namespace backend.Services
 
         public async Task<AttributeValueDto> Update(UpdateAttributeValueDto updateAttributeValueDto)
         {
-            AttributeValue attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(x => x.Id == updateAttributeValueDto.Id);
+            AttributeValue attributeValue = await _db.AttributeValues.Include(x => x.Attribute).FirstOrDefaultAsync(x => x.UserId == updateAttributeValueDto.UserId && x.AttributeId == updateAttributeValueDto.AttributeId);
             if (attributeValue is null)
             {
                 throw new NotFoundException(_localizer["AttributeValueNotFound"]);
             }
+            string valueToStore = updateAttributeValueDto.Value;
+            if (attributeValue.Attribute.AttributeType == AttributeType.Period)
+            {
+                if (!DateTime.TryParse(updateAttributeValueDto.Value, out var start))
+                {
+                    throw new InvalidDataException(_localizer["PeriodStartInvalid"]);
+                }
+
+                DateTime? end = null;
+                if (updateAttributeValueDto.PeriodEnd is not null)
+                {
+                    if (!DateTime.TryParse(updateAttributeValueDto.PeriodEnd, out var parsedEnd))
+                    {
+                        throw new InvalidDataException(_localizer["PeriodEndInvalid"]);
+                    }
+                    end = parsedEnd;
+
+                    if (end < start)
+                    {
+                        throw new InvalidDataException(_localizer["PeriodEndBeforeStart"]);
+                    }
+
+
+                    valueToStore = JsonSerializer.Serialize(new { start = updateAttributeValueDto.Value, end = updateAttributeValueDto.PeriodEnd });
+                }
+
+            }
 
             attributeValue.UserId = updateAttributeValueDto.UserId;
             attributeValue.AttributeId = updateAttributeValueDto.AttributeId;
-            attributeValue.Value = updateAttributeValueDto.Value;
+            attributeValue.Value = valueToStore;
             await _db.SaveChangesAsync();
             return new AttributeValueDto
             {

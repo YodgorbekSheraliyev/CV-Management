@@ -1,0 +1,35 @@
+.description-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.description-tooltip-text {
+  position: absolute;
+  bottom: 80%;
+  width: 30vw;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+
+  background: white;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  border-radius: 15px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  font-size: 14px;
+  line-height: 1.4;
+
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+
+  transition: all 0.2s ease;
+}
+
+.description-tooltip:hover .description-tooltip-text {
+    opacity: 1;
+    display: block;
+    transition: all 2.2s ease;
+}

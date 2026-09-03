@@ -47,6 +47,10 @@ namespace backend.Controllers
             {
                 return NotFound(CommonResponse<string>.Fail(e.Message));
             }
+            catch (InvalidDataException e)
+            {
+                return BadRequest(CommonResponse<string>.Fail(e.Message));
+            }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
@@ -64,6 +68,10 @@ namespace backend.Controllers
             catch (NotFoundException e)
             {
                 return NotFound(CommonResponse<string>.Fail(e.Message));
+            }
+            catch (InvalidDataException e)
+            {
+                return BadRequest(CommonResponse<string>.Fail(e.Message));
             }
             catch (Exception)
             {

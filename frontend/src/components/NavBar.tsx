@@ -127,10 +127,6 @@ const NavBar = () => {
                     {user.firstName?.[0]}
                     {user.lastName?.[0]}
                   </div>
-
-                  <span className="d-none d-md-inline fw-semibold">
-                    {user.firstName} {user.lastName}
-                  </span>
                 </Link>
 
                 <button

@@ -186,4 +186,13 @@
   <data name="DuplicateDropdownOptions" xml:space="preserve">
     <value>Dropdown takroriy bir xil qiymatga ega bo'la olmaydi</value>
   </data>
+  <data name="PeriodStartInvalid" xml:space="preserve">
+    <value>Boshlanish sanasi noto'g'ri formatda.</value>
+  </data>
+  <data name="PeriodEndInvalid" xml:space="preserve">
+    <value>Tugash sanasi noto'g'ri formatda.</value>
+  </data>
+  <data name="PeriodEndBeforeStart" xml:space="preserve">
+    <value>Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas.</value>
+  </data>
 </root>

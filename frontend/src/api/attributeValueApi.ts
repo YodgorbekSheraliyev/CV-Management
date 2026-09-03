@@ -19,17 +19,19 @@ export const createAttributeValue = async (
 };
 
 export const updateAttributeValue = async (
-  attribute: Omit<AttributeValue, "attribute">,
+  attributeValue: Omit<AttributeValue, "id" | "attribute">,
 ) => {
-  const { data: response } = await api.post<CommonResponse<AttributeValue>>(
+  const { data: response } = await api.put<CommonResponse<AttributeValue>>(
     `/attributevalue`,
-    attribute,
+    attributeValue,
   );
   return response.data;
 };
 
 export const deleteAttributeValue = async (
-  attribute: Pick<AttributeValue, "id">,
+  attributeValue: Pick<AttributeValue, "id">,
 ) => {
-  await api.post<void>(`/attributevalue`, attribute);
+  await api.delete<void>(`/attributevalue`, {
+    data: attributeValue
+  });
 };

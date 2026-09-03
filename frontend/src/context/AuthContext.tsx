@@ -18,6 +18,8 @@ interface DecodedType {
 export interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
+
   login: ({
     email,
     password,
@@ -44,6 +46,7 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const restoreUser = async () => {
@@ -52,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!token) {
         setIsAuthenticated(false);
         setUser(null);
+        setIsLoading(false);
         return;
       }
 
@@ -74,6 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(TOKEN_KEY);
         setUser(null);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -134,9 +140,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const currentUser = await getUser(
       Number(
-        decoded[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ],
+      decoded[
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+      ],
       ),
     );
 
@@ -159,11 +165,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       isAuthenticated,
+      isLoading,
       login,
       register,
       logout,
     }),
-    [user, isAuthenticated],
+    [user, isAuthenticated, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -108,15 +108,20 @@ function ValueField({
     case AttributeType.Period:
       return (
         <div className="value-field">
-          <div className="row g-3 align-items-end">
+          <div className="row g-2 align-items-end">
             <div className="col-12 col-sm-5">
-              <label className="form-label small fw-semibold text-muted">
+              <label className="form-label small fw-semibold text-muted mb-1">
                 Start date
               </label>
 
               <input
                 type="date"
-                className="form-control form-control-lg"
+                className="form-control"
+                style={{
+                  height: "40px",
+                  fontSize: "14px",
+                  borderRadius: "8px",
+                }}
                 value={period.start}
                 onChange={(e) =>
                   onPeriodChange({
@@ -128,18 +133,23 @@ function ValueField({
               />
             </div>
 
-            <div className="col-12 col-sm-2 text-center d-none d-sm-block">
-              <span className="text-muted fs-5">→</span>
+            <div className="col-12 col-sm-2 d-none d-sm-flex justify-content-center align-items-center pb-1">
+              <span className="text-muted">→</span>
             </div>
 
             <div className="col-12 col-sm-5">
-              <label className="form-label small fw-semibold text-muted">
+              <label className="form-label small fw-semibold text-muted mb-1">
                 End date
               </label>
 
               <input
                 type="date"
-                className="form-control form-control-lg"
+                className="form-control"
+                style={{
+                  height: "40px",
+                  fontSize: "14px",
+                  borderRadius: "8px",
+                }}
                 value={period.end}
                 min={period.start || undefined}
                 onChange={(e) =>

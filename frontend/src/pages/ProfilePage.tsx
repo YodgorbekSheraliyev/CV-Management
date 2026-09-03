@@ -106,8 +106,8 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {activeTab == "me" && user && <MeSection user={user} />}
-        {activeTab == "info" && <InfoSection />}
+        {activeTab == "me" &&  <MeSection user={user!} />}
+        {activeTab == "info" && <InfoSection user={user!} />}
         {activeTab == "projects" && <div>projects</div>}
         {activeTab == "cvs" && <div>cvs</div>}
       </main>
