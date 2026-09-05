@@ -44,13 +44,12 @@ const ProfilePage = () => {
                   {user?.firstName} {user?.lastName}
                 </h2>
 
-                <p className="text-muted mb-2">Software Engineer</p>
-
-                <div className="d-flex flex-wrap gap-3 text-muted small">
+                <div className="text-muted small">
                   <span>
                     <i className="bi bi-geo-alt me-1" />
                     Tashkent, Uzbekistan
                   </span>
+                  <br/>
 
                   <span>
                     <i className="bi bi-envelope me-1" />
