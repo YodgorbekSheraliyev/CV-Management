@@ -1,0 +1,71 @@
+﻿using backend.Dtos;
+using backend.Dtos.Position;
+using backend.Exceptions;
+using backend.Localization;
+using backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using System.Security.Claims;
+
+namespace backend.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "Recruiter,Administrator")]
+    public class PositionsController : ControllerBase
+    {
+        private readonly PositionService _positionService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
+
+        public PositionsController(PositionService positionService, IStringLocalizer<SharedResource> localizer)
+        {
+            _positionService = positionService;
+            _localizer = localizer;
+        }
+
+        [HttpGet("all")]
+        [Authorize(Roles = "Recruiter,Administrator,Candidate")]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _positionService.GetAll();
+            return Ok(CommonResponse<List<PositionSummaryDto>>.Ok(result));
+        }
+
+        [HttpGet("{positionId:int}/{userId:int}")]
+        [Authorize(Roles = "Recruiter,Administrator,Candidate")]
+        public async Task<IActionResult> GetById(int positionId, int userId)
+        {
+            var result = await _positionService.GetById(positionId, userId);
+            return Ok(CommonResponse<PositionDto>.Ok(result));
+        }
+
+        [HttpPost("{userId:int}")]
+        public async Task<IActionResult> Create(CreatePositionDto dto, int userId)
+        {
+            var result = await _positionService.Create(dto, userId);
+            return Ok(CommonResponse<PositionDto>.Ok(result));
+        }
+
+        [HttpPut("{userId:int}")]
+        public async Task<IActionResult> Update(UpdatePositionDto dto, int userId)
+        {
+            var result = await _positionService.Update(dto, userId);
+            return Ok(CommonResponse<PositionDto>.Ok(result));
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(DeletePositionDto dto)
+        {
+            await _positionService.Delete(dto);
+            return NoContent();
+        }
+
+        [HttpPost("{id}/duplicate/{userId}")]
+        public async Task<IActionResult> Duplicate(int id, int userId)
+        {
+            var result = await _positionService.Duplicate(id, userId);
+            return Ok(CommonResponse<PositionDto>.Ok(result));
+        }
+    }
+}

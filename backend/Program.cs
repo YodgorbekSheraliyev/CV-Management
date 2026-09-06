@@ -1,3 +1,4 @@
+using backend;
 using backend.Data;
 using backend.Dtos;
 using backend.Localization;
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddCors();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,6 +75,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AttributeService>();
 builder.Services.AddScoped<AttributeValueService>();
 builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<PositionService>();
 
 var app = builder.Build();
 app.UseCors(builder => builder
@@ -87,6 +91,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 //app.UseHttpsRedirection();
+app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
