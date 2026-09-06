@@ -1,9 +1,9 @@
 ﻿using backend.enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.Dtos
+namespace backend.Dtos.AttributeValue
 {
-    public class CreateAttributeValueDto
+    public class UpdateAttributeValueDto
     {
         [Required(ErrorMessage = "UserIdRequired")]
         public int UserId { get; set; }

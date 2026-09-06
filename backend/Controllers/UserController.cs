@@ -1,4 +1,5 @@
 ﻿using backend.Dtos;
+using backend.Dtos.User;
 using backend.Exceptions;
 using backend.Localization;
 using backend.Models;
@@ -30,6 +31,24 @@ namespace backend.Controllers
             try
             {
                 var user = await _userService.GetUserById(userId);
+                return Ok(CommonResponse<UserDto>.Ok(user));
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(CommonResponse<string>.Fail(e.Message));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
+            }
+        }
+
+        [HttpPut("{userId:int}")]
+        public async Task<IActionResult> UpdateUserProfile(int userId, [FromBody] UpdateUserDto updateUserDto)
+        {
+            try
+            {
+                var user = await _userService.Update(userId, updateUserDto);
                 return Ok(CommonResponse<UserDto>.Ok(user));
             }
             catch (NotFoundException e)

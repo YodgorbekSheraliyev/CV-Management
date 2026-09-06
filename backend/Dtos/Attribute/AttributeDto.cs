@@ -1,6 +1,6 @@
 ﻿using backend.enums;
 
-namespace backend.Dtos
+namespace backend.Dtos.Attribute
 {
     public class AttributeDto
     {

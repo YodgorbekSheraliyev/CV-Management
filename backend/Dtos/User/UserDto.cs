@@ -1,7 +1,7 @@
 ﻿using backend.enums;
 using backend.Models;
 
-namespace backend.Dtos
+namespace backend.Dtos.User
 {
     public class UserDto
     {

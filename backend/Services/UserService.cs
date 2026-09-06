@@ -1,5 +1,5 @@
 ﻿using backend.Data;
-using backend.Dtos;
+using backend.Dtos.User;
 using backend.enums;
 using backend.Exceptions;
 using backend.Localization;
@@ -58,6 +58,39 @@ namespace backend.Services
             };
 
             return userDto;
+        }
+
+        public async Task<UserDto> Update(int userId, UpdateUserDto updateUserDto)
+        {
+            User user = await _db.Users.FirstOrDefaultAsync(X => X.Id == userId);
+            if (user is null)
+            {
+
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+
+            var attributeValues = await _db.AttributeValues
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+            if (updateUserDto.FirstName is not null)
+            {
+                var firstName = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.FirstName);
+                firstName.Value = updateUserDto.FirstName;
+
+            }
+            if (updateUserDto.LastName is not null)
+            {
+                var lastName = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.LastName);
+                lastName.Value = updateUserDto.LastName;
+            }
+            if (updateUserDto.Location is not null)
+            {
+                var location = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.Location);
+                location.Value = updateUserDto.FirstName;
+            }
+
+            await _db.SaveChangesAsync();
+            return await GetUserById(userId);
         }
     }
 }

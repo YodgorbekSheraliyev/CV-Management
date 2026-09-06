@@ -1,4 +1,5 @@
 ﻿using backend.Dtos;
+using backend.Dtos.Auth;
 using backend.Localization;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;

@@ -71,6 +71,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AttributeService>();
 builder.Services.AddScoped<AttributeValueService>();
+builder.Services.AddScoped<ProjectService>();
 
 var app = builder.Build();
 app.UseCors(builder => builder

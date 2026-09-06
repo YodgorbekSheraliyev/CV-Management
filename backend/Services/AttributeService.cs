@@ -1,5 +1,5 @@
 ﻿using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Attribute;
 using backend.enums;
 using backend.Exceptions;
 using backend.Localization;

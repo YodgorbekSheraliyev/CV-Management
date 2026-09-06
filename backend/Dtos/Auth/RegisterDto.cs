@@ -1,7 +1,7 @@
 ﻿using backend.enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.Dtos
+namespace backend.Dtos.Auth
 {
     public class RegisterDto
     {

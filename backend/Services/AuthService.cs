@@ -1,5 +1,5 @@
 ﻿using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Auth;
 using backend.enums;
 using backend.Localization;
 using backend.Models;

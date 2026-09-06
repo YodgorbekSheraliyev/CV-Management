@@ -1,20 +1,17 @@
 ﻿using backend.enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.Dtos
+namespace backend.Dtos.Attribute
 {
-    public class UpdateAttributeDto
+    public class CreateAttributeDto
     {
-        [Required(ErrorMessage ="IdRequired")]
-        public int Id { get; set; }
         [Required(ErrorMessage = "AttributeNameRequired")]
         public string Name { get; init; }
-
         [Required(ErrorMessage = "AttributeCategoryRequired")]
         public AttributeCategory Category { get; init; }
         [Required(ErrorMessage = "AttributeTypeRequired")]
-        public AttributeType Type { get; set; }
+        public AttributeType Type { get; init; }
         public string? Description { get; init; }
-        public List<string>? Options { get; set; }
+        public List<string>? Options { get; init; }
     }
 }

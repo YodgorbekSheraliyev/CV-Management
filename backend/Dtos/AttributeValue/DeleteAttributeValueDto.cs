@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace backend.Dtos
+namespace backend.Dtos.AttributeValue
 {
     public class DeleteAttributeValueDto
     {

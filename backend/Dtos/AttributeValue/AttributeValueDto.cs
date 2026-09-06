@@ -1,4 +1,6 @@
-﻿namespace backend.Dtos
+﻿using backend.Dtos.Attribute;
+
+namespace backend.Dtos.AttributeValue
 {
     public class AttributeValueDto
     {

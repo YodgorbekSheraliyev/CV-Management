@@ -10,6 +10,7 @@ const ProfilePage = () => {
   const { user } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>("me");
+  const handleEditProfile = async () => {};
 
   return (
     <div className="min-vhx-100 bg-light">
@@ -49,7 +50,7 @@ const ProfilePage = () => {
                     <i className="bi bi-geo-alt me-1" />
                     Tashkent, Uzbekistan
                   </span>
-                  <br/>
+                  <br />
 
                   <span>
                     <i className="bi bi-envelope me-1" />
@@ -58,7 +59,7 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <button className="btn btn-outline-primary">Edit profile</button>
+              <button onClick={handleEditProfile} className="btn btn-outline-primary">Edit profile</button>
             </div>
           </div>
         </div>
@@ -105,7 +106,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {activeTab == "me" &&  <MeSection user={user!} />}
+        {activeTab == "me" && <MeSection user={user!} />}
         {activeTab == "info" && <InfoSection user={user!} />}
         {activeTab == "projects" && <div>projects</div>}
         {activeTab == "cvs" && <div>cvs</div>}
