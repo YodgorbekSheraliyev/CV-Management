@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar";
 import { useAuth } from "../hooks/auth";
 import MeSection from "../components/MeSection";
 import InfoSection from "../components/InfoSection";
+import ProjectsSection from "../components/ProjectsSection";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -108,7 +109,7 @@ const ProfilePage = () => {
 
         {activeTab == "me" && <MeSection user={user!} />}
         {activeTab == "info" && <InfoSection user={user!} />}
-        {activeTab == "projects" && <div>projects</div>}
+        {activeTab == "projects" && <ProjectsSection/>}
         {activeTab == "cvs" && <div>cvs</div>}
       </main>
     </div>

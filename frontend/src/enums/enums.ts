@@ -34,3 +34,8 @@ export enum ComparisonType {
   GreaterThanOrEqual,
   Equal,
 }
+
+export enum CVStatus {
+  Draft,
+  Published,
+}

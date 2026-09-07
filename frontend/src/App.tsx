@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import RequireAuth from "./components/RequireAuth";
 import PositionsPage from "./pages/PositionsPage";
 import PositionPage from "./pages/PositionPage";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/positions/:id" element={<PositionPage />} />
         <Route path="/positions" element={<PositionsPage />} />
-        <Route path="/" element={<ProfilePage />} />
+        <Route path="/" element={<MainPage />} />
       </Route>
     </Routes>
   );

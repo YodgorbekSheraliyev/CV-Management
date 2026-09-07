@@ -3,10 +3,9 @@ import NavBar from "../components/NavBar";
 import type { Position } from "../models";
 import { ComparisonType } from "../enums/enums";
 import { useAuth } from "../hooks/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { CommonResponse } from "../api/axios";
 
-// Backend's ComparisonType enum: LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual, Equal
-// (mirrors the C# enum member names exactly) — adjust this map if your enums.ts names differ.
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
   [ComparisonType.GreaterThan]: ">",
@@ -22,140 +21,67 @@ const PositionPage = () => {
   const isRecruiterOrAdmin = role === "Recruiter" || role === "Administrator";
   const isCandidate = role === "Candidate";
   const [position, setPosition] = useState<Position | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data — replace with API data later. Shaped exactly as `Position` from models.ts,
-  // no invented fields (no Company/Level/createdAt/updatedAt — none of those exist on the
-  // backend model). `accessible` below is intentionally NOT part of Position: it's a
-  // per-viewer computed result (depends on the current candidate's attribute values), not
-  // a property of the position entity itself, so it's kept as a separate mock value.
-  setPosition({
-    id: Number(id ?? 1),
-    title: "Senior Frontend Developer",
-    description:
-      "Build modern and scalable web applications for our recruitment platform, working closely with designers, backend engineers and product managers.",
-    isPublic: true,
-    maxProjects: 3,
-    tags: [
-      { id: 1, name: "React" },
-      { id: 2, name: "TypeScript" },
-      { id: 3, name: "Node.js" },
-      { id: 4, name: "PostgreSQL" },
-    ],
-    attributes: [
-      {
-        id: 1,
-        name: "IELTS Score",
-        type: "Numeric" as any,
-        category: "PersonalInformation" as any,
-        isBuiltIn: false,
-      },
-      {
-        id: 2,
-        name: "Presentation Skills",
-        type: "Dropdown" as any,
-        category: "SoftSkills" as any,
-        isBuiltIn: false,
-        options: ["Basic", "Intermediate", "Advanced"],
-      },
-      {
-        id: 3,
-        name: "Remote Work Availability",
-        type: "Boolean" as any,
-        category: "WorkPreference" as any,
-        isBuiltIn: false,
-      },
-      {
-        id: 4,
-        name: "Years of Experience",
-        type: "Numeric" as any,
-        category: "DomainKnowledge" as any,
-        isBuiltIn: false,
-      },
-    ],
-    positionAccessRules: [
-      {
-        id: 1,
-        positionId: Number(id ?? 1),
-        attributeId: 1,
-        comparisonType: ComparisonType.GreaterThan,
-        value: "7.0",
-        attribute: {
-          id: 1,
-          name: "IELTS Score",
-          type: "Numeric" as any,
-          category: "PersonalInformation" as any,
-          isBuiltIn: false,
-        },
-      },
-      {
-        id: 2,
-        positionId: Number(id ?? 1),
-        attributeId: 3,
-        comparisonType: ComparisonType.Equal,
-        value: "true",
-        attribute: {
-          id: 3,
-          name: "Remote Work Availability",
-          type: "Boolean" as any,
-          category: "WorkPreference" as any,
-          isBuiltIn: false,
-        },
-      },
-      {
-        id: 3,
-        positionId: Number(id ?? 1),
-        attributeId: 2,
-        comparisonType: ComparisonType.Equal,
-        value: "Advanced",
-        attribute: {
-          id: 2,
-          name: "Presentation Skills",
-          type: "Dropdown" as any,
-          category: "SoftSkills" as any,
-          isBuiltIn: false,
-          options: ["Basic", "Intermediate", "Advanced"],
-        },
-      },
-    ],
-    cvs: new Array(86)
-      .fill(null)
-      .map((_, i) => ({ id: i, userId: i, likes: [] }) as any), // stand-in for a real count until an endpoint exists
-    discussion: {
-      id: 1,
-      positionId: Number(id ?? 1),
-      posts: [
-        {
-          id: 1,
-          authorId: 10,
-          authorName: "Sarah Johnson",
-          content:
-            "We're particularly interested in candidates with strong experience building large React applications.",
-          createdAt: new Date().toISOString(),
-          discussionId: 1,
-        } as any,
-        {
-          id: 2,
-          authorId: 20,
-          authorName: "Michael Smith",
-          content:
-            "Would experience with Next.js also be considered for this position?",
-          createdAt: new Date().toISOString(),
-          discussionId: 1,
-        } as any,
-        {
-          id: 3,
-          authorId: 10,
-          authorName: "Sarah Johnson",
-          content:
-            "Yes. Next.js experience is definitely relevant for this position.",
-          createdAt: new Date().toISOString(),
-          discussionId: 1,
-        } as any,
-      ],
-    } as any,
-  })
+  // Fetching belongs in an effect, not the render body — calling a state setter
+  // directly while rendering causes an immediate re-render, which calls it again,
+  // forever. This also means `position` can genuinely be null on first render,
+  // so every read below needs to handle that (see the loading/error guards).
+  useEffect(() => {
+    if (!id) return;
 
-  // Not on the Position model — computed server-side per viewer, kept separate on purpose.
+    setLoading(true);
+    setError(null);
+
+    const token = localStorage.getItem("token");
+    fetch(`/api/positions/${id}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((body: CommonResponse<Position>) => {
+        if (body.error) {
+          throw new Error(body.error ?? "Couldn't load this position.");
+        }
+        setPosition(body.data);
+      })
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : "Couldn't load this position.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-vh-100 bg-light">
+        <NavBar />
+        <main className="container py-5 text-center text-muted">
+          Loading position…
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !position) {
+    return (
+      <div className="min-vh-100 bg-light">
+        <NavBar />
+        <main className="container py-5 text-center">
+          <p className="text-danger mb-3">{error ?? "Position not found."}</p>
+          <Link to="/positions" className="btn btn-outline-secondary">
+            Back to positions
+          </Link>
+        </main>
+      </div>
+    );
+  }
+
+  // Not on the Position model — computed server-side per viewer (the backend's
+  // GetById already throws ForbiddenException if a Candidate can't access a
+  // restricted position, so reaching this point at all implies access — this
+  // flag is purely for the "Your access" panel copy, not a real permission gate).
   const accessible = true;
   const cvCount = position.cvs?.length ?? 0;
 
@@ -164,7 +90,6 @@ const PositionPage = () => {
       <NavBar />
 
       <main className="container py-4 py-md-5">
-        {/* Breadcrumb */}
         <nav aria-label="breadcrumb" className="mb-4">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
@@ -183,7 +108,6 @@ const PositionPage = () => {
           </ol>
         </nav>
 
-        {/* Position Header */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4 p-md-5">
             <div className="d-flex flex-column flex-lg-row justify-content-between gap-4">
@@ -235,11 +159,8 @@ const PositionPage = () => {
           </div>
         </section>
 
-        {/* Main content */}
         <div className="row g-4">
-          {/* Left column */}
           <div className="col-lg-8">
-            {/* Access requirements — from position.positionAccessRules */}
             {position.positionAccessRules.length > 0 && (
               <section className="card border-0 shadow-sm mb-4">
                 <div className="card-body p-0">
@@ -290,7 +211,6 @@ const PositionPage = () => {
               </section>
             )}
 
-            {/* Attributes included in the generated CV — position.attributes, the full set */}
             <section className="card border-0 shadow-sm mb-4">
               <div className="card-body p-0">
                 <div className="p-4 border-bottom">
@@ -329,7 +249,6 @@ const PositionPage = () => {
               </div>
             </section>
 
-            {/* Projects — position.tags is Tag[], not string[] */}
             <section className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
                 <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
@@ -358,7 +277,6 @@ const PositionPage = () => {
               </div>
             </section>
 
-            {/* Discussion — position.discussion.posts, using the model's authorName/authorId/createdAt */}
             <section className="card border-0 shadow-sm">
               <div className="card-body p-0">
                 <div className="p-4 border-bottom">
@@ -394,7 +312,6 @@ const PositionPage = () => {
 
                         <div className="flex-grow-1">
                           <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            {/* Spec: author name links to the user's public profile view, only for Recruiters */}
                             {isRecruiterOrAdmin ? (
                               <Link
                                 to={`/profile/${post.authorId}`}
@@ -441,13 +358,11 @@ const PositionPage = () => {
             </section>
           </div>
 
-          {/* Right column */}
           <div className="col-lg-4">
             {isCandidate && (
               <section className="card border-0 shadow-sm mb-4">
                 <div className="card-body p-4">
                   <h2 className="h6 fw-bold mb-3">Your access</h2>
-
                   <div className="d-flex align-items-start gap-3 mb-3">
                     <div
                       className={`rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 ${
@@ -472,11 +387,9 @@ const PositionPage = () => {
                       </div>
                     </div>
                   </div>
-
                   <Link
                     to={`/positions/${position.id}/cv`}
-                    className={`btn w-100 ${accessible ? "btn-primary" : "btn-secondary disabled"}`}
-                    aria-disabled={!accessible}
+                    className="btn btn-primary w-100"
                   >
                     Create CV
                   </Link>

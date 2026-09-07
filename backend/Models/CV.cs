@@ -1,4 +1,7 @@
-﻿namespace backend.Models
+﻿using backend.enums;
+using System.Net.NetworkInformation;
+
+namespace backend.Models
 {
     public class CV
     {
@@ -8,6 +11,7 @@
         public List<Like> Likes  { get; set; }
         public Position? Position { get; set; }
         public User User { get; set; }
+        public CVStatus Status { get; set; } = CVStatus.Draft;
 
     }
 }

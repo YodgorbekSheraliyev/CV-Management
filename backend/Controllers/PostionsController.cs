@@ -61,10 +61,10 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        [HttpPost("{id}/duplicate/{userId}")]
-        public async Task<IActionResult> Duplicate(int id, int userId)
+        [HttpPost("{positionId}/duplicate/{userId}")]
+        public async Task<IActionResult> Duplicate(int positionId, int userId)
         {
-            var result = await _positionService.Duplicate(id, userId);
+            var result = await _positionService.Duplicate(positionId, userId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
     }

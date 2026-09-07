@@ -2,6 +2,7 @@ import type {
   AttributeCategory,
   AttributeType,
   ComparisonType,
+  CVStatus,
   UserRole,
 } from "../enums/enums";
 
@@ -11,7 +12,7 @@ export interface User {
   lastName: string;
   email: string;
   role: UserRole;
-  location? : string
+  location?: string;
   imageUrl?: string;
 }
 
@@ -34,13 +35,23 @@ export interface AttributeValue {
   periodEnd?: string;
 }
 
-export interface CV {
+export interface CV extends CVSummary {
+  field: CvField[];
+  projects: Project[];
+}
+
+export interface CVSummary {
   id: number;
-  userId: number;
-  positionId?: number;
-  likes: Like[];
-  position?: Position;
-  user: User;
+  positionId: number;
+  positionTitle: string;
+  likeCount: number;
+  status: CVStatus;
+}
+
+interface CvField {
+  attribute: Attribute;
+  value?: string;
+  isEmpty: boolean;
 }
 
 export interface Discussion {
@@ -71,6 +82,15 @@ export interface Position {
   maxProjects: number;
 }
 
+export interface PositionSummary {
+  id: number;
+  title: string;
+  description: string;
+  tags: string[];
+  isPublic: boolean;
+  maxProjects: number;
+}
+
 export interface PositionAccessRule {
   id: number;
   positionId: number;
@@ -94,9 +114,9 @@ export interface Project {
   id: number;
   name: string;
   startDate: string;
-  endDate?: string;
+  endDate?: string | null;
   description: string;
-  tags: Tag[];
+  tags: string[];
   userId: number;
 }
 
