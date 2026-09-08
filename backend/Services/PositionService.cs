@@ -23,6 +23,8 @@ namespace backend.Services
         public async Task<List<PositionSummaryDto>> GetAll()
         {
             return await _db.Positions
+                .Include(p => p.CVs)
+                .Include(p => p.Tags)
                 .AsNoTracking()
                 .Select(p => new PositionSummaryDto
                 {
@@ -32,19 +34,21 @@ namespace backend.Services
                     IsPublic = p.IsPublic,
                     MaxProjects = p.MaxProjects,
                     Tags = p.Tags.Select(t => t.Name).ToList(),
+                    CVsCount = p.CVs.Count
                 })
                 .ToListAsync();
         }
         public async Task<PositionDto> GetById(int positionId, int userId)
         {
-
             var position = await _db.Positions
                 .AsNoTracking()
                 .Include(p => p.Tags)
                 .Include(p => p.Attributes)
                 .Include(p => p.Discussion)
+                    .ThenInclude(d => d.Posts)
                 .Include(p => p.CVs)
                 .Include(p => p.PositionAccessRules)
+                    .ThenInclude(par => par.Attribute)
                 .FirstOrDefaultAsync(p => p.Id == positionId);
             if (position is null)
             {
@@ -78,28 +82,30 @@ namespace backend.Services
                 CVs = position.CVs
             };
         }
-
         public async Task<PositionDto> Create(CreatePositionDto dto, int userId)
         {
-            Position position = new Position
+            var attributes = await _db.Attributes
+                .Where(a => dto.AttributeIds.Contains(a.Id))
+                .ToListAsync();
+
+            var tags = dto.TagIds?.Count > 0
+                ? await _db.Tags.Where(t => dto.TagIds.Contains(t.Id)).ToListAsync()
+                : new List<Tag>();
+
+            var position = new Position
             {
                 Title = dto.Title,
                 Description = dto.Description,
                 IsPublic = dto.IsPublic,
                 MaxProjects = dto.MaxProjects,
-                Attributes = dto.Attributes.Select(a => new Models.Attribute
+                Attributes = attributes,
+                Tags = tags,
+                PositionAccessRules = dto.AccessRules.Select(r => new PositionAccessRule
                 {
-                    Id = a.Id,
-                    Name = a.Name,
-                    Category = a.Category,
-                    AttributeType = a.Type,
-                    Description = a.Description,
-                    IsBuiltIn = a.IsBuiltIn
-                }).ToList(),
-                Tags = dto.Tags,
-                PositionAccessRules = dto.PositionAccessRules,
-                Discussion = dto.Discussion,
-                CVs = dto.CVs
+                    AttributeId = r.AttributeId,
+                    ComparisonType = r.ComparisonType,
+                    Value = r.Value
+                }).ToList()
             };
 
             _db.Positions.Add(position);
@@ -110,7 +116,7 @@ namespace backend.Services
 
         public async Task<PositionDto> Update(UpdatePositionDto dto, int userId)
         {
-            Position position = await _db.Positions
+            var position = await _db.Positions
                 .Include(p => p.Attributes)
                 .Include(p => p.Tags)
                 .Include(p => p.PositionAccessRules)
@@ -121,29 +127,33 @@ namespace backend.Services
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
 
+            var attributes = await _db.Attributes
+                .Where(a => dto.AttributeIds.Contains(a.Id))
+                .ToListAsync();
+
+            var tags = dto.TagIds is { Count: > 0 }
+                ? await _db.Tags.Where(t => dto.TagIds.Contains(t.Id)).ToListAsync()
+                : new List<Tag>();
+
             position.Title = dto.Title;
             position.Description = dto.Description;
-            position.Attributes = dto.Attributes.Select(a => new Models.Attribute
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Category = a.Category,
-                AttributeType = a.Type,
-                Description = a.Description,
-                IsBuiltIn = a.IsBuiltIn
-            }).ToList();
-            position.PositionAccessRules = dto.PositionAccessRules;
-            position.Tags = dto.Tags;
-            position.CVs = dto.CVs;
-            position.Discussion = dto.Discussion;
+            position.Attributes = attributes;
+            position.Tags = tags;
             position.IsPublic = dto.IsPublic;
             position.MaxProjects = dto.MaxProjects;
 
+            // replace access rules rather than mutate in place
+            position.PositionAccessRules.Clear();
+            position.PositionAccessRules = dto.AccessRules.Select(r => new PositionAccessRule
+            {
+                AttributeId = r.AttributeId,
+                ComparisonType = r.ComparisonType,
+                Value = r.Value
+            }).ToList();
 
             await _db.SaveChangesAsync();
             return await GetById(dto.Id, userId);
         }
-
         public async Task Delete(DeletePositionDto dto)
         {
             var position = await _db.Positions.FirstOrDefaultAsync(p => p.Id == dto.Id);

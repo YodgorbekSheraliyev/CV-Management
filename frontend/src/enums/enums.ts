@@ -23,7 +23,7 @@ export enum AttributeCategory {
 
 export enum UserRole {
   Candidate = "Candidate",
-  Recruiter = "Recruited",
+  Recruiter = "Recruiter",
   Administrator = "Administrator",
 }
 

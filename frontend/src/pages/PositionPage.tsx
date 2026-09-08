@@ -1,10 +1,11 @@
 import { Link, useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import type { Position } from "../models";
-import { ComparisonType } from "../enums/enums";
+import { AttributeType, ComparisonType, UserRole } from "../enums/enums";
 import { useAuth } from "../hooks/auth";
 import { useEffect, useState } from "react";
-import type { CommonResponse } from "../api/axios";
+import { getPositionById } from "../api/positionApi";
+import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
@@ -17,41 +18,31 @@ const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
 const PositionPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const role = user?.role.toString();
-  const isRecruiterOrAdmin = role === "Recruiter" || role === "Administrator";
-  const isCandidate = role === "Candidate";
+  const isRecruiterOrAdmin =
+    user?.role === UserRole.Recruiter || user?.role === UserRole.Administrator;
+  const isCandidate = user?.role === UserRole.Candidate;
   const [position, setPosition] = useState<Position | null>(null);
+  const [post, setPost] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetching belongs in an effect, not the render body — calling a state setter
-  // directly while rendering causes an immediate re-render, which calls it again,
-  // forever. This also means `position` can genuinely be null on first render,
-  // so every read below needs to handle that (see the loading/error guards).
   useEffect(() => {
     if (!id) return;
-
-    setLoading(true);
-    setError(null);
-
-    const token = localStorage.getItem("token");
-    fetch(`/api/positions/${id}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => res.json())
-      .then((body: CommonResponse<Position>) => {
-        if (body.error) {
-          throw new Error(body.error ?? "Couldn't load this position.");
-        }
-        setPosition(body.data);
-      })
-      .catch((err) =>
-        setError(
-          err instanceof Error ? err.message : "Couldn't load this position.",
-        ),
-      )
-      .finally(() => setLoading(false));
+    loadPosition(+id);
   }, [id]);
+
+  const loadPosition = async (positionId: number) => {
+    setLoading(true);
+    try {
+      const res = await getPositionById(positionId, user!.id);
+      setPosition(res);
+    } catch (error: any) {
+      setError(error.message ?? "Could not load position");
+    }
+    setLoading(false);
+  };
+
+  const submitPost = async () => {};
 
   if (loading) {
     return (
@@ -78,10 +69,6 @@ const PositionPage = () => {
     );
   }
 
-  // Not on the Position model — computed server-side per viewer (the backend's
-  // GetById already throws ForbiddenException if a Candidate can't access a
-  // restricted position, so reaching this point at all implies access — this
-  // flag is purely for the "Your access" panel copy, not a real permission gate).
   const accessible = true;
   const cvCount = position.cvs?.length ?? 0;
 
@@ -192,7 +179,7 @@ const PositionPage = () => {
                             </td>
                             <td>
                               <span className="badge text-bg-light border">
-                                {rule.attribute.type}
+                                {ATTRIBUTE_TYPE_LABELS[rule.attribute.attributeType as AttributeType]}
                               </span>
                             </td>
                             <td>
@@ -265,7 +252,7 @@ const PositionPage = () => {
                 </div>
 
                 <div className="d-flex flex-wrap gap-2">
-                  {(position.tags ?? []).map((tag) => (
+                  {(position?.tags ?? []).map((tag) => (
                     <span
                       key={tag.id}
                       className="badge rounded-pill text-bg-primary-subtle text-primary border border-primary-subtle px-3 py-2"
@@ -288,16 +275,16 @@ const PositionPage = () => {
                       </p>
                     </div>
                     <span className="badge text-bg-light border">
-                      {position.discussion.posts.length} posts
+                      {position.discussion?.posts.length} posts
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  {position.discussion.posts.map((post, index) => (
+                  {position.discussion?.posts.map((post, index) => (
                     <div
                       key={post.id}
-                      className={`p-4 ${index !== position.discussion.posts.length - 1 ? "border-bottom" : ""}`}
+                      className={`p-4 ${index !== position.discussion?.posts.length || 0 - 1 ? "border-bottom" : ""}`}
                     >
                       <div className="d-flex gap-3">
                         <div
@@ -347,6 +334,10 @@ const PositionPage = () => {
                       id="discussion"
                       className="form-control"
                       rows={3}
+                      value={post}
+                      onChange={(e) => {
+                        setPost(e.target.value);
+                      }}
                       placeholder="Write a message…"
                     />
                   </div>

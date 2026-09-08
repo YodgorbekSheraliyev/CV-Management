@@ -77,18 +77,19 @@ export interface Position {
   positionAccessRules: PositionAccessRule[];
   tags?: Tag[];
   cvs?: CV[];
-  discussion: Discussion;
+  discussion?: Discussion;
   isPublic: boolean;
-  maxProjects: number;
+  maxProjects?: number;
 }
 
 export interface PositionSummary {
   id: number;
   title: string;
   description: string;
-  tags: string[];
   isPublic: boolean;
   maxProjects: number;
+  tags: string[];
+  cvsCount?: number;
 }
 
 export interface PositionAccessRule {

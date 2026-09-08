@@ -24,5 +24,6 @@ namespace backend.Dtos.Position
         public bool IsPublic { get; set; }
         public int MaxProjects { get; set; }
         public List<string> Tags { get; set; }
+        public int? CVsCount { get; set; }
     }
 }

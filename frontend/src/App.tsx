@@ -6,6 +6,8 @@ import RequireAuth from "./components/RequireAuth";
 import PositionsPage from "./pages/PositionsPage";
 import PositionPage from "./pages/PositionPage";
 import MainPage from "./pages/MainPage";
+import NewPositionPage from "./pages/NewPositionPage";
+import PositionEditPage from "./pages/PositionEditPage";
 
 function App() {
   return (
@@ -14,8 +16,10 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<RequireAuth/>}>
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/positions/:id" element={<PositionPage />} />
         <Route path="/positions" element={<PositionsPage />} />
+        <Route path="/positions/new" element={<NewPositionPage />} />
+        <Route path="/positions/:id" element={<PositionPage />} />
+        <Route path="/positions/:id/edit" element={<PositionEditPage />} />
         <Route path="/" element={<MainPage />} />
       </Route>
     </Routes>

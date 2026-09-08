@@ -12,7 +12,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Recruiter,Administrator")]
+    [Authorize]
     public class PositionsController : ControllerBase
     {
         private readonly PositionService _positionService;
@@ -40,13 +40,15 @@ namespace backend.Controllers
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 
+        [Authorize(Roles = "Recruiter,Administrator")]
         [HttpPost("{userId:int}")]
         public async Task<IActionResult> Create(CreatePositionDto dto, int userId)
         {
             var result = await _positionService.Create(dto, userId);
-            return Ok(CommonResponse<PositionDto>.Ok(result));
+            return CreatedAtAction(nameof(GetById), new { PositionId = result.Id, UserId = userId }, CommonResponse<PositionDto>.Ok(result));
         }
 
+        [Authorize(Roles = "Recruiter,Administrator")]
         [HttpPut("{userId:int}")]
         public async Task<IActionResult> Update(UpdatePositionDto dto, int userId)
         {
@@ -54,13 +56,14 @@ namespace backend.Controllers
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 
+        [Authorize(Roles = "Recruiter,Administrator")]
         [HttpDelete]
         public async Task<IActionResult> Delete(DeletePositionDto dto)
         {
             await _positionService.Delete(dto);
             return NoContent();
         }
-
+        [Authorize(Roles = "Recruiter,Administrator")]
         [HttpPost("{positionId}/duplicate/{userId}")]
         public async Task<IActionResult> Duplicate(int positionId, int userId)
         {

@@ -4,12 +4,11 @@ import NavBar from "../components/NavBar";
 import { useAuth } from "../hooks/auth";
 import type { PositionSummary } from "../models";
 import { getPositions } from "../api/positionApi";
+import { UserRole } from "../enums/enums";
 
 const MainPage = () => {
   const { user } = useAuth();
-  const role = user?.role.toString();
-  const isRecruiterOrAdmin = role === "Recruiter" || role === "Administrator";
-  const isCandidate = role === "Candidate";
+  const isCandidate = user?.role === UserRole.Candidate;
 
   const [positions, setPositions] = useState<PositionSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,26 +29,17 @@ const MainPage = () => {
     }
   };
 
-  // "Latest" — Position has no createdAt/updatedAt field (flagged earlier), so this is
-  // just API insertion order, not a real recency sort. Add a timestamp field to sort by
-  // it properly once it exists.
   const latestPositions = positions.slice(0, 5);
 
-  // "Most popular" — ranked by submitted (published) CVs, per the Main Page spec section.
   const popularPositions = [...positions]
-    .sort((a, b) => (b.cvs?.length ?? 0) - (a.cvs?.length ?? 0))
+    .sort((a, b) => (b.cvsCount ?? 0) - (a.cvsCount ?? 0))
     .slice(0, 5);
-
-  // No /api/stats or /api/tags/cloud endpoint exists yet — both sections are omitted
-  // below rather than shown with fake numbers. Add those endpoints and wire them in
-  // the same way `positions` is loaded above once they exist.
 
   return (
     <div className="min-vh-100 bg-light">
       <NavBar />
 
       <main className="container py-4 py-md-5">
-        {/* Hero */}
         <section className="mb-5">
           <div className="row align-items-center g-4">
             <div className="col-lg-7">
@@ -80,7 +70,6 @@ const MainPage = () => {
               </div>
             </div>
 
-            {/* Candidate-only — Recruiters/Admins don't have a candidate profile to complete */}
             {isCandidate && (
               <div className="col-lg-5">
                 <div className="card border-0 shadow-sm">
@@ -121,7 +110,6 @@ const MainPage = () => {
           </div>
         )}
 
-        {/* Latest + Popular */}
         {!loading && positions.length > 0 && (
           <section className="mb-5">
             <div className="row g-4">
@@ -217,9 +205,6 @@ const MainPage = () => {
 
                     <div className="list-group list-group-flush">
                       {popularPositions.map((position, index) => (
-                        // Uses position.id, not display rank — the earlier mock linked to
-                        // `/positions/${position.rank}`, which pointed at the wrong position
-                        // (or a nonexistent one) whenever rank didn't happen to equal id.
                         <Link
                           key={position.id}
                           to={`/positions/${position.id}`}
@@ -263,7 +248,6 @@ const MainPage = () => {
           </section>
         )}
 
-        {/* Bottom CTA — Candidate-only */}
         {isCandidate && (
           <section>
             <div className="card border-0 bg-primary text-white shadow-sm">
