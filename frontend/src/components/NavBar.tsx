@@ -2,10 +2,13 @@ import { Link, NavLink } from "react-router-dom";
 
 import { useAuth } from "../hooks/auth";
 import { useLocale } from "../hooks/locale";
+import { UserRole } from "../enums/enums";
 
 const NavBar = () => {
   const { user, logout } = useAuth();
   const { locale, changeLocale } = useLocale();
+  const isRecruiterOrAdmin =
+    user?.role == UserRole.Recruiter || user?.role == UserRole.Administrator;
 
   return (
     <nav className="navbar navbar-expand-lg bg-white border-bottom sticky-top">
@@ -71,6 +74,19 @@ const NavBar = () => {
                 My CVs
               </NavLink>
             </li>
+
+            {isRecruiterOrAdmin && (
+              <li className="nav-item">
+                <NavLink
+                  to="/attribute"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active fw-semibold" : "nav-link"
+                  }
+                >
+                  Atrributes
+                </NavLink>
+              </li>
+            )}
           </ul>
 
           <div className="d-flex align-items-center gap-3">
