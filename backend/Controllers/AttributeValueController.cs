@@ -25,77 +25,33 @@ namespace backend.Controllers
         [HttpGet("{userId:int}")]
         public async Task<IActionResult> GetAllForUserId(int userId)
         {
-            try
-            {
-                var result = await _attributeValueService.GetAllForUserId(userId);
-                return Ok(CommonResponse<List<AttributeValueDto>>.Ok(result));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _attributeValueService.GetAllForUserId(userId);
+            return Ok(CommonResponse<List<AttributeValueDto>>.Ok(result));
+
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAttributeValueDto createAttributeValueDto)
         {
-            try
-            {
-                var result = await _attributeValueService.Create(createAttributeValueDto);
-                return Ok(CommonResponse<AttributeValueDto>.Ok(result));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (InvalidDataException e)
-            {
-                return BadRequest(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _attributeValueService.Create(createAttributeValueDto);
+            return Ok(CommonResponse<AttributeValueDto>.Ok(result));
+
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(UpdateAttributeValueDto updateAttributeValueDto)
         {
-            try
-            {
-                var result = await _attributeValueService.Update(updateAttributeValueDto);
-                return Ok(CommonResponse<AttributeValueDto>.Ok(result));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (InvalidDataException e)
-            {
-                return BadRequest(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _attributeValueService.Update(updateAttributeValueDto);
+            return Ok(CommonResponse<AttributeValueDto>.Ok(result));
+
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteAttributeValueDto deleteAttributeValueDto)
         {
-            try
-            {
-                var result = await _attributeValueService.Delete(deleteAttributeValueDto);
-                return NoContent();
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _attributeValueService.Delete(deleteAttributeValueDto);
+            return NoContent();
+
         }
     }
 }

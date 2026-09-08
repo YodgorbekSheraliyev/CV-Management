@@ -26,102 +26,39 @@ namespace backend.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var result = await _attributeService.GetAll();
-                return Ok(CommonResponse<List<AttributeDto>>.Ok(result));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, _localizer["InternalServerError"]);
-            }
+            var result = await _attributeService.GetAll();
+            return Ok(CommonResponse<List<AttributeDto>>.Ok(result));
+
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var result = await _attributeService.GetById(id);
-                return Ok(CommonResponse<AttributeDto>.Ok(result));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
+            var result = await _attributeService.GetById(id);
+            return Ok(CommonResponse<AttributeDto>.Ok(result));
 
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAttributeDto createAttributeDto)
         {
-            try
-            {
-                var result = await _attributeService.Create(createAttributeDto);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, CommonResponse<AttributeDto>.Ok(result));
-            }
-            catch (ConflictException e)
-            {
-                return BadRequest(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (InvalidOperationException e)
-            {
-                return BadRequest(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
+            var result = await _attributeService.Create(createAttributeDto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, CommonResponse<AttributeDto>.Ok(result));
 
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAttributeDto updateAttributeDto)
         {
-            try
-            {
-                var result = await _attributeService.Update(updateAttributeDto);
-                return Ok(CommonResponse<AttributeDto>.Ok(result));
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                return Unauthorized(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (ConflictException e)
-            {
-                return BadRequest(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _attributeService.Update(updateAttributeDto);
+            return Ok(CommonResponse<AttributeDto>.Ok(result));
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteAttributeDto deleteAttributeDto)
         {
-            try
-            {
-                await _attributeService.Delete(deleteAttributeDto);
-                return NoContent();
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            await _attributeService.Delete(deleteAttributeDto);
+            return NoContent();
         }
     }
 }

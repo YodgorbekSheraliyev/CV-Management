@@ -144,6 +144,10 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["AttributeNotFound"]);
             }
+            if (attribute.IsBuiltIn)
+            {
+                throw new ForbiddenException(_localizer["CannotDeleteBuiltInAttribute"]);
+            }
             _db.Attributes.Remove(attribute);
             await _db.SaveChangesAsync();
             return true;

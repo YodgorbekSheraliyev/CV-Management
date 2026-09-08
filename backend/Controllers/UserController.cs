@@ -13,7 +13,7 @@ namespace backend.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         private UserService _userService;
         private readonly IStringLocalizer<SharedResource> _localizer;
@@ -28,37 +28,15 @@ namespace backend.Controllers
         [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> GetUserProfile(int userId)
         {
-            try
-            {
-                var user = await _userService.GetUserById(userId);
-                return Ok(CommonResponse<UserDto>.Ok(user));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var user = await _userService.GetUserById(userId);
+            return Ok(CommonResponse<UserDto>.Ok(user));
         }
 
         [HttpPut("{userId:int}")]
         public async Task<IActionResult> UpdateUserProfile(int userId, [FromBody] UpdateUserDto updateUserDto)
         {
-            try
-            {
-                var user = await _userService.Update(userId, updateUserDto);
-                return Ok(CommonResponse<UserDto>.Ok(user));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<string>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var user = await _userService.Update(userId, updateUserDto);
+            return Ok(CommonResponse<UserDto>.Ok(user));
         }
     }
 }

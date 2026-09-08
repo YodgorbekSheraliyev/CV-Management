@@ -67,48 +67,14 @@ namespace backend.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(UpdateProjectDto dto)
         {
-            try
-            {
-                var result = await _projectService.Update(dto);
-                return Ok(CommonResponse<ProjectDto>.Ok(result));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<ProjectDto>.Fail(e.Message));
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                return StatusCode(403, CommonResponse<ProjectDto>.Fail(e.Message));
-            }
-            catch (InvalidDataException e)
-            {
-                return BadRequest(CommonResponse<ProjectDto>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _projectService.Update(dto);
+            return Ok(CommonResponse<ProjectDto>.Ok(result));
         }
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteProjectDto dto)
         {
-            try
-            {
-                await _projectService.Delete(dto);
-                return NoContent();
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<object>.Fail(e.Message));
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return StatusCode(403, CommonResponse<object>.Fail("NotYourProject"));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            await _projectService.Delete(dto);
+            return NoContent();
         }
     }
 }
