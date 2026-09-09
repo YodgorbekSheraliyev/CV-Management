@@ -1,4 +1,5 @@
 ﻿using backend.Data;
+using backend.Dtos;
 using backend.Dtos.Attribute;
 using backend.Dtos.Position;
 using backend.enums;
@@ -67,7 +68,11 @@ namespace backend.Services
                 Description = position.Description,
                 IsPublic = position.IsPublic,
                 MaxProjects = position.MaxProjects,
-                Tags = position.Tags,
+                Tags = position.Tags.Select(t => new TagDto
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                }).ToList(),
                 Attributes = position.Attributes.Select(a => new AttributeDto
                 {
                     Id = a.Id,

@@ -16,12 +16,10 @@ namespace backend.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly ProjectService _projectService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public ProjectsController(ProjectService projectService, IStringLocalizer<SharedResource> localizer)
+        public ProjectsController(ProjectService projectService)
         {
             _projectService = projectService;
-            _localizer = localizer;
         }
 
         [HttpGet("{userId:int}")]
@@ -33,36 +31,14 @@ namespace backend.Controllers
         [HttpGet("{userId:int}/{projectId:int}")]
         public async Task<IActionResult> GetOne(int userId, int projectId)
         {
-            try
-            {
-                var result = await _projectService.GetOne(userId, projectId);
-                return Ok(CommonResponse<ProjectDto>.Ok(result));
-            }
-            catch (NotFoundException e)
-            {
-                return NotFound(CommonResponse<ProjectDto>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _projectService.GetOne(userId, projectId);
+            return Ok(CommonResponse<ProjectDto>.Ok(result));
         }
         [HttpPost]
         public async Task<IActionResult> Create(CreateProjectDto dto)
         {
-            try
-            {
-                var result = await _projectService.Create(dto);
-                return Ok(CommonResponse<ProjectDto>.Ok(result));
-            }
-            catch (InvalidDataException e)
-            {
-                return BadRequest(CommonResponse<ProjectDto>.Fail(e.Message));
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CommonResponse<string>.Fail(_localizer["InternalServerError"]));
-            }
+            var result = await _projectService.Create(dto);
+            return Ok(CommonResponse<ProjectDto>.Ok(result));
         }
         [HttpPut]
         public async Task<IActionResult> Update(UpdateProjectDto dto)

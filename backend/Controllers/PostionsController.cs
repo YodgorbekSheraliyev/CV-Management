@@ -16,12 +16,10 @@ namespace backend.Controllers
     public class PositionsController : ControllerBase
     {
         private readonly PositionService _positionService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public PositionsController(PositionService positionService, IStringLocalizer<SharedResource> localizer)
+        public PositionsController(PositionService positionService)
         {
             _positionService = positionService;
-            _localizer = localizer;
         }
 
         [HttpGet("all")]

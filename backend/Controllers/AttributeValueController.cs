@@ -14,12 +14,10 @@ namespace backend.Controllers
     public class AttributeValueController : ControllerBase
     {
         private readonly AttributeValueService _attributeValueService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public AttributeValueController(AttributeValueService attributeValueService, IStringLocalizer<SharedResource> localizer)
+        public AttributeValueController(AttributeValueService attributeValueService)
         {
             _attributeValueService = attributeValueService;
-            _localizer = localizer;
         }
 
         [HttpGet("{userId:int}")]

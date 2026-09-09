@@ -16,12 +16,10 @@ namespace backend.Controllers
     public class UserController : ControllerBase
     {
         private UserService _userService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public UserController(UserService userService, IStringLocalizer<SharedResource> localizer)
+        public UserController(UserService userService)
         {
             _userService = userService;
-            _localizer = localizer;
         }
 
         [HttpGet("{userId:int}")]

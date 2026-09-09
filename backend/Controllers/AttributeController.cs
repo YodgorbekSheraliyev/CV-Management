@@ -15,12 +15,10 @@ namespace backend.Controllers
     public class AttributeController : ControllerBase
     {
         private readonly AttributeService _attributeService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public AttributeController(AttributeService attributeService, IStringLocalizer<SharedResource> localizer)
+        public AttributeController(AttributeService attributeService)
         {
             _attributeService = attributeService;
-            _localizer = localizer;
         }
 
         [HttpGet("all")]

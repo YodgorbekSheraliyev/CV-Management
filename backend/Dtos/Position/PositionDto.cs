@@ -10,7 +10,7 @@ namespace backend.Dtos.Position
         public string Description { get; set; }
         public List<AttributeDto> Attributes { get; set; }
         public List<PositionAccessRule> PositionAccessRules { get; set; }
-        public List<Tag>? Tags { get; set; }
+        public List<TagDto>? Tags { get; set; }
         public List<CV>? CVs { get; set; }
         public Discussion Discussion { get; set; }
         public bool IsPublic { get; set; } = true;

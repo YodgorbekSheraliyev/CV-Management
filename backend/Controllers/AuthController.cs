@@ -12,11 +12,9 @@ namespace backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
-        public AuthController(AuthService authService, IStringLocalizer<SharedResource> localizer)
+        public AuthController(AuthService authService)
         {
             _authService = authService;
-            _localizer = localizer;
         }
 
         [HttpPost("login")]
