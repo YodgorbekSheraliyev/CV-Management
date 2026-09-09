@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import type { PositionSummary } from "../models";
 import { useAuth } from "../hooks/auth";
 import { getPositions } from "../api/positionApi";

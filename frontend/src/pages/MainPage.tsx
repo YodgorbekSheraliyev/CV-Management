@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
 import type { PositionSummary } from "../models";
 import { getPositions } from "../api/positionApi";
@@ -224,7 +224,7 @@ const MainPage = () => {
                             </div>
                             <div className="text-end">
                               <div className="fw-bold small">
-                                {position.cvs?.length ?? 0}
+                                {position.cvsCount ?? 0}
                               </div>
                               <div className="text-muted small">CVs</div>
                             </div>

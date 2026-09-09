@@ -11,7 +11,7 @@ import {
   deleteAttribute,
 } from "../api/attributeApi";
 
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import { ATTRIBUTE_TYPE_LABELS, CATEGORY_LABELS } from "../constants";
 import { useAuth } from "../hooks/auth";
 

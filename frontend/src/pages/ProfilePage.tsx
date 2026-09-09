@@ -1,9 +1,10 @@
 import { useState } from "react";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
-import MeSection from "../components/MeSection";
-import InfoSection from "../components/InfoSection";
-import ProjectsSection from "../components/ProjectsSection";
+import MeSection from "../components/sections/MeSection";
+import InfoSection from "../components/sections/InfoSection";
+import ProjectsSection from "../components/sections/ProjectsSection";
+import CvsSection from "../components/sections/CvsSection";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -60,7 +61,12 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <button onClick={handleEditProfile} className="btn btn-outline-primary">Edit profile</button>
+              <button
+                onClick={handleEditProfile}
+                className="btn btn-outline-primary"
+              >
+                Edit profile
+              </button>
             </div>
           </div>
         </div>
@@ -109,8 +115,8 @@ const ProfilePage = () => {
 
         {activeTab == "me" && <MeSection user={user!} />}
         {activeTab == "info" && <InfoSection user={user!} />}
-        {activeTab == "projects" && <ProjectsSection/>}
-        {activeTab == "cvs" && <div>cvs</div>}
+        {activeTab == "projects" && <ProjectsSection />}
+        {activeTab == "cvs" && <CvsSection />}
       </main>
     </div>
   );

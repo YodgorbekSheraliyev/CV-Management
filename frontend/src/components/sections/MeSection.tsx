@@ -1,6 +1,6 @@
-import type { User } from "../models";
-import ProfileField from "./ProfileField";
-import SectionHeader from "./SectionHeader";
+import type { User } from "../../models";
+import ProfileField from "../fields/ProfileField";
+import SectionHeader from "../SectionHeader";
 
 const MeSection = ({ user }: { user: User }) => {
   return (

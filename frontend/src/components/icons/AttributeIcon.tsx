@@ -1,4 +1,4 @@
-import { AttributeType } from "../enums/enums";
+import { AttributeType } from "../../enums/enums";
 import CalendarIcon from "./CalendarIcon";
 import ImageIcon from "./ImageIcon";
 

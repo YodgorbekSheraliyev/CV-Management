@@ -8,9 +8,9 @@ import {
   updateAttributeValue,
 } from "../api/attributeValueApi";
 
-import AttributeIcon from "./AttributeIcon";
-import ValueField from "./ValueField";
-import type { PeriodValue } from "./ValueField";
+import AttributeIcon from "./icons/AttributeIcon";
+import ValueField from "./fields/ValueField";
+import type { PeriodValue } from "./fields/ValueField";
 import { parsePeriod } from "../utils";
 
 interface ValueCardProps {

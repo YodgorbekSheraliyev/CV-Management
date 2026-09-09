@@ -9,7 +9,7 @@ const SectionHeader = ({
   title: string;
   description: string;
   buttonText?: string;
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }) => {
   return (
     <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
+        RoleClaimType = ClaimTypes.Role,
         ValidateAudience = true,
         ValidateIssuer = true,
         ValidateLifetime = true,
@@ -76,6 +78,7 @@ builder.Services.AddScoped<AttributeService>();
 builder.Services.AddScoped<AttributeValueService>();
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<PositionService>();
+builder.Services.AddScoped<CvService>();
 
 var app = builder.Build();
 app.UseCors(builder => builder

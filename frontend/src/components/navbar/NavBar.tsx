@@ -1,8 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
 
-import { useAuth } from "../hooks/auth";
-import { useLocale } from "../hooks/locale";
-import { UserRole } from "../enums/enums";
+import { useAuth } from "../../hooks/auth";
+import { useLocale } from "../../hooks/locale";
+import { UserRole } from "../../enums/enums";
 
 const NavBar = () => {
   const { user, logout } = useAuth();

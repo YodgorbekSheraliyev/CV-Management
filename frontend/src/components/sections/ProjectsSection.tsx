@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import SectionHeader from "./SectionHeader";
-import type { Project } from "../models";
-import { deleteProject, getUserProjects } from "../api/projectApi";
-import { useAuth } from "../hooks/auth";
-import ProjectFormModal from "./ProjectFormModal";
+import SectionHeader from "../SectionHeader";
+import type { Project } from "../../models";
+import { deleteProject, getUserProjects } from "../../api/projectApi";
+import { useAuth } from "../../hooks/auth";
+import ProjectFormModal from "../ProjectFormModal";
 
 const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);

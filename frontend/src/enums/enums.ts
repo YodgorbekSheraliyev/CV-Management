@@ -33,6 +33,7 @@ export enum ComparisonType {
   GreaterThan,
   GreaterThanOrEqual,
   Equal,
+  NotEqual
 }
 
 export enum CVStatus {

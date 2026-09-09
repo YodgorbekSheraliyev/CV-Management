@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import SectionHeader from "./SectionHeader";
-import AttributePickerModal from "./AttributePickerModal";
-import ValueCard from "./ValueCard";
-import type { Attribute, AttributeValue, User } from "../models";
-import { getAttributes } from "../api/attributeApi";
+import SectionHeader from "../SectionHeader";
+import AttributePickerModal from "../AttributePickerModal";
+import ValueCard from "../ValueCard";
+import type { Attribute, AttributeValue, User } from "../../models";
+import { getAttributes } from "../../api/attributeApi";
 import {
   deleteAttributeValue,
   getAttributeValuesByUserId,
-} from "../api/attributeValueApi";
+} from "../../api/attributeValueApi";
 
 interface InfoSectionProps {
   user: User;

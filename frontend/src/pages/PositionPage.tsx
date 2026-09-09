@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import type { Position } from "../models";
 import { AttributeType, ComparisonType, UserRole } from "../enums/enums";
 import { useAuth } from "../hooks/auth";

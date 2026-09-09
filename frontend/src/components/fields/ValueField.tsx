@@ -1,6 +1,6 @@
-import { AttributeType } from "../enums/enums";
-import type { Attribute } from "../models";
-import CalendarIcon from "./CalendarIcon";
+import { AttributeType } from "../../enums/enums";
+import type { Attribute } from "../../models";
+import CalendarIcon from "../icons/CalendarIcon";
 import ImageField from "./ImageField";
 import MarkdownField from "./MarkdownField";
 

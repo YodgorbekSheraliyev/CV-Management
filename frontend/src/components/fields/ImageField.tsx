@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-import ImageIcon from "./ImageIcon";
+import ImageIcon from "../icons/ImageIcon";
 
 interface ImageFieldProps {
   value: string;
