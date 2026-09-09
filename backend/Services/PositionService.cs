@@ -209,6 +209,9 @@ namespace backend.Services
         {
             if (position.IsPublic)
                 return true;
+            var user = await _db.Users.FindAsync(userId);
+            if(user is { Role: UserRole.Administrator or UserRole.Recruiter })
+                return true;
 
             if (position.PositionAccessRules.Count == 0)
                 return true;
