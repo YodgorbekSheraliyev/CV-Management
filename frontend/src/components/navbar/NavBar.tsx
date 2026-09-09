@@ -64,17 +64,6 @@ const NavBar = () => {
               </NavLink>
             </li>
 
-            <li className="nav-item">
-              <NavLink
-                to="/cvs"
-                className={({ isActive }) =>
-                  isActive ? "nav-link active fw-semibold" : "nav-link"
-                }
-              >
-                My CVs
-              </NavLink>
-            </li>
-
             {isRecruiterOrAdmin && (
               <li className="nav-item">
                 <NavLink

@@ -9,6 +9,7 @@ import MainPage from "./pages/MainPage";
 import CreatePositionPage from "./pages/CreatePositionPage";
 import EditPositionPage from "./pages/EditPositionPage";
 import AttributeManagement from "./pages/AttributeManagement";
+import PositionCvsPage from "./pages/PositionCvsPage";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route path="/positions/new" element={<CreatePositionPage />} />
         <Route path="/positions/:id" element={<PositionPage />} />
         <Route path="/positions/:id/edit" element={<EditPositionPage />} />
-        <Route path="/positions/:id/cvs" element={<div>123</div>} />
+        <Route path="/positions/:id/cvs" element={<PositionCvsPage />} />
         <Route path="/attribute" element={<AttributeManagement />} />
         <Route path="/" element={<MainPage />} />
       </Route>

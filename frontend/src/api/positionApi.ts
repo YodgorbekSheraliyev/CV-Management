@@ -1,4 +1,4 @@
-import type { Position, PositionSummary } from "../models";
+import type { CVSummary, Position, PositionSummary } from "../models";
 import api, { type CommonResponse } from "./axios";
 
 export const getPositions = async () => {
@@ -41,5 +41,11 @@ export const duplicatePosition = async (positionId: number, userId: number) => {
   const { data: response } = await api.post<CommonResponse<Position>>(
     `/positions/${positionId}/duplicate/${userId}`,
   );
+  return response.data;
+};
+
+export const getPositionCvs = async (positionId: number) => {
+  const { data: response } =
+    await api.get<CommonResponse<CVSummary[]>>(`/positions/${positionId}/cvs`);
   return response.data;
 };

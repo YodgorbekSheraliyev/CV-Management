@@ -1,10 +1,14 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../components/navbar/NavBar";
 import type { Position } from "../models";
 import { AttributeType, ComparisonType, UserRole } from "../enums/enums";
 import { useAuth } from "../hooks/auth";
 import { useEffect, useState } from "react";
-import { getPositionById } from "../api/positionApi";
+import {
+  getPositionById,
+  deletePosition,
+  duplicatePosition,
+} from "../api/positionApi";
 import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
@@ -17,6 +21,7 @@ const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
 
 const PositionPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const isRecruiterOrAdmin =
     user?.role === UserRole.Recruiter || user?.role === UserRole.Administrator;
@@ -25,6 +30,8 @@ const PositionPage = () => {
   const [post, setPost] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [duplicating, setDuplicating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -33,6 +40,8 @@ const PositionPage = () => {
 
   const loadPosition = async (positionId: number) => {
     setLoading(true);
+    setError(null);
+
     try {
       const res = await getPositionById(positionId, user!.id);
       setPosition(res);
@@ -40,6 +49,40 @@ const PositionPage = () => {
       setError(error.message ?? "Could not load position");
     }
     setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    if (!position || !user || deleting) return;
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      await deletePosition({ id: position.id });
+
+      navigate("/positions");
+    } catch (error: any) {
+      setError(error.message ?? "Could not delete position.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!position || !user || duplicating) return;
+
+    setDuplicating(true);
+    setError(null);
+
+    try {
+      const duplicatedPosition = await duplicatePosition(position.id, user.id);
+
+      navigate(`/positions/${duplicatedPosition.id}`);
+    } catch (error: any) {
+      setError(error.message ?? "Could not duplicate position.");
+    } finally {
+      setDuplicating(false);
+    }
   };
 
   const submitPost = async () => {};
@@ -101,7 +144,9 @@ const PositionPage = () => {
               <div className="flex-grow-1">
                 <div className="d-flex flex-wrap gap-2 mb-3">
                   <span
-                    className={`badge rounded-pill px-3 py-2 ${position.isPublic ? "text-bg-success" : "text-bg-warning"}`}
+                    className={`badge rounded-pill px-3 py-2 ${
+                      position.isPublic ? "text-bg-success" : "text-bg-warning"
+                    }`}
                   >
                     {position.isPublic ? "Public" : "Restricted"}
                   </span>
@@ -133,13 +178,36 @@ const PositionPage = () => {
               )}
 
               {isRecruiterOrAdmin && (
-                <div className="d-flex flex-column gap-2 flex-shrink-0">
+                <div className="d-flex flex-wrap gap-2 align-content-start flex-shrink-0">
                   <Link
                     to={`/positions/${position.id}/edit`}
                     className="btn btn-outline-secondary px-4"
                   >
-                    Edit position
+                    <i className="bi bi-pencil me-2" />
+                    Edit
                   </Link>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary px-4"
+                    onClick={handleDuplicate}
+                    disabled={duplicating || deleting}
+                  >
+                    <i className="bi bi-copy me-2" />
+
+                    {duplicating ? "Duplicating…" : "Duplicate"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger px-4"
+                    onClick={handleDelete}
+                    disabled={deleting || duplicating}
+                  >
+                    <i className="bi bi-trash me-2" />
+
+                    {deleting ? "Deleting…" : "Delete"}
+                  </button>
                 </div>
               )}
             </div>
@@ -275,7 +343,7 @@ const PositionPage = () => {
                       </p>
                     </div>
                     <span className="badge text-bg-light border">
-                      {position.discussion?.posts.length} posts
+                      {position.discussion?.posts.length ?? 0} posts
                     </span>
                   </div>
                 </div>
@@ -342,7 +410,9 @@ const PositionPage = () => {
                     />
                   </div>
                   <div className="d-flex justify-content-end">
-                    <button className="btn btn-primary">Post message</button>
+                    <button className="btn btn-primary" onClick={submitPost}>
+                      Post message
+                    </button>
                   </div>
                 </div>
               </div>
