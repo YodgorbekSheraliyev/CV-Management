@@ -14,6 +14,7 @@ export interface AccessRule {
 }
 
 export interface PositionFormValues {
+  id: number
   title: string;
   description: string;
   attributeIds: number[];
@@ -36,6 +37,7 @@ interface PositionFormProps {
 }
 
 const EMPTY_FORM: PositionFormValues = {
+  id: -Date.now(),
   title: "",
   description: "",
   attributeIds: [],
@@ -376,7 +378,7 @@ const PositionForm = ({
           <div>
             <label className="form-label fw-semibold">Project tags</label>
             <TagSelector
-              selectedIds={form.tagIds}
+              selectedTagIds={form.tagIds}
               onChange={(tagIds) => updateField("tagIds", tagIds)}
             />
             <div className="form-text">

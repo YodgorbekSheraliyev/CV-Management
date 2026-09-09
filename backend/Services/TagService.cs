@@ -47,7 +47,7 @@ namespace backend.Services
         {
             return await _db.Tags
                 .AsNoTracking()
-                .Where(t => t.Name == name)
+                .Where(t => t.Name.ToLower() == name.ToLower())
                 .Select(t => new TagDto
                 {
                     Id = t.Id,
