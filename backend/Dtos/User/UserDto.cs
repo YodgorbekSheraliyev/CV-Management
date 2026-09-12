@@ -11,5 +11,6 @@ namespace backend.Dtos.User
         public string? Email { get; set; }
         public string Role { get; set; }
         public string? ImageUrl { get; set; }
+        public string? Location { get; set; }
     }
 }

@@ -53,6 +53,7 @@ namespace backend.Services
                 FirstName = firstName,
                 LastName = lastName,
                 ImageUrl = imageUrl,
+                Location = location,
                 Role = user.Role.ToString(),
                 Email = user.Email
             };
@@ -62,31 +63,78 @@ namespace backend.Services
 
         public async Task<UserDto> Update(int userId, UpdateUserDto updateUserDto)
         {
-            User user = await _db.Users.FirstOrDefaultAsync(X => X.Id == userId);
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user is null)
             {
-
                 throw new NotFoundException(_localizer["UserNotFound"]);
             }
 
             var attributeValues = await _db.AttributeValues
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
+
             if (updateUserDto.FirstName is not null)
             {
                 var firstName = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.FirstName);
-                firstName.Value = updateUserDto.FirstName;
 
+                if (firstName is null)
+                {
+                    firstName = new AttributeValue
+                    {
+                        UserId = userId,
+                        AttributeId = (int)BuiltInAttributes.FirstName,
+                        Value = updateUserDto.FirstName
+                    };
+
+                    _db.AttributeValues.Add(firstName);
+                }
+                else
+                {
+                    firstName.Value = updateUserDto.FirstName;
+                }
             }
+
             if (updateUserDto.LastName is not null)
             {
-                var lastName = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.LastName);
-                lastName.Value = updateUserDto.LastName;
+                var lastName = attributeValues
+                    .FirstOrDefault(x =>
+                        x.AttributeId == (int)BuiltInAttributes.LastName);
+
+                if (lastName is null)
+                {
+                    lastName = new AttributeValue
+                    {
+                        UserId = userId,
+                        AttributeId = (int)BuiltInAttributes.LastName,
+                        Value = updateUserDto.LastName
+                    };
+
+                    _db.AttributeValues.Add(lastName);
+                }
+                else
+                {
+                    lastName.Value = updateUserDto.LastName;
+                }
             }
+
             if (updateUserDto.Location is not null)
             {
                 var location = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.Location);
-                location.Value = updateUserDto.FirstName;
+                if (location is null)
+                {
+                    location = new AttributeValue
+                    {
+                        UserId = userId,
+                        AttributeId = (int)BuiltInAttributes.Location,
+                        Value = updateUserDto.Location
+                    };
+
+                    _db.AttributeValues.Add(location);
+                }
+                else
+                {
+                    location.Value = updateUserDto.Location;
+                }
             }
 
             await _db.SaveChangesAsync();

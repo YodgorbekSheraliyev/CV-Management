@@ -3,13 +3,16 @@ import {
   useEffect,
   useMemo,
   useState,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
 } from "react";
 import type { User } from "../models";
 import { UserRole } from "../enums/enums";
 import type { CommonResponse } from "../api/axios";
 import api from "../api/axios";
 import { jwtDecode } from "jwt-decode";
+import { getUser } from "../api/userApi";
 
 const TOKEN_KEY = "token";
 
@@ -22,6 +25,7 @@ interface DecodedType {
 
 export interface AuthContextValue {
   user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (creds: { email: string; password: string }) => Promise<string>;
@@ -40,23 +44,12 @@ function isExpired(decoded: DecodedType): boolean {
   return Date.now() >= decoded.exp * 1000;
 }
 
-function userFromToken(decoded: DecodedType): User {
-  return {
-    id: Number(
-      decoded[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-      ],
-    ),
-    email:
-      decoded[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
-      ],
-    role: decoded[
-      "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+function getUserIdFromToken(decoded: DecodedType): number {
+  return Number(
+    decoded[
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
     ],
-    firstName: "",
-    lastName: "",
-  };
+  );
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -65,30 +58,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const loadUser = async () => {
+      const token = localStorage.getItem(TOKEN_KEY);
 
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode<DecodedType>(token);
-
-      if (isExpired(decoded)) {
-        localStorage.removeItem(TOKEN_KEY);
+      if (!token) {
         setIsLoading(false);
         return;
       }
 
-      // Synchronous, no network call — this is what makes refresh instant.
-      setUser(userFromToken(decoded));
-      setIsAuthenticated(true);
-    } catch {
-      localStorage.removeItem(TOKEN_KEY);
-    } finally {
-      setIsLoading(false);
-    }
+      try {
+        const decoded = jwtDecode<DecodedType>(token);
+
+        if (isExpired(decoded)) {
+          localStorage.removeItem(TOKEN_KEY);
+          setUser(null);
+          setIsAuthenticated(false);
+          return;
+        }
+        const userId = getUserIdFromToken(decoded);
+        const currentUser = await getUser(userId);
+
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      } catch {
+        localStorage.removeItem(TOKEN_KEY);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUser();
   }, []);
 
   const login = async ({
@@ -106,7 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const decoded = jwtDecode<DecodedType>(token);
 
     localStorage.setItem(TOKEN_KEY, token);
-    setUser(userFromToken(decoded));
+
+    const userId = getUserIdFromToken(decoded);
+    const currentUser = await getUser(userId);
+
+    setUser(currentUser);
     setIsAuthenticated(true);
 
     return token;
@@ -126,7 +131,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const decoded = jwtDecode<DecodedType>(token);
 
     localStorage.setItem(TOKEN_KEY, token);
-    setUser(userFromToken(decoded));
+
+    const userId = getUserIdFromToken(decoded);
+    const currentUser = await getUser(userId);
+
+    setUser(currentUser);
     setIsAuthenticated(true);
 
     return token;
@@ -140,7 +149,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, isAuthenticated, isLoading, login, register, logout }),
+    () => ({
+      user,
+      setUser,
+      isAuthenticated,
+      isLoading,
+      login,
+      register,
+      logout,
+    }),
     [user, isAuthenticated, isLoading],
   );
 
