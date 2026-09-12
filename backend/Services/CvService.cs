@@ -81,7 +81,7 @@ namespace backend.Services
             var position = await _db.Positions
                 .Include(p => p.Attributes)
                 .Include(p => p.PositionAccessRules)
-                .ThenInclude(r => r.Attribute)
+                    .ThenInclude(r => r.Attribute)
                 .Include(p => p.Tags)
                 .FirstOrDefaultAsync(p => p.Id == dto.PositionId);
 
@@ -95,8 +95,17 @@ namespace backend.Services
                 throw new BadRequestException(_localizer["CvAlreadyExistsForPosition"]);
             }
 
+            var user = await _db.Users.Include(u => u.AttributeValues).FirstOrDefaultAsync(u => u.Id == dto.UserId);
+            if (user is null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+
             var attributeIds = position.Attributes.Select(a => a.Id).ToList();
-            var projectIds = await GetMatchingProjectIds(dto.UserId, position);
+            var userAttributeIds = user.AttributeValues.Select(av => av.AttributeId).ToHashSet();
+            attributeIds = attributeIds.Where(attributeId =>userAttributeIds.Contains(attributeId)).ToList();
+            var projectIds = await GetMatchingProjectIds(dto.UserId,position);
+
             var cv = new CV
             {
                 UserId = dto.UserId,
