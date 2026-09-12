@@ -21,224 +21,308 @@ namespace backend.Services
             _localizer = localizer;
         }
 
-        public async Task<List<CvSummaryDto>> GetMine(int userId)
+        public async Task<List<CvSummaryDto>> GetAll()
         {
-            var cvs = await _db.CVs.AsNoTracking()
-                .Include(c => c.Position).Include(c => c.Likes)
+            return await _db.CVs
+                .AsNoTracking()
+                .Include(c => c.Position)
+                .Include(c => c.Likes)
+                .Select(cv => new CvSummaryDto
+                {
+                    Id = cv.Id,
+                    PositionId = cv.PositionId,
+                    PositionTitle = cv.Position != null ? cv.Position.Title : string.Empty,
+                    LikeCount = cv.Likes.Count,
+                    Status = cv.Status,
+                    CreatedAt = cv.CreatedAt
+                })
+                .ToListAsync();
+        }
+        public async Task<List<CvSummaryDto>> GetAllForUserId(int userId)
+        {
+            return await _db.CVs
+                .AsNoTracking()
+                .Include(c => c.Position)
+                .Include(c => c.Likes)
                 .Where(c => c.UserId == userId)
+                .Select(x => new CvSummaryDto
+                {
+                    Id = x.Id,
+                    PositionId = x.PositionId,
+                    LikeCount = x.Likes.Count,
+                    PositionTitle = x.Position.Title,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt
+                })
                 .ToListAsync();
-
-            return cvs.Select(ToSummaryDto).ToList();
         }
 
-        public async Task<List<CvSummaryDto>> GetByPosition(int positionId)
+        public async Task<List<CvSummaryDto>> GetByPositionId(int positionId)
         {
-            var cvs = await _db.CVs.AsNoTracking()
-                .Include(c => c.Position).Include(c => c.Likes)
+            return await _db.CVs
+                .AsNoTracking()
+                .Include(c => c.Position)
+                .Include(c => c.Likes)
                 .Where(c => c.PositionId == positionId && c.Status == CVStatus.Published)
+                .Select(x => new CvSummaryDto
+                {
+                    Id = x.Id,
+                    PositionId = x.PositionId,
+                    LikeCount = x.Likes.Count,
+                    PositionTitle = x.Position.Title,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt
+                })
                 .ToListAsync();
-
-            return cvs.Select(ToSummaryDto).ToList();
         }
 
-        public async Task<CvDto> Create(CreateCvDto dto, int userId)
+        public async Task<CvDto> Create(CreateCvDto dto)
         {
-            if (await _db.CVs.AnyAsync(c => c.UserId == userId && c.PositionId == dto.PositionId))
-                throw new BadRequestException(_localizer["CvAlreadyExistsForPosition"]);
-
             var position = await _db.Positions
-                .Include(p => p.PositionAccessRules).ThenInclude(r => r.Attribute)
-                .FirstOrDefaultAsync(p => p.Id == dto.PositionId)
-                ?? throw new NotFoundException(_localizer["PositionNotFound"]);
+                .Include(p => p.Attributes)
+                .Include(p => p.PositionAccessRules)
+                .ThenInclude(r => r.Attribute)
+                .Include(p => p.Tags)
+                .FirstOrDefaultAsync(p => p.Id == dto.PositionId);
 
-            var candidateValues = await GetAttributeValues(userId);
-            if (!CanAccess(position, candidateValues))
-                throw new ForbiddenException(_localizer["PositionAccessDenied"]);
+            if (position is null)
+            {
+                throw new NotFoundException(_localizer["PositionNotFound"]);
+            }
 
-            var cv = new CV { UserId = userId, PositionId = dto.PositionId, Likes = new List<Like>() };
+            if (await _db.CVs.AnyAsync(c => c.UserId == dto.UserId && c.PositionId == dto.PositionId))
+            {
+                throw new BadRequestException(_localizer["CvAlreadyExistsForPosition"]);
+            }
+
+            var attributeIds = position.Attributes.Select(a => a.Id).ToList();
+            var projectIds = await GetMatchingProjectIds(dto.UserId, position);
+            var cv = new CV
+            {
+                UserId = dto.UserId,
+                PositionId = position.Id,
+                Status = CVStatus.Published,
+                AttributeIds = attributeIds,
+                ProjectIds = projectIds,
+                Likes = new List<Like>(),
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
             _db.CVs.Add(cv);
             await _db.SaveChangesAsync();
-
-            return await GetById(cv.Id, userId, isRecruiterOrAdmin: false, isAdmin: false);
+            return await GetById(cv.Id, dto.UserId);
         }
 
-        public async Task<CvDto> GetById(int cvId, int userId, bool isRecruiterOrAdmin, bool isAdmin)
+        public async Task<CvDto> GetById(int cvId, int userId)
         {
-            var cv = await _db.CVs.AsNoTracking()
-                .Include(c => c.Position).ThenInclude(p => p.Attributes)
+            var cv = await _db.CVs
+                .AsNoTracking()
+                .Include(c => c.Position)
+                    .ThenInclude(p => p.Attributes)
                 .Include(c => c.Likes)
-                .FirstOrDefaultAsync(c => c.Id == cvId)
-                ?? throw new NotFoundException(_localizer["CvNotFound"]);
+                .FirstOrDefaultAsync(c => c.Id == cvId);
 
-            EnsureViewable(cv, userId, isRecruiterOrAdmin, isAdmin);
+            if (cv is null)
+            {
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
 
-            var candidateValues = await GetAttributeValues(cv.UserId);
+            User user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            EnsureViewable(cv, user);
+
+            var attributes = await _db.Attributes
+                .AsNoTracking()
+                .Where(a => cv.AttributeIds.Contains(a.Id))
+                .ToListAsync();
+
+            var attributeValues = await GetAttributeValues(cv.UserId);
+
+            var projects = await _db.Projects
+                .AsNoTracking()
+                .Include(p => p.Tags)
+                .Where(p => cv.ProjectIds.Contains(p.Id))
+                .ToListAsync();
 
             return new CvDto
             {
                 Id = cv.Id,
-                PositionId = cv.PositionId!.Value,
-                PositionTitle = cv.Position!.Title,
+                PositionId = cv.PositionId,
+                PositionTitle = cv.Position.Title,
                 LikeCount = cv.Likes.Count,
                 Status = cv.Status,
-                Fields = BuildFields(cv.Position.Attributes, candidateValues),
-                Projects = await BuildMatchingProjects(cv.UserId, cv.Position)
+                Attributes = BuildAttributes(attributes, attributeValues),
+                CreatedAt = cv.CreatedAt,
+                Projects = projects.Select(project => new ProjectDto
+                {
+                    Id = project.Id,
+                    Name = project.Name,
+                    StartDate = project.StartDate,
+                    EndDate = project.EndDate,
+                    Description = project.Description,
+                    Tags = project.Tags.Select(t => t.Name).ToList()
+                }).ToList()
             };
         }
 
         public async Task<CvDto> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)
         {
-            var cv = await GetOwned(dto.CvId, userId);
+            var cv = await _db.CVs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == dto.CvId);
+            if (cv is null)
+            {
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
 
-            if (!await _db.Attributes.AnyAsync(a => a.Id == dto.AttributeId))
-                throw new NotFoundException(_localizer["AttributeNotFound"]);
-
-            var existing = await _db.AttributeValues
-                .FirstOrDefaultAsync(v => v.UserId == cv.UserId && v.AttributeId == dto.AttributeId);
-
-            if (existing is null)
-                _db.AttributeValues.Add(new AttributeValue { UserId = cv.UserId, AttributeId = dto.AttributeId, Value = dto.Value });
-            else
-                existing.Value = dto.Value;
-
-            await _db.SaveChangesAsync();
-            return await GetById(dto.CvId, userId, isRecruiterOrAdmin: false, isAdmin: false);
-        }
-
-        public async Task<CvDto> Publish(int cvId, int userId)
-        {
-            var cv = await GetOwned(cvId, userId);
-
-            var detail = await GetById(cvId, userId, isRecruiterOrAdmin: false, isAdmin: false);
-            if (detail.Fields.Any(f => f.IsEmpty))
-                throw new BadRequestException(_localizer["CvHasEmptyFields"]);
-
-            cv.Status = CVStatus.Published;
-            await _db.SaveChangesAsync();
-            return await GetById(cvId, userId, isRecruiterOrAdmin: false, isAdmin: false);
-        }
-
-        public async Task Delete(DeleteCvDto dto, int userId, bool isAdmin)
-        {
-            var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.Id)
-                ?? throw new NotFoundException(_localizer["CvNotFound"]);
-
+            var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
             if (cv.UserId != userId && !isAdmin)
+            {
                 throw new ForbiddenException(_localizer["NotYourCv"]);
+            }
+
+            if (!cv.AttributeIds.Contains(dto.AttributeValueId))
+            {
+                throw new BadRequestException(_localizer["AttributeNotInCv"]);
+            }
+
+            var attributeValue = await _db.AttributeValues
+                .FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeValueId);
+
+            if (attributeValue is null)
+            {
+                attributeValue = new AttributeValue
+                {
+                    UserId = userId,
+                    AttributeId = dto.AttributeValueId,
+                    Value = dto.Value,
+                };
+
+                _db.AttributeValues.Add(attributeValue);
+            }
+            else
+            {
+                attributeValue.Value = dto.Value;
+            }
+
+            cv.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return await GetById(dto.CvId, userId);
+        }
+
+        public async Task Delete(DeleteCvDto dto)
+        {
+            var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.Id);
+            if (cv is null)
+            {
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
+
+            var isAdmin = await _db.Users.AnyAsync(u => u.Id == dto.UserId && u.Role == UserRole.Administrator);
+            if (cv.UserId != dto.UserId && !isAdmin)
+            {
+                throw new ForbiddenException(_localizer["NotYourCv"]);
+            }
 
             _db.CVs.Remove(cv);
             await _db.SaveChangesAsync();
         }
 
-        // ---------- private helpers ----------
-
-        private async Task<CV> GetOwned(int cvId, int userId)
+        public async Task<CvDto> Publish(PublishCvDto dto)
         {
-            var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == cvId)
-                ?? throw new NotFoundException(_localizer["CvNotFound"]);
-
-            if (cv.UserId != userId)
-                throw new ForbiddenException(_localizer["NotYourCv"]);
-
-            return cv;
-        }
-
-        private void EnsureViewable(CV cv, int userId, bool isRecruiterOrAdmin, bool isAdmin)
-        {
-            if (cv.UserId == userId || isAdmin) return;
-            if (!isRecruiterOrAdmin) throw new ForbiddenException(_localizer["NotYourCv"]);
-            if (cv.Status != CVStatus.Published) throw new ForbiddenException(_localizer["CvNotPublished"]);
-        }
-
-        private Task<List<AttributeValue>> GetAttributeValues(int userId) =>
-            _db.AttributeValues.AsNoTracking().Include(v => v.Attribute).Where(v => v.UserId == userId).ToListAsync();
-
-        private static List<CvFieldDto> BuildFields(List<Models.Attribute> attributes, List<AttributeValue> values) =>
-            attributes.Select(attr =>
+            var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.Id);
+            if (cv is null)
             {
-                var value = values.FirstOrDefault(v => v.AttributeId == attr.Id)?.Value;
-                return new CvFieldDto
-                {
-                    Attribute = new Dtos.Attribute.AttributeDto
-                    {
-                        Id = attr.Id,
-                        Name = attr.Name,
-                        Category = attr.Category,
-                        Type = attr.AttributeType,
-                        Description = attr.Description,
-                        IsBuiltIn = attr.IsBuiltIn
-                    },
-                    Value = value,
-                    IsEmpty = string.IsNullOrWhiteSpace(value)
-                };
-            }).ToList();
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
 
-        private async Task<List<ProjectDto>> BuildMatchingProjects(int userId, Position position)
+            var isAdmin = await _db.Users.AnyAsync(u => u.Id == dto.UserId && u.Role == UserRole.Administrator);
+            if (cv.UserId != dto.UserId && !isAdmin)
+            {
+                throw new ForbiddenException(_localizer["NotYourCv"]);
+            }
+
+            var attributeValues = await GetAttributeValues(cv.UserId);
+            var hasEmptyAttribute = cv.AttributeIds.Any(attributeId =>
+            {
+                var value = attributeValues.FirstOrDefault(v => v.AttributeId == attributeId)?.Value;
+                return string.IsNullOrWhiteSpace(value);
+            });
+
+            if (hasEmptyAttribute)
+            {
+                throw new BadRequestException(_localizer["CvHasEmptyAttributes"]);
+            }
+
+            cv.Status = CVStatus.Published;
+            cv.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return await GetById(dto.Id, dto.UserId);
+        }
+        private async Task<List<AttributeValue>> GetAttributeValues(int userId)
         {
-            var tagNames = (position.Tags ?? new List<Tag>()).Select(t => t.Name).ToHashSet();
-
-            var projects = await _db.Projects.AsNoTracking().Include(p => p.Tags)
-                .Where(p => p.UserId == userId).ToListAsync();
-
-            return projects
-                .Where(p => p.Tags.Any(t => tagNames.Contains(t.Name)))
-                .OrderByDescending(p => p.StartDate)
-                .Take(position.MaxProjects)
-                .Select(p => new ProjectDto
+            return await _db.AttributeValues
+                .AsNoTracking()
+                .Where(v => v.UserId == userId)
+                .ToListAsync();
+        }
+        private static List<CvAttributeDto> BuildAttributes(List<Models.Attribute> attributes, List<AttributeValue> values)
+        {
+            return attributes
+                .Select(attribute =>
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    StartDate = p.StartDate,
-                    EndDate = p.EndDate,
-                    Description = p.Description,
-                    Tags = p.Tags.Select(t => t.Name).ToList()
+                    var value = values.FirstOrDefault(v => v.AttributeId == attribute.Id)?.Value;
+                    return new CvAttributeDto
+                    {
+                        AttributeId = attribute.Id,
+                        Attribute = new Dtos.Attribute.AttributeDto
+                        {
+                            Id = attribute.Id,
+                            Name = attribute.Name,
+                            Category = attribute.Category,
+                            Type = attribute.AttributeType,
+                            Description = attribute.Description,
+                            IsBuiltIn = attribute.IsBuiltIn,
+                        },
+                        Value = value,
+                        IsEmpty = string.IsNullOrWhiteSpace(value),
+                    };
                 })
                 .ToList();
         }
-
-        // Same CanAccess/Compare pattern as PositionService, inlined here per the earlier
-        // decision to drop the separate evaluator class.
-        private bool CanAccess(Position position, List<AttributeValue> candidateValues)
+        private async Task<List<int>> GetMatchingProjectIds(int userId, Position position)
         {
-            if (position.IsPublic) return true;
-            if (position.PositionAccessRules.Count == 0) return true;
-
-            foreach (var rule in position.PositionAccessRules)
+            var positionTagNames = (position.Tags ?? new List<Tag>()).Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (positionTagNames.Count == 0)
             {
-                var value = candidateValues.FirstOrDefault(v => v.AttributeId == rule.AttributeId);
-                if (value is null) return false;
-
-                bool matches = rule.ComparisonType switch
-                {
-                    ComparisonType.Equal => value.Value == rule.Value,
-                    ComparisonType.LessThan => Compare(value.Value, rule.Value) < 0,
-                    ComparisonType.LessThanOrEqual => Compare(value.Value, rule.Value) <= 0,
-                    ComparisonType.GreaterThan => Compare(value.Value, rule.Value) > 0,
-                    ComparisonType.GreaterThanOrEqual => Compare(value.Value, rule.Value) >= 0,
-                    _ => false
-                };
-
-                if (!matches) return false;
+                return new List<int>();
             }
 
-            return true;
+            var projects = await _db.Projects
+                .AsNoTracking()
+                .Include(p => p.Tags)
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+
+            return projects
+                .Where(p => p.Tags.Any(t => positionTagNames.Contains(t.Name)))
+                .OrderByDescending(p => p.StartDate)
+                .Take(position.MaxProjects)
+                .Select(p => p.Id)
+                .ToList();
         }
-
-        private static int Compare(string userValue, string ruleValue)
+        private void EnsureViewable(CV cv, User user)
         {
-            if (decimal.TryParse(userValue, out var userNumber) && decimal.TryParse(ruleValue, out var ruleNumber))
-                return userNumber.CompareTo(ruleNumber);
-
-            return string.Compare(userValue, ruleValue, StringComparison.OrdinalIgnoreCase);
+            if (cv.UserId == user.Id || user.Role == UserRole.Administrator)
+            {
+                return;
+            }
+            if (user.Role == UserRole.Recruiter && cv.Status != CVStatus.Published)
+            {
+                throw new ForbiddenException(_localizer["CvNotPublished"]);
+            }
         }
-
-        private static CvSummaryDto ToSummaryDto(CV cv) => new()
-        {
-            Id = cv.Id,
-            PositionId = cv.PositionId ?? 0,
-            PositionTitle = cv.Position?.Title ?? "",
-            LikeCount = cv.Likes?.Count ?? 0,
-            Status = cv.Status
-        };
     }
 }

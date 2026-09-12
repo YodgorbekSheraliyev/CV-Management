@@ -64,36 +64,46 @@ namespace backend.Data
                     Description = "",
                     IsBuiltIn = true
                 });
+            });
 
-                modelBuilder.Entity<Like>(entity =>
-                {
-                    entity.HasKey(x => x.Id);
-                    entity.HasOne(x => x.Recruiter)
-                    .WithMany(x => x.Likes)
-                    .HasForeignKey(x => x.RecruiterId)
-                    .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Like>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.HasOne(x => x.Recruiter)
+                .WithMany(x => x.Likes)
+                .HasForeignKey(x => x.RecruiterId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-                    entity.HasOne(x => x.CV)
-                    .WithMany(x => x.Likes)
-                    .HasForeignKey(x => x.CVId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                });
+                entity.HasOne(x => x.CV)
+                .WithMany(x => x.Likes)
+                .HasForeignKey(x => x.CVId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
 
-                modelBuilder.Entity<CV>(entity =>
-                {
-                    entity.HasKey(x => x.Id);
+            modelBuilder.Entity<CV>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                
+                entity.HasOne(x => x.User)
+                .WithMany(u => u.CVs)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(x => x.Position)
+                .WithMany(p => p.CVs)
+                .HasForeignKey(x => x.PositionId)
+                .OnDelete(DeleteBehavior.SetNull);
+            });
 
-                    entity.HasOne(x => x.User)
-                    .WithMany(u => u.CVs)
-                    .HasForeignKey(x => x.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Position>(entity =>
+            {
+                entity.HasMany(x => x.Tags).WithMany(x => x.Positions);
+                entity.HasMany(x => x.Attributes).WithMany(x => x.Positions);
+            });
 
-                    entity.HasOne(x => x.Position)
-                    .WithMany(p => p.CVs)
-                    .HasForeignKey(x => x.PositionId)
-                    .OnDelete(DeleteBehavior.SetNull);
-                });
-
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.HasMany(x => x.Tags).WithMany(x => x.Projects);
             });
         }
     }

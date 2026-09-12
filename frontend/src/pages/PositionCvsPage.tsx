@@ -5,7 +5,7 @@ import NavBar from "../components/navbar/NavBar";
 import { getPositionById, getPositionCvs } from "../api/positionApi";
 import { useAuth } from "../hooks/auth";
 import { UserRole } from "../enums/enums";
-import type { CV, CVSummary, Position } from "../models";
+import type { CVSummary, Position, User } from "../models";
 
 const PositionCvsPage = () => {
   const { id } = useParams();
@@ -209,7 +209,7 @@ const PositionCvsPage = () => {
 
                   <tbody>
                     {cvs.map((cv) => (
-                      <CvRow key={cv.id} cv={cv} positionId={position.id} />
+                      <CvRow key={cv.id} user={user} cv={cv} />
                     ))}
                   </tbody>
                 </table>
@@ -249,27 +249,13 @@ const PositionCvsPage = () => {
 };
 
 interface CvRowProps {
-  cv: CV;
-  positionId: number;
+  cv: CVSummary;
+  user: User
 }
 
-const CvRow = ({ cv, positionId }: CvRowProps) => {
-  /*
-   * Adjust these properties to match your CV model.
-   *
-   * For example, if your CV contains:
-   *   candidate.id
-   *   candidate.firstName
-   *   candidate.lastName
-   *   createdAt
-   *
-   * use those properties here.
-   */
-
-  const candidateName =
-    (cv as any).candidateName ?? (cv as any).candidate?.name ?? "Candidate";
-
-  const submittedAt = (cv as any).createdAt ?? (cv as any).submittedAt;
+const CvRow = ({ cv, user }: CvRowProps) => {
+  const candidateName = `${user?.firstName} ${user.lastName}`;
+  const submittedAt = cv.createdAt;
 
   return (
     <tr>
@@ -287,10 +273,9 @@ const CvRow = ({ cv, positionId }: CvRowProps) => {
 
           <div>
             <div className="fw-semibold">{candidateName}</div>
-
-            {(cv as any).candidate?.email && (
+            {user.email && (
               <div className="text-muted small">
-                {(cv as any).candidate.email}
+                {user.email}
               </div>
             )}
           </div>
@@ -313,7 +298,7 @@ const CvRow = ({ cv, positionId }: CvRowProps) => {
 
       <td className="text-end px-4">
         <Link
-          to={`/positions/${positionId}/cvs/${cv.id}`}
+          to={`/cvs/${cv.id}`}
           className="btn btn-sm btn-outline-primary"
         >
           <i className="bi bi-eye me-1" />

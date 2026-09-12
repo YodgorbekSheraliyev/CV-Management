@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260911165358_UpdateTag")]
+    partial class UpdateTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("AttributePosition", b =>
-                {
-                    b.Property<int>("AttributesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PositionsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AttributesId", "PositionsId");
-
-                    b.HasIndex("PositionsId");
-
-                    b.ToTable("AttributePosition");
-                });
 
             modelBuilder.Entity("PositionTag", b =>
                 {
@@ -94,10 +82,15 @@ namespace backend.Migrations
                     b.Property<string>("Options")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PositionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
+
+                    b.HasIndex("PositionId");
 
                     b.ToTable("Attributes");
 
@@ -179,7 +172,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PositionId")
@@ -192,7 +185,7 @@ namespace backend.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
@@ -411,21 +404,6 @@ namespace backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AttributePosition", b =>
-                {
-                    b.HasOne("backend.Models.Attribute", null)
-                        .WithMany()
-                        .HasForeignKey("AttributesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Position", null)
-                        .WithMany()
-                        .HasForeignKey("PositionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("PositionTag", b =>
                 {
                     b.HasOne("backend.Models.Position", null)
@@ -454,6 +432,13 @@ namespace backend.Migrations
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Attribute", b =>
+                {
+                    b.HasOne("backend.Models.Position", null)
+                        .WithMany("Attributes")
+                        .HasForeignKey("PositionId");
                 });
 
             modelBuilder.Entity("backend.Models.AttributeValue", b =>
@@ -570,6 +555,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Position", b =>
                 {
+                    b.Navigation("Attributes");
+
                     b.Navigation("CVs");
 
                     b.Navigation("Discussion")

@@ -68,5 +68,14 @@ namespace backend.Controllers
             var result = await _positionService.Duplicate(positionId, userId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
+
+
+        [HttpPost("{positionId:int}/apply")]
+        [Authorize(Roles = "Candidate")]
+        public async Task<IActionResult> Apply(int positionId)
+        {
+            var result = await _positionService.Apply(positionId, 1);
+            return Ok(CommonResponse<object>.Ok(result));
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using backend.Dtos;
 using backend.Dtos.Cv;
-using backend.Exceptions;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +19,17 @@ namespace backend.Controllers
             _cvService = cvService;
         }
 
-        private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        private bool IsRecruiterOrAdmin => User.IsInRole("Recruiter") || User.IsInRole("Administrator");
-        private bool IsAdmin => User.IsInRole("Administrator");
-
-        [HttpGet]
-        public async Task<IActionResult> GetMine()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
         {
-            var result = await _cvService.GetMine(CurrentUserId);
+            var result = await _cvService.GetAll();
+            return Ok(CommonResponse<List<CvSummaryDto>>.Ok(result));
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetAllForUserId(int userId)
+        {
+            var result = await _cvService.GetAllForUserId(userId);
             return Ok(CommonResponse<List<CvSummaryDto>>.Ok(result));
         }
 
@@ -35,45 +37,45 @@ namespace backend.Controllers
         [Authorize(Roles = "Candidate")]
         public async Task<IActionResult> Create(CreateCvDto dto)
         {
-            var result = await _cvService.Create(dto, CurrentUserId);
+            var result = await _cvService.Create(dto);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{cvId}/{userId}")]
+        public async Task<IActionResult> GetById(int cvId, int userId)
         {
-            var result = await _cvService.GetById(id, CurrentUserId, IsRecruiterOrAdmin, IsAdmin);
+            var result = await _cvService.GetById(cvId, userId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpPut("attribute-values")]
-        [Authorize(Roles = "Candidate")]
-        public async Task<IActionResult> UpdateAttributeValue(UpdateCvAttributeValueDto dto)
+        [HttpPut("attribute-values/{userId}")]
+        [Authorize(Roles = "Candidate,Administrator")]
+        public async Task<IActionResult> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)
         {
-            var result = await _cvService.UpdateAttributeValue(dto, CurrentUserId);
+            var result = await _cvService.UpdateAttributeValue(dto, userId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpPost("{id}/publish")]
-        [Authorize(Roles = "Candidate")]
-        public async Task<IActionResult> Publish(int id)
+        [HttpPut("publish")]
+        [Authorize(Roles = "Candidate,Administrator")]
+        public async Task<IActionResult> Publish(PublishCvDto dto)
         {
-            var result = await _cvService.Publish(id, CurrentUserId);
+            var result = await _cvService.Publish(dto);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteCvDto dto)
         {
-            await _cvService.Delete(dto, CurrentUserId, IsAdmin);
+            await _cvService.Delete(dto);
             return NoContent();
         }
 
         [HttpGet("/api/positions/{positionId}/cvs")]
         [Authorize(Roles = "Recruiter,Administrator")]
-        public async Task<IActionResult> GetByPosition(int positionId)
+        public async Task<IActionResult> GetByPositionId(int positionId)
         {
-            var result = await _cvService.GetByPosition(positionId);
+            var result = await _cvService.GetByPositionId(positionId);
             return Ok(CommonResponse<List<CvSummaryDto>>.Ok(result));
         }
     }

@@ -32,7 +32,7 @@ namespace backend.Services
                     Id = p.Id,
                     Title = p.Title,
                     Description = p.Description,
-                    IsPublic = p.IsPublic,
+                    IsPublic = p.PositionAccessRules == null || p.PositionAccessRules.Count == 0,
                     MaxProjects = p.MaxProjects,
                     Tags = p.Tags.Select(t => t.Name).ToList(),
                     CVsCount = p.CVs.Count
@@ -48,6 +48,7 @@ namespace backend.Services
                 .Include(p => p.Discussion)
                     .ThenInclude(d => d.Posts)
                 .Include(p => p.CVs)
+                    .ThenInclude(c => c.Likes)
                 .Include(p => p.PositionAccessRules)
                     .ThenInclude(par => par.Attribute)
                 .FirstOrDefaultAsync(p => p.Id == positionId);
@@ -66,7 +67,7 @@ namespace backend.Services
                 Id = position.Id,
                 Title = position.Title,
                 Description = position.Description,
-                IsPublic = position.IsPublic,
+                IsPublic = position.PositionAccessRules == null || position.PositionAccessRules.Count == 0,
                 MaxProjects = position.MaxProjects,
                 Tags = position.Tags.Select(t => new TagDto
                 {
@@ -101,7 +102,6 @@ namespace backend.Services
             {
                 Title = dto.Title,
                 Description = dto.Description,
-                IsPublic = dto.IsPublic,
                 MaxProjects = dto.MaxProjects,
                 Attributes = attributes,
                 Tags = tags,
@@ -144,10 +144,8 @@ namespace backend.Services
             position.Description = dto.Description;
             position.Attributes = attributes;
             position.Tags = tags;
-            position.IsPublic = dto.IsPublic;
             position.MaxProjects = dto.MaxProjects;
 
-            // replace access rules rather than mutate in place
             position.PositionAccessRules.Clear();
             position.PositionAccessRules = dto.AccessRules.Select(r => new PositionAccessRule
             {
@@ -170,7 +168,6 @@ namespace backend.Services
             _db.Positions.Remove(position);
             await _db.SaveChangesAsync();
         }
-
         public async Task<PositionDto> Duplicate(int id, int userId)
         {
             var position = await _db.Positions
@@ -187,7 +184,6 @@ namespace backend.Services
             {
                 Title = $"{position.Title} (Copy)",
                 Description = position.Description,
-                IsPublic = position.IsPublic,
                 MaxProjects = position.MaxProjects,
                 Attributes = position.Attributes.ToList(),
                 Tags = position.Tags?.ToList() ?? new(),
@@ -204,16 +200,18 @@ namespace backend.Services
 
             return await GetById(duplicate.Id, userId);
         }
+        public async Task<object> Apply(int positionId, int userId)
+        {
 
+            throw new NotImplementedException();
+        }
         private async Task<bool> CanAccess(int userId, Position position)
         {
-            if (position.IsPublic)
-                return true;
             var user = await _db.Users.FindAsync(userId);
-            if(user is { Role: UserRole.Administrator or UserRole.Recruiter })
+            if (user is { Role: UserRole.Administrator or UserRole.Recruiter })
                 return true;
 
-            if (position.PositionAccessRules.Count == 0)
+            if (position.PositionAccessRules is null || position.PositionAccessRules.Count == 0)
                 return true;
 
             var attributeIds = position.PositionAccessRules
@@ -238,21 +236,12 @@ namespace backend.Services
 
                 bool matches = rule.ComparisonType switch
                 {
-                    ComparisonType.Equal =>
-                        userValue.Value == rule.Value,
-
-                    ComparisonType.LessThan =>
-                        Compare(userValue.Value, rule.Value) < 0,
-
-                    ComparisonType.LessThanOrEqual =>
-                        Compare(userValue.Value, rule.Value) <= 0,
-
-                    ComparisonType.GreaterThan =>
-                        Compare(userValue.Value, rule.Value) > 0,
-
-                    ComparisonType.GreaterThanOrEqual =>
-                        Compare(userValue.Value, rule.Value) >= 0,
-
+                    ComparisonType.Equal => userValue.Value == rule.Value,
+                    ComparisonType.NotEqual => userValue.Value != rule.Value,
+                    ComparisonType.LessThan => Compare(userValue.Value, rule.Value) < 0,
+                    ComparisonType.LessThanOrEqual => Compare(userValue.Value, rule.Value) <= 0,
+                    ComparisonType.GreaterThan => Compare(userValue.Value, rule.Value) > 0,
+                    ComparisonType.GreaterThanOrEqual => Compare(userValue.Value, rule.Value) >= 0,
                     _ => false
                 };
 

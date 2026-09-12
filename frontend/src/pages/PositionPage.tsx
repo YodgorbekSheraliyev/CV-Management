@@ -10,6 +10,8 @@ import {
   duplicatePosition,
 } from "../api/positionApi";
 import { ATTRIBUTE_TYPE_LABELS } from "../constants";
+import { createCv } from "../api/cvApi";
+import ToastNotification from "../components/notifications/ToastNotification";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
@@ -29,9 +31,12 @@ const PositionPage = () => {
   const [position, setPosition] = useState<Position | null>(null);
   const [post, setPost] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [duplicating, setDuplicating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -40,13 +45,15 @@ const PositionPage = () => {
 
   const loadPosition = async (positionId: number) => {
     setLoading(true);
-    setError(null);
 
     try {
       const res = await getPositionById(positionId, user!.id);
       setPosition(res);
     } catch (error: any) {
-      setError(error.message ?? "Could not load position");
+      setToast({
+        message: error.message ?? "Could not load position.",
+        type: "danger",
+      });
     }
     setLoading(false);
   };
@@ -55,14 +62,16 @@ const PositionPage = () => {
     if (!position || !user || deleting) return;
 
     setDeleting(true);
-    setError(null);
 
     try {
       await deletePosition({ id: position.id });
 
       navigate("/positions");
     } catch (error: any) {
-      setError(error.message ?? "Could not delete position.");
+      setToast({
+        message: error.message ?? "Could not delete position.",
+        type: "danger",
+      });
     } finally {
       setDeleting(false);
     }
@@ -72,16 +81,41 @@ const PositionPage = () => {
     if (!position || !user || duplicating) return;
 
     setDuplicating(true);
-    setError(null);
 
     try {
       const duplicatedPosition = await duplicatePosition(position.id, user.id);
 
       navigate(`/positions/${duplicatedPosition.id}`);
     } catch (error: any) {
-      setError(error.message ?? "Could not duplicate position.");
+      setToast({
+        message: error.message ?? "Could not duplicate position.",
+        type: "danger",
+      });
     } finally {
       setDuplicating(false);
+    }
+  };
+
+  const handleApply = async (positionId: number) => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      setToast(null);
+
+      await createCv(positionId, user.id);
+
+      setToast({
+        message: "You have successfully applied for this position!",
+        type: "success",
+      });
+    } catch (error: any) {
+      setToast({
+        message: error.message ?? "Failed to apply for this position.",
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,12 +132,13 @@ const PositionPage = () => {
     );
   }
 
-  if (error || !position) {
+  if (!position) {
     return (
       <div className="min-vh-100 bg-light">
         <NavBar />
+        <ToastNotification toast={toast} onClose={() => setToast(null)} />
         <main className="container py-5 text-center">
-          <p className="text-danger mb-3">{error ?? "Position not found."}</p>
+          <p className="text-danger mb-3">Position not found.</p>
           <Link to="/positions" className="btn btn-outline-secondary">
             Back to positions
           </Link>
@@ -118,6 +153,7 @@ const PositionPage = () => {
   return (
     <div className="min-vh-100 bg-light">
       <NavBar />
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
       <main className="container py-4 py-md-5">
         <nav aria-label="breadcrumb" className="mb-4">
@@ -168,12 +204,14 @@ const PositionPage = () => {
 
               {isCandidate && (
                 <div className="d-flex flex-column gap-2 flex-shrink-0">
-                  <Link
-                    to={`/positions/${position.id}/cv`}
+                  <button
+                    onClick={() => {
+                      handleApply(position.id);
+                    }}
                     className="btn btn-primary px-4"
                   >
-                    Create CV
-                  </Link>
+                    Apply
+                  </button>
                 </div>
               )}
 
@@ -448,12 +486,14 @@ const PositionPage = () => {
                       </div>
                     </div>
                   </div>
-                  <Link
-                    to={`/positions/${position.id}/cv`}
-                    className="btn btn-primary w-100"
+                  <button
+                    onClick={() => {
+                      handleApply(position.id);
+                    }}
+                    className="btn btn-primary px-4"
                   >
-                    Create CV
-                  </Link>
+                    Apply
+                  </button>
                 </div>
               </section>
             )}

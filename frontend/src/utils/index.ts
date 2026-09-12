@@ -1,4 +1,4 @@
-import type { PeriodValue } from "../components/ValueField";
+import type { PeriodValue } from "../components/fields/ValueField";
 import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 import { AttributeType, ComparisonType } from "../enums/enums";
 

@@ -39,8 +39,9 @@ namespace backend.Services
                         Description = x.Attribute.Description,
                         IsBuiltIn = x.Attribute.IsBuiltIn,
                         Name = x.Attribute.Name,
-                        Type = x.Attribute.AttributeType
-                    }
+                        Type = x.Attribute.AttributeType,
+                        Options = x.Attribute.Options,
+                    },
                 })
                 .ToListAsync();
 

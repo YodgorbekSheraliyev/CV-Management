@@ -5,12 +5,14 @@ import SectionHeader from "../SectionHeader";
 
 import type { CVSummary } from "../../models";
 import { CVStatus } from "../../enums/enums";
-import { getMyCvs } from "../../api/cvApi";
+import { getCvsByUserId } from "../../api/cvApi";
+import { useAuth } from "../../hooks/auth";
 
 const CvsSection = () => {
   const [cvs, setCvs] = useState<CVSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     loadCvs();
@@ -21,9 +23,8 @@ const CvsSection = () => {
       setLoading(true);
       setError(null);
 
-      const result = await getMyCvs();
-
-      setCvs(result ?? []);
+      const result = await getCvsByUserId(user?.id!);
+      setCvs(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't load your CVs.");
     } finally {
@@ -119,9 +120,7 @@ const CvsSection = () => {
                     <td>{getStatusBadge(cv.status)}</td>
 
                     <td>
-                      <span className="text-muted">
-                        {cv.likeCount?? 0}
-                      </span>
+                      <span className="text-muted">{cv.likeCount ?? 0}</span>
                     </td>
 
                     <td>

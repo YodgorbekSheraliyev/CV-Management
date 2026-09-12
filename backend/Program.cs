@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +46,9 @@ builder.Services.AddControllers().AddDataAnnotationsLocalization(options =>
     {
         return factory.Create(typeof(SharedResource));
     };
+}).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>

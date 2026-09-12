@@ -36,8 +36,15 @@ export interface AttributeValue {
 }
 
 export interface CV extends CVSummary {
-  field: CvField[];
+  attributes: CvAttribute[];
   projects: Project[];
+}
+
+export interface CvAttribute {
+  attributeId: number;
+  attribute: Attribute;
+  value?: string;
+  isEmpty: boolean;
 }
 
 export interface CVSummary {
@@ -46,12 +53,7 @@ export interface CVSummary {
   positionTitle: string;
   likeCount: number;
   status: CVStatus;
-}
-
-interface CvField {
-  attribute: Attribute;
-  value?: string;
-  isEmpty: boolean;
+  createdAt: string;
 }
 
 export interface Discussion {

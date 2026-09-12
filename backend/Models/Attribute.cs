@@ -11,6 +11,7 @@ namespace backend.Models
         public string? Description { get; set; }
         public bool IsBuiltIn { get; set; } = false;
         public List<string>? Options { get; set; }
+        public List<Position>? Positions { get; set; }
 
     }
 }

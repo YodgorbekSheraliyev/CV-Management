@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import SectionHeader from "../SectionHeader";
 import AttributePickerModal from "../AttributePickerModal";
 import ValueCard from "../ValueCard";
+import ToastNotification from "../notifications/ToastNotification";
 import type { Attribute, AttributeValue, User } from "../../models";
 import { getAttributes } from "../../api/attributeApi";
 import {
@@ -17,14 +18,20 @@ const InfoSection = ({ user }: InfoSectionProps) => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [attributeValues, setAttributeValues] = useState<AttributeValue[]>([]);
   const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   const loadAttributes = async () => {
     try {
       const res = await getAttributes();
       setAttributes(res.filter((x) => x.isBuiltIn !== true));
     } catch (err: any) {
-      setError(err.message);
+      setToast({
+        message: err.message ?? "Could not load attributes.",
+        type: "danger",
+      });
     }
   };
 
@@ -33,19 +40,23 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       const res = await getAttributeValuesByUserId(user.id);
       setAttributeValues(res.filter((x) => !x.attribute.isBuiltIn));
     } catch (err: any) {
-      setError(err.message);
+      setToast({
+        message: err.message ?? "Could not load attribute values.",
+        type: "danger",
+      });
     }
   };
 
   const handleSelectAttribute = (attribute: Attribute) => {
-    setError("");
-
     const alreadyExists = attributeValues.some(
       (x) => x.attribute.id === attribute.id,
     );
 
     if (alreadyExists) {
-      setError(`"${attribute.name}" has already been added.`);
+      setToast({
+        message: `"${attribute.name}" has already been added.`,
+        type: "danger",
+      });
       return;
     }
 
@@ -54,8 +65,10 @@ const InfoSection = ({ user }: InfoSectionProps) => {
     );
 
     if (alreadySelected) {
-      setError(`"${attribute.name}" is already being added.`);
-
+      setToast({
+        message: `"${attribute.name}" is already being added.`,
+        type: "danger",
+      });
       return;
     }
 
@@ -74,8 +87,6 @@ const InfoSection = ({ user }: InfoSectionProps) => {
 
   const handleDelete = async (attributeValue: AttributeValue) => {
     try {
-      setError("");
-
       if (attributeValue.id < 0) {
         setAttributeValues((current) =>
           current.filter((x) => x.id !== attributeValue.id),
@@ -89,7 +100,10 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       });
       await loadAttributeValues();
     } catch (err: any) {
-      setError(err.message);
+      setToast({
+        message: err.message ?? "Could not delete attribute.",
+        type: "danger",
+      });
     }
   };
 
@@ -97,18 +111,6 @@ const InfoSection = ({ user }: InfoSectionProps) => {
     loadAttributeValues();
     loadAttributes();
   }, [user.id]);
-
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setError("");
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [error]);
 
   return (
     <section>
@@ -146,41 +148,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
         />
       )}
 
-      {error && (
-        <div
-          className="toast-container position-fixed bottom-0 end-0 p-3"
-          style={{ zIndex: 1100 }}
-        >
-          <div
-            className="toast show border-0 shadow"
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
-          >
-            <div className="toast-header">
-              <span
-                className="bg-danger rounded-circle me-2"
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  display: "inline-block",
-                }}
-              />
-
-              <strong className="me-auto">Error</strong>
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={() => setError("")}
-              />
-            </div>
-
-            <div className="toast-body">{error}</div>
-          </div>
-        </div>
-      )}
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
     </section>
   );
 };
