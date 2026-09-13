@@ -9,6 +9,8 @@ import ProjectsSection from "../components/sections/ProjectsSection";
 import CvsSection from "../components/sections/CvsSection";
 
 import { updateUser } from "../api/userApi";
+import { UserRole } from "../enums/enums";
+import ToastNotification from "../components/notifications/ToastNotification";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -28,23 +30,18 @@ const ProfilePage = () => {
     type: "success" | "danger";
   } | null>(null);
 
-  const handleUpdateUser = async (
-    data: UpdateUserData,
-  ): Promise<void> => {
+  const handleUpdateUser = async (data: UpdateUserData): Promise<void> => {
     if (!user) {
       return;
     }
 
     try {
       const updatedUser = await updateUser(user.id, data);
-
-      /*
-       * Update the global user state.
-       *
-       * This makes the profile UI update immediately
-       * without requiring a page refresh.
-       */
-      setUser(updatedUser);
+      setToast({
+        message: "Changes saved successfully",
+        type: "success",
+      });
+      setUser?.(updatedUser);
 
       setToast({
         message: "Profile updated successfully.",
@@ -52,17 +49,9 @@ const ProfilePage = () => {
       });
     } catch (err: any) {
       setToast({
-        message:
-          err?.message ??
-          "Could not update user profile.",
+        message: err?.message ?? "Could not update user profile.",
         type: "danger",
       });
-
-      /*
-       * Re-throw the error so MeSection knows
-       * that saving failed and stays in edit mode.
-       */
-      throw err;
     }
   };
 
@@ -99,42 +88,42 @@ const ProfilePage = () => {
       label: "Additional info",
       icon: "bi-list-ul",
     },
-    {
-      value: "projects",
-      label: "Projects",
-      icon: "bi-kanban",
-    },
-    {
-      value: "cvs",
-      label: "CVs",
-      icon: "bi-file-earmark-person",
-    },
   ];
+
+  if (user.role != UserRole.Recruiter) {
+    tabs.push(
+      {
+        value: "projects",
+        label: "Projects",
+        icon: "bi-kanban",
+      },
+      {
+        value: "cvs",
+        label: "CVs",
+        icon: "bi-file-earmark-person",
+      },
+    );
+  }
 
   return (
     <div className="min-vh-100 bg-light">
       <NavBar />
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
       <main className="container py-4 py-md-5">
-
         {/* Page heading */}
         <div className="mb-4">
-          <h1 className="h3 fw-bold mb-1">
-            My profile
-          </h1>
+          <h1 className="h3 fw-bold mb-1">My profile</h1>
 
           <p className="text-muted mb-0">
-            Manage your personal information, projects,
-            and CVs.
+            Manage your personal information, projects, and CVs.
           </p>
         </div>
 
         {/* Profile header */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4">
-
             <div className="d-flex flex-column flex-md-row align-items-md-center gap-3">
-
               {/* Avatar */}
               <div
                 className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
@@ -150,21 +139,17 @@ const ProfilePage = () => {
                     className="w-100 h-100 object-fit-cover"
                   />
                 ) : (
-                  <span className="fs-2 fw-bold">
-                    {initials}
-                  </span>
+                  <span className="fs-2 fw-bold">{initials}</span>
                 )}
               </div>
 
               {/* User information */}
               <div className="flex-grow-1">
-
                 <h2 className="h4 fw-bold mb-1">
                   {user.firstName} {user.lastName}
                 </h2>
 
                 <div className="text-muted small d-flex flex-column gap-1">
-
                   <span>
                     <i className="bi bi-envelope me-2" />
                     {user.email}
@@ -172,10 +157,8 @@ const ProfilePage = () => {
 
                   <span>
                     <i className="bi bi-geo-alt me-2" />
-                    {user.location ||
-                      "Location not provided"}
+                    {user.location || "Location not provided"}
                   </span>
-
                 </div>
               </div>
             </div>
@@ -185,30 +168,21 @@ const ProfilePage = () => {
         {/* Tabs */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-2">
-
             <div className="nav nav-pills flex-column flex-md-row gap-1">
-
               {tabs.map((tab) => (
                 <button
                   key={tab.value}
                   type="button"
                   className={`nav-link flex-fill text-md-center ${
-                    activeTab === tab.value
-                      ? "active"
-                      : "text-dark"
+                    activeTab === tab.value ? "active" : "text-dark"
                   }`}
-                  onClick={() =>
-                    setActiveTab(tab.value)
-                  }
+                  onClick={() => setActiveTab(tab.value)}
                 >
-                  <i
-                    className={`${tab.icon} me-2`}
-                  />
+                  <i className={`${tab.icon} me-2`} />
 
                   {tab.label}
                 </button>
               ))}
-
             </div>
           </div>
         </section>
@@ -216,24 +190,14 @@ const ProfilePage = () => {
         {/* Tab content */}
 
         {activeTab === "me" && (
-          <MeSection
-            user={user}
-            onSave={handleUpdateUser}
-          />
+          <MeSection user={user} onSave={handleUpdateUser} />
         )}
 
-        {activeTab === "info" && (
-          <InfoSection user={user} />
-        )}
+        {activeTab === "info" && <InfoSection user={user} />}
 
-        {activeTab === "projects" && (
-          <ProjectsSection />
-        )}
+        {activeTab === "projects" && <ProjectsSection />}
 
-        {activeTab === "cvs" && (
-          <CvsSection />
-        )}
-
+        {activeTab === "cvs" && <CvsSection />}
       </main>
     </div>
   );
