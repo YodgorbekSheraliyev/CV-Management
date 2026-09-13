@@ -21,6 +21,8 @@ const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.LessThanOrEqual]: "≤",
 };
 
+const DISCUSSION_PAGE_SIZE = 5;
+
 const PositionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,11 +30,15 @@ const PositionPage = () => {
   const isRecruiterOrAdmin =
     user?.role === UserRole.Recruiter || user?.role === UserRole.Administrator;
   const isCandidate = user?.role === UserRole.Candidate;
+
   const [position, setPosition] = useState<Position | null>(null);
   const [post, setPost] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [duplicating, setDuplicating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [visiblePosts, setVisiblePosts] = useState(DISCUSSION_PAGE_SIZE);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "danger";
@@ -65,9 +71,9 @@ const PositionPage = () => {
 
     try {
       await deletePosition({ id: position.id });
-
       navigate("/positions");
     } catch (error: any) {
+      setShowDeleteConfirm(false);
       setToast({
         message: error.message ?? "Could not delete position.",
         type: "danger",
@@ -84,7 +90,7 @@ const PositionPage = () => {
 
     try {
       const duplicatedPosition = await duplicatePosition(position.id, user.id);
-
+      setToast({ message: "Position duplicated.", type: "success" });
       navigate(`/positions/${duplicatedPosition.id}`);
     } catch (error: any) {
       setToast({
@@ -109,6 +115,7 @@ const PositionPage = () => {
         message: "You have successfully applied for this position!",
         type: "success",
       });
+      await loadPosition(positionId)
     } catch (error: any) {
       setToast({
         message: error.message ?? "Failed to apply for this position.",
@@ -119,14 +126,42 @@ const PositionPage = () => {
     }
   };
 
-  const submitPost = async () => {};
+  const submitPost = async () => {
+    if (!post.trim() || posting) return;
+    setPosting(true);
+    try {
+      // Wire up to a real endpoint when available.
+      setPost("");
+    } finally {
+      setPosting(false);
+    }
+  };
 
-  if (loading) {
+  if (loading && !position) {
     return (
       <div className="min-vh-100 bg-light">
         <NavBar />
-        <main className="container py-5 text-center text-muted">
-          Loading position…
+        <main className="container py-4 py-md-5">
+          <div className="placeholder-glow mb-4">
+            <span className="placeholder col-3 mb-3" style={{ height: 14 }} />
+          </div>
+          <div className="card border-0 shadow-sm mb-4">
+            <div className="card-body p-4 p-md-5 placeholder-glow">
+              <span className="placeholder col-2 mb-3" style={{ height: 24 }} />
+              <span className="placeholder col-6 mb-2" style={{ height: 32 }} />
+              <span className="placeholder col-8" style={{ height: 16 }} />
+            </div>
+          </div>
+          <div className="card border-0 shadow-sm placeholder-glow">
+            <div className="card-body p-4">
+              <span className="placeholder col-4 mb-3" style={{ height: 18 }} />
+              <span
+                className="placeholder col-12 mb-2"
+                style={{ height: 40 }}
+              />
+              <span className="placeholder col-12" style={{ height: 40 }} />
+            </div>
+          </div>
         </main>
       </div>
     );
@@ -138,8 +173,17 @@ const PositionPage = () => {
         <NavBar />
         <ToastNotification toast={toast} onClose={() => setToast(null)} />
         <main className="container py-5 text-center">
-          <p className="text-danger mb-3">Position not found.</p>
-          <Link to="/positions" className="btn btn-outline-secondary">
+          <div
+            className="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center mb-3"
+            style={{ width: 56, height: 56 }}
+          >
+            <i className="bi bi-exclamation-triangle fs-4" />
+          </div>
+          <h1 className="h4 fw-bold mb-2">Position not found</h1>
+          <p className="text-muted mb-4">
+            It may have been removed, or the link may be incorrect.
+          </p>
+          <Link to="/positions" className="btn btn-outline-secondary px-4">
             Back to positions
           </Link>
         </main>
@@ -149,6 +193,8 @@ const PositionPage = () => {
 
   const accessible = true;
   const cvCount = position.cVsCount;
+  const posts = position.discussion?.posts ?? [];
+  const hasMorePosts = posts.length > visiblePosts;
 
   return (
     <div className="min-vh-100 bg-light">
@@ -168,7 +214,11 @@ const PositionPage = () => {
                 Positions
               </Link>
             </li>
-            <li className="breadcrumb-item active" aria-current="page">
+            <li
+              className="breadcrumb-item active text-truncate"
+              style={{ maxWidth: 320 }}
+              aria-current="page"
+            >
               {position.title}
             </li>
           </ol>
@@ -177,44 +227,33 @@ const PositionPage = () => {
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4 p-md-5">
             <div className="d-flex flex-column flex-lg-row justify-content-between gap-4">
-              <div className="flex-grow-1">
-                <div className="d-flex flex-wrap gap-2 mb-3">
-                  <span
-                    className={`badge rounded-pill px-3 py-2 ${
-                      position.isPublic ? "text-bg-success" : "text-bg-warning"
-                    }`}
-                  >
-                    {position.isPublic ? "Public" : "Restricted"}
-                  </span>
-                </div>
+              <div className="flex-grow-1 min-w-0">
+                <span
+                  className={`badge rounded-pill px-3 py-2 mb-3 ${
+                    position.isPublic ? "text-bg-success" : "text-bg-warning"
+                  }`}
+                >
+                  <i
+                    className={`bi ${
+                      position.isPublic ? "bi-unlock" : "bi-lock"
+                    } me-1`}
+                  />
+                  {position.isPublic ? "Public" : "Restricted"}
+                </span>
 
-                <h1 className="display-6 fw-bold mb-2">{position.title}</h1>
+                <h1 className="h2 fw-bold mb-2">{position.title}</h1>
 
                 {isRecruiterOrAdmin && (
-                  <div className="d-flex flex-wrap gap-3 text-muted mb-4">
-                    <span>
-                      <i className="bi bi-file-earmark-text me-1" />
-                      {cvCount} CVs
-                    </span>
+                  <div className="text-muted small mb-3">
+                    <i className="bi bi-file-earmark-text me-1" />
+                    {cvCount} submitted {cvCount === 1 ? "CV" : "CVs"}
                   </div>
                 )}
 
-                <p className="lead text-muted mb-0">{position.description}</p>
+                <p className="text-muted mb-0" style={{ maxWidth: 640 }}>
+                  {position.description}
+                </p>
               </div>
-
-              {isCandidate && (
-                <div className="d-flex flex-column gap-2 flex-shrink-0">
-                  <button
-                    disabled={position.hasUserApplied}
-                    onClick={() => {
-                      handleApply(position.id);
-                    }}
-                    className="btn btn-primary px-4"
-                  >
-                    {position.hasUserApplied ? "Applied" : "Apply"}
-                  </button>
-                </div>
-              )}
 
               {isRecruiterOrAdmin && (
                 <div className="d-flex flex-wrap gap-2 align-content-start flex-shrink-0">
@@ -232,20 +271,25 @@ const PositionPage = () => {
                     onClick={handleDuplicate}
                     disabled={duplicating || deleting}
                   >
-                    <i className="bi bi-copy me-2" />
-
+                    {duplicating ? (
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <i className="bi bi-copy me-2" />
+                    )}
                     {duplicating ? "Duplicating…" : "Duplicate"}
                   </button>
 
                   <button
                     type="button"
                     className="btn btn-outline-danger px-4"
-                    onClick={handleDelete}
+                    onClick={() => setShowDeleteConfirm(true)}
                     disabled={deleting || duplicating}
                   >
                     <i className="bi bi-trash me-2" />
-
-                    {deleting ? "Deleting…" : "Delete"}
+                    Delete
                   </button>
                 </div>
               )}
@@ -255,18 +299,22 @@ const PositionPage = () => {
 
         <div className="row g-4">
           <div className="col-lg-8">
-            {position.positionAccessRules.length > 0 && (
-              <section className="card border-0 shadow-sm mb-4">
-                <div className="card-body p-0">
-                  <div className="p-4 border-bottom">
-                    <h2 className="h5 fw-bold mb-1">Access requirements</h2>
-                    <p className="text-muted small mb-0">
-                      {position.isPublic
-                        ? "This position is public — these rules are shown for reference only."
-                        : "A candidate must meet all of these to access this position."}
-                    </p>
-                  </div>
+            <section className="card border-0 shadow-sm mb-4">
+              <div className="card-body p-0">
+                <div className="p-4 border-bottom">
+                  <h2 className="h5 fw-bold mb-1">Access requirements</h2>
+                  <p className="text-muted small mb-0">
+                    {position.isPublic
+                      ? "This position is public — these rules are shown for reference only."
+                      : "A candidate must meet all of these to access this position."}
+                  </p>
+                </div>
 
+                {position.positionAccessRules.length === 0 ? (
+                  <div className="p-4 text-center text-muted small">
+                    No access rules have been added to this position.
+                  </div>
+                ) : (
                   <div className="table-responsive">
                     <table className="table align-middle mb-0">
                       <thead className="table-light">
@@ -305,9 +353,9 @@ const PositionPage = () => {
                       </tbody>
                     </table>
                   </div>
-                </div>
-              </section>
-            )}
+                )}
+              </div>
+            </section>
 
             <section className="card border-0 shadow-sm mb-4">
               <div className="card-body p-0">
@@ -320,30 +368,38 @@ const PositionPage = () => {
                   </p>
                 </div>
 
-                <div className="table-responsive">
-                  <table className="table align-middle mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th className="px-4 py-3">Attribute</th>
-                        <th className="py-3">Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {position.attributes.map((attribute) => (
-                        <tr key={attribute.id}>
-                          <td className="px-4 py-3">
-                            <div className="fw-semibold">{attribute.name}</div>
-                          </td>
-                          <td>
-                            <span className="badge text-bg-light border">
-                              {ATTRIBUTE_TYPE_LABELS[attribute.type]}
-                            </span>
-                          </td>
+                {position.attributes.length === 0 ? (
+                  <div className="p-4 text-center text-muted small">
+                    No attributes have been configured yet.
+                  </div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table align-middle mb-0">
+                      <thead className="table-light">
+                        <tr>
+                          <th className="px-4 py-3">Attribute</th>
+                          <th className="py-3">Type</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {position.attributes.map((attribute) => (
+                          <tr key={attribute.id}>
+                            <td className="px-4 py-3">
+                              <div className="fw-semibold">
+                                {attribute.name}
+                              </div>
+                            </td>
+                            <td>
+                              <span className="badge text-bg-light border">
+                                {ATTRIBUTE_TYPE_LABELS[attribute.type]}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -357,21 +413,27 @@ const PositionPage = () => {
                       the generated CV.
                     </p>
                   </div>
-                  <span className="badge text-bg-light border">
+                  <span className="badge text-bg-light border flex-shrink-0">
                     Max {position.maxProjects}
                   </span>
                 </div>
 
-                <div className="d-flex flex-wrap gap-2">
-                  {(position?.tags ?? []).map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="badge rounded-pill text-bg-primary-subtle text-primary border border-primary-subtle px-3 py-2"
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
+                {(position?.tags ?? []).length === 0 ? (
+                  <p className="text-muted small mb-0">
+                    No technologies specified — projects won't be filtered.
+                  </p>
+                ) : (
+                  <div className="d-flex flex-wrap gap-2">
+                    {(position?.tags ?? []).map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="badge rounded-pill text-bg-primary-subtle text-primary border border-primary-subtle px-3 py-2"
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </section>
 
@@ -386,52 +448,74 @@ const PositionPage = () => {
                       </p>
                     </div>
                     <span className="badge text-bg-light border">
-                      {position.discussion?.posts.length ?? 0} posts
+                      {posts.length} {posts.length === 1 ? "post" : "posts"}
                     </span>
                   </div>
                 </div>
 
-                <div>
-                  {position.discussion?.posts.map((post, index) => (
-                    <div
-                      key={post.id}
-                      className={`p-4 ${index !== position.discussion?.posts.length || 0 - 1 ? "border-bottom" : ""}`}
-                    >
-                      <div className="d-flex gap-3">
-                        <div
-                          className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
-                          style={{ width: 40, height: 40 }}
-                        >
-                          {post.authorName
-                            .split(" ")
-                            .map((name) => name[0])
-                            .join("")}
-                        </div>
-
-                        <div className="flex-grow-1">
-                          <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            {isRecruiterOrAdmin ? (
-                              <Link
-                                to={`/profile/${post.authorId}`}
-                                className="fw-semibold text-decoration-none"
-                              >
-                                {post.authorName}
-                              </Link>
-                            ) : (
-                              <span className="fw-semibold">
-                                {post.authorName}
-                              </span>
-                            )}
-                            <span className="text-muted small">
-                              {new Date(post.createdAt).toLocaleString()}
-                            </span>
+                {posts.length === 0 ? (
+                  <div className="p-4 text-center text-muted small">
+                    No discussion yet — be the first to ask a question.
+                  </div>
+                ) : (
+                  <div>
+                    {posts.slice(0, visiblePosts).map((post, index, arr) => (
+                      <div
+                        key={post.id}
+                        className={
+                          index !== arr.length - 1 ? "p-4 border-bottom" : "p-4"
+                        }
+                      >
+                        <div className="d-flex gap-3">
+                          <div
+                            className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                            style={{ width: 40, height: 40 }}
+                          >
+                            {post.authorName
+                              .split(" ")
+                              .map((name) => name[0])
+                              .join("")}
                           </div>
-                          <p className="text-muted mb-0">{post.content}</p>
+
+                          <div className="flex-grow-1 min-w-0">
+                            <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
+                              {isRecruiterOrAdmin ? (
+                                <Link
+                                  to={`/profile/${post.authorId}`}
+                                  className="fw-semibold text-decoration-none"
+                                >
+                                  {post.authorName}
+                                </Link>
+                              ) : (
+                                <span className="fw-semibold">
+                                  {post.authorName}
+                                </span>
+                              )}
+                              <span className="text-muted small">
+                                {new Date(post.createdAt).toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="text-muted mb-0">{post.content}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+
+                    {hasMorePosts && (
+                      <div className="p-3 text-center border-top">
+                        <button
+                          type="button"
+                          className="btn btn-link btn-sm text-decoration-none"
+                          onClick={() =>
+                            setVisiblePosts((v) => v + DISCUSSION_PAGE_SIZE)
+                          }
+                        >
+                          Show more posts
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="p-4 bg-light border-top">
                   <div className="mb-3">
@@ -446,15 +530,17 @@ const PositionPage = () => {
                       className="form-control"
                       rows={3}
                       value={post}
-                      onChange={(e) => {
-                        setPost(e.target.value);
-                      }}
+                      onChange={(e) => setPost(e.target.value)}
                       placeholder="Write a message…"
                     />
                   </div>
                   <div className="d-flex justify-content-end">
-                    <button className="btn btn-primary" onClick={submitPost}>
-                      Post message
+                    <button
+                      className="btn btn-primary"
+                      onClick={submitPost}
+                      disabled={!post.trim() || posting}
+                    >
+                      {posting ? "Posting…" : "Post message"}
                     </button>
                   </div>
                 </div>
@@ -464,7 +550,10 @@ const PositionPage = () => {
 
           <div className="col-lg-4">
             {isCandidate && (
-              <section className="card border-0 shadow-sm mb-4">
+              <section
+                className="card border-0 shadow-sm mb-4 sticky-lg-top"
+                style={{ top: 16 }}
+              >
                 <div className="card-body p-4">
                   <h2 className="h6 fw-bold mb-3">Your access</h2>
                   <div className="d-flex align-items-start gap-3 mb-3">
@@ -476,7 +565,9 @@ const PositionPage = () => {
                       }`}
                       style={{ width: 40, height: 40 }}
                     >
-                      {accessible ? "✓" : "✕"}
+                      <i
+                        className={`bi ${accessible ? "bi-check-lg" : "bi-x-lg"}`}
+                      />
                     </div>
                     <div>
                       <div className="fw-semibold">
@@ -492,14 +583,17 @@ const PositionPage = () => {
                     </div>
                   </div>
                   <button
-                    disabled={position.hasUserApplied}
-                    onClick={() => {
-                      handleApply(position.id);
-                    }}
-                    className="btn btn-primary px-4"
+                    disabled={position.hasUserApplied || !accessible}
+                    onClick={() => handleApply(position.id)}
+                    className="btn btn-primary w-100"
                   >
                     {position.hasUserApplied ? "Applied" : "Apply"}
                   </button>
+                  {!accessible && !position.hasUserApplied && (
+                    <p className="text-muted small mt-2 mb-0">
+                      Meet the requirements above to unlock applying.
+                    </p>
+                  )}
                 </div>
               </section>
             )}
@@ -515,6 +609,10 @@ const PositionPage = () => {
                   {isRecruiterOrAdmin && (
                     <InfoRow label="Submitted CVs" value={String(cvCount)} />
                   )}
+                  <InfoRow
+                    label="Max projects in CV"
+                    value={String(position.maxProjects)}
+                  />
                 </div>
               </div>
             </section>
@@ -573,6 +671,61 @@ const PositionPage = () => {
           </div>
         </div>
       </footer>
+
+      {showDeleteConfirm && (
+        <div
+          className="modal d-block"
+          tabIndex={-1}
+          role="dialog"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header border-0">
+                <h2 className="modal-title h5 fw-bold">
+                  Delete this position?
+                </h2>
+                <button
+                  type="button"
+                  className="btn-close"
+                  aria-label="Close"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                />
+              </div>
+              <div className="modal-body">
+                <p className="text-muted mb-0">
+                  This will permanently remove <strong>{position.title}</strong>
+                  {cvCount > 0
+                    ? ` and its ${cvCount} submitted ${
+                        cvCount === 1 ? "CV" : "CVs"
+                      }`
+                    : ""}
+                  . This action can't be undone.
+                </p>
+              </div>
+              <div className="modal-footer border-0">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                >
+                  {deleting ? "Deleting…" : "Delete position"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

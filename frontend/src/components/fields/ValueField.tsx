@@ -113,27 +113,18 @@ function ValueField({
               <label className="form-label small fw-semibold text-muted mb-1">
                 Start date
               </label>
-
               <input
                 type="date"
                 className="form-control"
-                style={{
-                  height: "40px",
-                  fontSize: "14px",
-                  borderRadius: "8px",
-                }}
                 value={period.start}
                 onChange={(e) =>
-                  onPeriodChange({
-                    ...period,
-                    start: e.target.value,
-                  })
+                  onPeriodChange({ ...period, start: e.target.value })
                 }
                 autoFocus
               />
             </div>
 
-            <div className="col-12 col-sm-2 d-none d-sm-flex justify-content-center align-items-center pb-1">
+            <div className="col-12 col-sm-2 d-none d-sm-flex justify-content-center align-items-center pb-2">
               <span className="text-muted">→</span>
             </div>
 
@@ -141,22 +132,13 @@ function ValueField({
               <label className="form-label small fw-semibold text-muted mb-1">
                 End date
               </label>
-
               <input
                 type="date"
                 className="form-control"
-                style={{
-                  height: "40px",
-                  fontSize: "14px",
-                  borderRadius: "8px",
-                }}
                 value={period.end}
                 min={period.start || undefined}
                 onChange={(e) =>
-                  onPeriodChange({
-                    ...period,
-                    end: e.target.value,
-                  })
+                  onPeriodChange({ ...period, end: e.target.value })
                 }
               />
             </div>
