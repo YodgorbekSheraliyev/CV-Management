@@ -69,3 +69,17 @@ export const getCvsByPosition = async (positionId: number) => {
   );
   return response.data;
 };
+
+export const likeCv = async (id: number, userId: number) => {
+  const { data: response } = await api.post<CommonResponse<CV>>(
+    `/cvs/like/${id}/${userId}`,
+  );
+  return response.data;
+};
+
+export const unlikeCv = async (id: number, userId: number) => {
+  const { data: response } = await api.delete<CommonResponse<CV>>(
+    `/cvs/like/${id}/${userId}`,
+  );
+  return response.data;
+};

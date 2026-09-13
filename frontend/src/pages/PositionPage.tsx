@@ -285,7 +285,11 @@ const PositionPage = () => {
                             </td>
                             <td>
                               <span className="badge text-bg-light border">
-                                {ATTRIBUTE_TYPE_LABELS[rule.attribute.type as AttributeType]}
+                                {
+                                  ATTRIBUTE_TYPE_LABELS[
+                                    rule.attribute.type as AttributeType
+                                  ]
+                                }
                               </span>
                             </td>
                             <td>

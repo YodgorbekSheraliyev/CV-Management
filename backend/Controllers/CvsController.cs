@@ -48,6 +48,20 @@ namespace backend.Controllers
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
+        [HttpPost("like/{cvId}/{userId}")]
+        public async Task<IActionResult> Like(int cvId, int userId)
+        {
+            var result = await _cvService.Like(cvId, userId);
+            return Ok(CommonResponse<CvDto>.Ok(result));
+        }
+
+        [HttpDelete("unlike/{cvId}/{userId}")]
+        public async Task<IActionResult> Unlike(int cvId, int userId)
+        {
+            var result = await _cvService.Unlike(cvId, userId);
+            return Ok(CommonResponse<CvDto>.Ok(result));
+        }
+
         [HttpPut("attribute-values/{userId}")]
         [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)

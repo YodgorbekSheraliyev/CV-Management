@@ -113,7 +113,7 @@ namespace backend.Services
                 Status = CVStatus.Published,
                 AttributeIds = attributeIds,
                 ProjectIds = projectIds,
-                Likes = new List<Like>(),
+                Likes = new List<User>(),
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -173,7 +173,38 @@ namespace backend.Services
                 }).ToList()
             };
         }
-
+        public async Task<CvDto> Like(int cvId, int userId)
+        {   
+            var cv = await _db.CVs.Include(c => c.Likes).FirstOrDefaultAsync(c => c.Id == cvId);
+            if (cv == null)
+            {
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
+            var recruiter = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if(recruiter == null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+            cv.Likes.Add(recruiter);
+            await _db.SaveChangesAsync();
+            return await GetById(cvId, userId);
+        }
+        public async Task<CvDto> Unlike(int cvId, int userId)
+        {
+            var cv = await _db.CVs.Include(c => c.Likes).FirstOrDefaultAsync(c => c.Id == cvId);
+            if (cv == null)
+            {
+                throw new NotFoundException(_localizer["CvNotFound"]);
+            }
+            var recruiter = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (recruiter == null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+            cv.Likes.Remove(recruiter);
+            await _db.SaveChangesAsync();
+            return await GetById(cvId, userId);
+        }
         public async Task<CvDto> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)
         {
             var cv = await _db.CVs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == dto.CvId);

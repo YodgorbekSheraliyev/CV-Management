@@ -14,7 +14,6 @@ namespace backend.Data
         public DbSet<AttributeValue> AttributeValues { get; set; }
         public DbSet<CV> CVs { get; set; }
         public DbSet<Discussion> Discussions { get; set; }
-        public DbSet<Like> Likes { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<PositionAccessRule> PositionAccessRules { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -66,20 +65,6 @@ namespace backend.Data
                 });
             });
 
-            modelBuilder.Entity<Like>(entity =>
-            {
-                entity.HasKey(x => x.Id);
-                entity.HasOne(x => x.Recruiter)
-                .WithMany(x => x.Likes)
-                .HasForeignKey(x => x.RecruiterId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(x => x.CV)
-                .WithMany(x => x.Likes)
-                .HasForeignKey(x => x.CVId)
-                .OnDelete(DeleteBehavior.Cascade);
-            });
-
             modelBuilder.Entity<CV>(entity =>
             {
                 entity.HasKey(x => x.Id);
@@ -88,7 +73,23 @@ namespace backend.Data
                 .WithMany(u => u.CVs)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
+
+                entity.HasMany(x => x.Likes)
+                .WithMany(x => x.LikedCVs)
+                .UsingEntity<Dictionary<string, object>>(
+                    "CVLikes",
+                    j => j
+                    .HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Restrict),
+                    j => j
+                    .HasOne<CV>()
+                    .WithMany()
+                    .HasForeignKey("CVId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                );
+
                 entity.HasOne(x => x.Position)
                 .WithMany(p => p.CVs)
                 .HasForeignKey(x => x.PositionId)

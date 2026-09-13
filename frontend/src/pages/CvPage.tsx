@@ -6,7 +6,12 @@ import ValueField from "../components/fields/ValueField";
 import type { PeriodValue } from "../components/fields/ValueField";
 import { useAuth } from "../hooks/auth";
 import type { CV, CvAttribute } from "../models";
-import { AttributeCategory, AttributeType, CVStatus, UserRole } from "../enums/enums";
+import {
+  AttributeCategory,
+  AttributeType,
+  CVStatus,
+  UserRole,
+} from "../enums/enums";
 import { CATEGORY_LABELS } from "../constants";
 import { parsePeriod } from "../utils";
 import {
@@ -36,8 +41,7 @@ const groupAttributes = (attributes: CvAttribute[]) => {
 
   for (const [category, attributesForCategory] of byCategory) {
     sections.push({
-      title:
-        CATEGORY_LABELS[category as AttributeCategory] ?? "Other",
+      title: CATEGORY_LABELS[category as AttributeCategory] ?? "Other",
       attributes: attributesForCategory,
     });
   }
@@ -88,32 +92,27 @@ const CvPage = () => {
 
   const [cv, setCv] = useState<CV | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "danger";
   } | null>(null);
-
   const [editingAttributeId, setEditingAttributeId] = useState<number | null>(
     null,
   );
-
   const [draftValue, setDraftValue] = useState("");
-
   const [draftPeriod, setDraftPeriod] = useState<PeriodValue>({
     start: "",
     end: "",
   });
-
   const [savingAttributeId, setSavingAttributeId] = useState<number | null>(
     null,
   );
-
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
   const canEdit = user?.role !== UserRole.Recruiter;
+  const isRecruiter = user?.role == UserRole.Recruiter;
 
   useEffect(() => {
     if (!id || !user) {
@@ -296,6 +295,10 @@ const CvPage = () => {
     }
   };
 
+  const handleLike = async () => {
+
+  }
+
   if (loading) {
     return (
       <div className="min-vh-100 bg-light">
@@ -360,6 +363,17 @@ const CvPage = () => {
           </div>
 
           <div className="d-flex gap-2">
+            {isRecruiter && (
+              <button
+                type="button"
+                className="btn btn-outline-primary px-4"
+                onClick={() => {}}
+                disabled={false}
+              >
+                <i className="bi bi-hand-thumbs-up me-2"></i>
+                Like
+              </button>
+            )}
             <Link
               to={`/positions/${cv.positionId}`}
               className="btn btn-outline-secondary btn-sm px-3"
@@ -428,8 +442,10 @@ const CvPage = () => {
 
                 <div className="row g-4">
                   {section.attributes.map((attribute) => {
-                    const isEditing = editingAttributeId === attribute.attributeId;
-                    const isSaving = savingAttributeId === attribute.attributeId;
+                    const isEditing =
+                      editingAttributeId === attribute.attributeId;
+                    const isSaving =
+                      savingAttributeId === attribute.attributeId;
                     const isEmpty = !isAttributeFilled(attribute);
                     const shown = displayValue(attribute);
 

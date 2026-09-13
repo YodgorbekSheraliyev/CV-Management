@@ -33,7 +33,7 @@ namespace backend.Dtos.Cv
     public class CvSummaryDto
     {
         public int Id { get; init; }
-        public int PositionId { get; init; }
+        public int? PositionId { get; init; }
         public string PositionTitle { get; init; }
         public int LikeCount { get; init; }
         public CVStatus Status { get; init; }

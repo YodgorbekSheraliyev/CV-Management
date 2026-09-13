@@ -23,7 +23,6 @@ namespace backend.Controllers
         }
 
         [HttpGet("{userId:int}")]
-        [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> GetUserProfile(int userId)
         {
             var user = await _userService.GetUserById(userId);
@@ -31,6 +30,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{userId:int}")]
+        [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> UpdateUserProfile(int userId, [FromBody] UpdateUserDto updateUserDto)
         {
             var user = await _userService.Update(userId, updateUserDto);
