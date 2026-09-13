@@ -24,8 +24,6 @@ namespace backend.Services
         public async Task<List<PositionSummaryDto>> GetAll()
         {
             return await _db.Positions
-                .Include(p => p.CVs)
-                .Include(p => p.Tags)
                 .AsNoTracking()
                 .Select(p => new PositionSummaryDto
                 {
@@ -41,52 +39,48 @@ namespace backend.Services
         }
         public async Task<PositionDto> GetById(int positionId, int userId)
         {
-            var position = await _db.Positions
+            var dto = await _db.Positions
                 .AsNoTracking()
-                .Include(p => p.Tags)
-                .Include(p => p.Attributes)
-                .Include(p => p.Discussion)
-                    .ThenInclude(d => d.Posts)
-                .Include(p => p.CVs)
-                    .ThenInclude(c => c.Likes)
-                .Include(p => p.PositionAccessRules)
-                    .ThenInclude(par => par.Attribute)
-                .FirstOrDefaultAsync(p => p.Id == positionId);
-            if (position is null)
+                .Where(p => p.Id == positionId)
+                .Select(p => new PositionDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    IsPublic = p.PositionAccessRules == null || p.PositionAccessRules.Count == 0,
+                    MaxProjects = p.MaxProjects,
+                    Tags = p.Tags.Select(t => new TagDto
+                    {
+                        Id = t.Id,
+                        Name = t.Name
+                    }).ToList(),
+                    Attributes = p.Attributes.Select(a => new AttributeDto
+                    {
+                        Id = a.Id,
+                        Name = a.Name,
+                        Category = a.Category,
+                        Type = a.AttributeType,
+                        Description = a.Description,
+                        IsBuiltIn = a.IsBuiltIn
+                    }).ToList(),
+                    PositionAccessRules = p.PositionAccessRules,
+                    Discussion = p.Discussion,
+                    CVs = p.CVs
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto is null)
             {
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
-            bool canAccess = await CanAccess(userId, position);
+
+            bool canAccess = await CanAccess(userId, dto.PositionAccessRules);
             if (!canAccess)
             {
                 throw new ForbiddenException(_localizer["PositionAccessDenied"]);
             }
 
-            return new PositionDto
-            {
-                Id = position.Id,
-                Title = position.Title,
-                Description = position.Description,
-                IsPublic = position.PositionAccessRules == null || position.PositionAccessRules.Count == 0,
-                MaxProjects = position.MaxProjects,
-                Tags = position.Tags.Select(t => new TagDto
-                {
-                    Id = t.Id,
-                    Name = t.Name
-                }).ToList(),
-                Attributes = position.Attributes.Select(a => new AttributeDto
-                {
-                    Id = a.Id,
-                    Name = a.Name,
-                    Category = a.Category,
-                    Type = a.AttributeType,
-                    Description = a.Description,
-                    IsBuiltIn = a.IsBuiltIn
-                }).ToList(),
-                PositionAccessRules = position.PositionAccessRules,
-                Discussion = position.Discussion,
-                CVs = position.CVs
-            };
+            return dto;
         }
         public async Task<PositionDto> Create(CreatePositionDto dto, int userId)
         {
@@ -118,7 +112,6 @@ namespace backend.Services
 
             return await GetById(position.Id, userId);
         }
-
         public async Task<PositionDto> Update(UpdatePositionDto dto, int userId)
         {
             var position = await _db.Positions
@@ -205,34 +198,37 @@ namespace backend.Services
 
             throw new NotImplementedException();
         }
-        private async Task<bool> CanAccess(int userId, Position position)
+        private async Task<bool> CanAccess(int userId, List<PositionAccessRule> accessRules)
         {
             var user = await _db.Users.FindAsync(userId);
             if (user is { Role: UserRole.Administrator or UserRole.Recruiter })
+            {
                 return true;
+            }
 
-            if (position.PositionAccessRules is null || position.PositionAccessRules.Count == 0)
+            if (accessRules is null || accessRules.Count == 0)
+            {
                 return true;
+            }
 
-            var attributeIds = position.PositionAccessRules
+            var attributeIds = accessRules
                 .Select(r => r.AttributeId)
                 .Distinct()
                 .ToList();
 
             var attributeValues = await _db.AttributeValues
                 .AsNoTracking()
-                .Where(x =>
-                    x.UserId == userId &&
-                    attributeIds.Contains(x.AttributeId))
+                .Where(x => x.UserId == userId && attributeIds.Contains(x.AttributeId))
                 .ToListAsync();
 
-            foreach (var rule in position.PositionAccessRules)
+            foreach (var rule in accessRules)
             {
-                var userValue = attributeValues
-                    .FirstOrDefault(x => x.AttributeId == rule.AttributeId);
+                var userValue = attributeValues.FirstOrDefault(x => x.AttributeId == rule.AttributeId);
 
                 if (userValue is null)
+                {
                     return false;
+                }
 
                 bool matches = rule.ComparisonType switch
                 {
@@ -246,7 +242,9 @@ namespace backend.Services
                 };
 
                 if (!matches)
+                {
                     return false;
+                }
             }
 
             return true;

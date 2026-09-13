@@ -79,7 +79,7 @@ export const likeCv = async (id: number, userId: number) => {
 
 export const unlikeCv = async (id: number, userId: number) => {
   const { data: response } = await api.delete<CommonResponse<CV>>(
-    `/cvs/like/${id}/${userId}`,
+    `/cvs/unlike/${id}/${userId}`,
   );
   return response.data;
 };

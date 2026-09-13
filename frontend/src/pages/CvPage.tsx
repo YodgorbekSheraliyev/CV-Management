@@ -19,6 +19,8 @@ import {
   updateCvAttributeValue,
   deleteCv,
   publishCv,
+  unlikeCv,
+  likeCv,
 } from "../api/cvApi";
 
 const groupAttributes = (attributes: CvAttribute[]) => {
@@ -110,6 +112,7 @@ const CvPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const canEdit = user?.role !== UserRole.Recruiter;
   const isRecruiter = user?.role == UserRole.Recruiter;
@@ -130,7 +133,7 @@ const CvPage = () => {
         }
 
         const result = await getCvById(cvId, user.id);
-
+        setIsLiked(result.isLikedByCurrentUser);
         setCv(result);
       } catch (err: any) {
         setToast({
@@ -296,8 +299,21 @@ const CvPage = () => {
   };
 
   const handleLike = async () => {
+    if (!cv || !user) return;
+    try {
+      const updated = isLiked
+        ? await unlikeCv(cv.id, user.id)
+        : await likeCv(cv.id, user.id);
 
-  }
+      setCv(updated);
+      setIsLiked(updated.isLikedByCurrentUser);
+    } catch (error: any) {
+      setToast({
+        message: error.message ?? "Could not perform action",
+        type: "danger",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -366,12 +382,13 @@ const CvPage = () => {
             {isRecruiter && (
               <button
                 type="button"
-                className="btn btn-outline-primary px-4"
-                onClick={() => {}}
-                disabled={false}
+                className={`btn px-4 ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
+                onClick={handleLike}
               >
-                <i className="bi bi-hand-thumbs-up me-2"></i>
-                Like
+                <i
+                  className={`bi ${isLiked ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up"} me-2`}
+                ></i>
+                {isLiked ? "Liked" : "Like"}
               </button>
             )}
             <Link

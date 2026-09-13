@@ -103,8 +103,8 @@ namespace backend.Services
 
             var attributeIds = position.Attributes.Select(a => a.Id).ToList();
             var userAttributeIds = user.AttributeValues.Select(av => av.AttributeId).ToHashSet();
-            attributeIds = attributeIds.Where(attributeId =>userAttributeIds.Contains(attributeId)).ToList();
-            var projectIds = await GetMatchingProjectIds(dto.UserId,position);
+            attributeIds = attributeIds.Where(attributeId => userAttributeIds.Contains(attributeId)).ToList();
+            var projectIds = await GetMatchingProjectIds(dto.UserId, position);
 
             var cv = new CV
             {
@@ -162,6 +162,7 @@ namespace backend.Services
                 Status = cv.Status,
                 Attributes = BuildAttributes(attributes, attributeValues),
                 CreatedAt = cv.CreatedAt,
+                IsLikedByCurrentUser = cv.Likes.Any(l => l.Id == userId),
                 Projects = projects.Select(project => new ProjectDto
                 {
                     Id = project.Id,
@@ -174,18 +175,22 @@ namespace backend.Services
             };
         }
         public async Task<CvDto> Like(int cvId, int userId)
-        {   
+        {
             var cv = await _db.CVs.Include(c => c.Likes).FirstOrDefaultAsync(c => c.Id == cvId);
             if (cv == null)
             {
                 throw new NotFoundException(_localizer["CvNotFound"]);
             }
             var recruiter = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if(recruiter == null)
+            if (recruiter == null)
             {
                 throw new NotFoundException(_localizer["UserNotFound"]);
             }
-            cv.Likes.Add(recruiter);
+
+            if (!cv.Likes.Any(l => l.Id == userId))
+            {
+                cv.Likes.Add(recruiter);
+            }
             await _db.SaveChangesAsync();
             return await GetById(cvId, userId);
         }
@@ -201,7 +206,10 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["UserNotFound"]);
             }
-            cv.Likes.Remove(recruiter);
+            if (cv.Likes.Any(l => l.Id == userId))
+            {
+                cv.Likes.Remove(recruiter);
+            }
             await _db.SaveChangesAsync();
             return await GetById(cvId, userId);
         }

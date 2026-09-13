@@ -38,6 +38,7 @@ export interface AttributeValue {
 export interface CV extends CVSummary {
   attributes: CvAttribute[];
   projects: Project[];
+  isLikedByCurrentUser: boolean
 }
 
 export interface CvAttribute {

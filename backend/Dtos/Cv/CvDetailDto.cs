@@ -44,6 +44,7 @@ namespace backend.Dtos.Cv
     {
         public List<CvAttributeDto> Attributes { get; init; } = new();
         public List<ProjectDto> Projects { get; init; } = new();
+        public bool IsLikedByCurrentUser { get; init; }
     }
     public class CvAttributeDto
     {
