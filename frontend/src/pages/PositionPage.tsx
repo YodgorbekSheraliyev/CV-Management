@@ -148,7 +148,7 @@ const PositionPage = () => {
   }
 
   const accessible = true;
-  const cvCount = position.cvs?.length ?? 0;
+  const cvCount = position.cVsCount;
 
   return (
     <div className="min-vh-100 bg-light">
@@ -205,12 +205,13 @@ const PositionPage = () => {
               {isCandidate && (
                 <div className="d-flex flex-column gap-2 flex-shrink-0">
                   <button
+                    disabled={position.hasUserApplied}
                     onClick={() => {
                       handleApply(position.id);
                     }}
                     className="btn btn-primary px-4"
                   >
-                    Apply
+                    {position.hasUserApplied ? "Applied" : "Apply"}
                   </button>
                 </div>
               )}
@@ -491,12 +492,13 @@ const PositionPage = () => {
                     </div>
                   </div>
                   <button
+                    disabled={position.hasUserApplied}
                     onClick={() => {
                       handleApply(position.id);
                     }}
                     className="btn btn-primary px-4"
                   >
-                    Apply
+                    {position.hasUserApplied ? "Applied" : "Apply"}
                   </button>
                 </div>
               </section>

@@ -11,10 +11,11 @@ namespace backend.Dtos.Position
         public List<AttributeDto> Attributes { get; set; }
         public List<PositionAccessRule>? PositionAccessRules { get; set; }
         public List<TagDto>? Tags { get; set; }
-        public List<CV>? CVs { get; set; }
+        public int CVsCount { get; set; }
         public Discussion Discussion { get; set; }
         public bool IsPublic { get; set; } = true;
         public int MaxProjects { get; set; }
+        public bool HasUserApplied { get; set; } = false;
     }
     public class PositionSummaryDto
     {

@@ -32,7 +32,7 @@ const MainPage = () => {
   const latestPositions = positions.slice(0, 5);
 
   const popularPositions = [...positions]
-    .sort((a, b) => (b.cvsCount ?? 0) - (a.cvsCount ?? 0))
+    .sort((a, b) => (b.cVsCount ?? 0) - (a.cVsCount ?? 0))
     .slice(0, 5);
 
   return (
@@ -224,7 +224,7 @@ const MainPage = () => {
                             </div>
                             <div className="text-end">
                               <div className="fw-bold small">
-                                {position.cvsCount ?? 0}
+                                {position.cVsCount}
                               </div>
                               <div className="text-muted small">CVs</div>
                             </div>

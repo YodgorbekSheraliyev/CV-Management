@@ -53,7 +53,7 @@ const PositionsPage = () => {
     switch (sort) {
       case "Most CVs":
         return [...filtered].sort(
-          (a, b) => (b.cvsCount ?? 0) - (a.cvsCount ?? 0),
+          (a, b) => (b.cVsCount ?? 0) - (a.cVsCount ?? 0),
         );
       case "Title A–Z":
         return [...filtered].sort((a, b) => a.title.localeCompare(b.title));
@@ -263,7 +263,7 @@ const PositionsPage = () => {
                         {isRecruiterOrAdmin && (
                           <td className="text-center">
                             <span className="fw-semibold">
-                              {position.cvsCount ?? 0}
+                              {position.cVsCount ?? 0}
                             </span>
                           </td>
                         )}
@@ -318,7 +318,7 @@ const PositionsPage = () => {
                         <div className="d-flex gap-3">
                           {isRecruiterOrAdmin && (
                             <span className="small text-muted">
-                              {position.cvsCount ?? 0} CVs
+                              {position.cVsCount ?? 0} CVs
                             </span>
                           )}
                           <span className="small text-muted">

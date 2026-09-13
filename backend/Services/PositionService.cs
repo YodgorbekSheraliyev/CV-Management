@@ -54,6 +54,7 @@ namespace backend.Services
                         Id = t.Id,
                         Name = t.Name
                     }).ToList(),
+                    HasUserApplied = p.CVs.Any(cv => cv.UserId == userId),
                     Attributes = p.Attributes.Select(a => new AttributeDto
                     {
                         Id = a.Id,
@@ -65,7 +66,7 @@ namespace backend.Services
                     }).ToList(),
                     PositionAccessRules = p.PositionAccessRules,
                     Discussion = p.Discussion,
-                    CVs = p.CVs
+                    CVsCount = p.CVs.Count
                 })
                 .FirstOrDefaultAsync();
 

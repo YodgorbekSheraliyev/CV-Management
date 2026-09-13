@@ -162,7 +162,7 @@ const PositionCvsPage = () => {
               </div>
 
               <div className="text-md-end">
-                <div className="display-6 fw-bold">{cvs?.length}</div>
+                <div className="display-6 fw-bold">{position.cVsCount}</div>
 
                 <div className="text-muted small">
                   {cvs?.length === 1 ? "submitted CV" : "submitted CVs"}

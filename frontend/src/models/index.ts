@@ -79,10 +79,11 @@ export interface Position {
   attributes: Attribute[];
   positionAccessRules: PositionAccessRule[];
   tags?: Tag[];
-  cvs?: CV[];
+  cVsCount: number;
   discussion?: Discussion;
   isPublic: boolean;
   maxProjects?: number;
+  hasUserApplied: boolean
 }
 
 export interface PositionSummary {
@@ -92,7 +93,7 @@ export interface PositionSummary {
   isPublic: boolean;
   maxProjects: number;
   tags: string[];
-  cvsCount?: number;
+  cVsCount?: number;
 }
 
 export interface PositionAccessRule {
