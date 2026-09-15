@@ -57,12 +57,6 @@ export interface CVSummary {
   createdAt: string;
 }
 
-export interface Discussion {
-  id: number;
-  positionId: number;
-  posts: Post[];
-  position: Position;
-}
 
 export interface Like {
   id: number;
@@ -80,7 +74,6 @@ export interface Position {
   positionAccessRules: PositionAccessRule[];
   tags?: Tag[];
   cVsCount: number;
-  discussion?: Discussion;
   isPublic: boolean;
   maxProjects?: number;
   hasUserApplied: boolean
@@ -111,8 +104,7 @@ export interface Post {
   authorName: string;
   content: string;
   createdAt: string;
-  discussionId: number;
-  discussion: Discussion;
+  positionId: number;
 }
 
 export interface Project {

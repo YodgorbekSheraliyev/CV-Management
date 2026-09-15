@@ -52,6 +52,7 @@
   },
   "positionPage": {
     "positionNotFound": "Position not found",
+    "postsNotFound": "Posts not found",
     "positionNotFoundDescription": "It may have been removed, or the link may be incorrect.",
     "backToPositions": "Back to positions",
 

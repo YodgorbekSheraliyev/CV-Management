@@ -65,7 +65,6 @@ namespace backend.Services
                         IsBuiltIn = a.IsBuiltIn
                     }).ToList(),
                     PositionAccessRules = p.PositionAccessRules,
-                    Discussion = p.Discussion,
                     CVsCount = p.CVs.Count
                 })
                 .FirstOrDefaultAsync();

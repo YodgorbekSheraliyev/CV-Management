@@ -52,6 +52,7 @@
   },
   "positionPage": {
     "positionNotFound": "Vakansiya topilmadi",
+    "postsNotFound": "Postlar topilmadi",
     "positionNotFoundDescription": "U o'chirilgan bo'lishi yoki havola noto'g'ri bo'lishi mumkin.",
     "backToPositions": "Vakansiyalarga qaytish",
 

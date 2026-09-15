@@ -13,7 +13,6 @@ namespace backend.Data
         public DbSet<Models.Attribute> Attributes { get; set; }
         public DbSet<AttributeValue> AttributeValues { get; set; }
         public DbSet<CV> CVs { get; set; }
-        public DbSet<Discussion> Discussions { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<PositionAccessRule> PositionAccessRules { get; set; }
         public DbSet<Post> Posts { get; set; }

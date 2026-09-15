@@ -9,7 +9,6 @@
         public List<PositionAccessRule>? PositionAccessRules { get; set; }
         public List<Tag>? Tags { get; set; }
         public List<CV>? CVs { get; set; }
-        public Discussion Discussion { get; set; }
         public int MaxProjects { get; set; }
         
     }

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using backend.Dtos;
+using backend.Dtos.Post;
+using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -9,31 +12,24 @@ namespace backend.Controllers
     [Authorize]
     public class PostsController : ControllerBase
     {
+        private readonly PostService _postService;
+        public PostsController(PostService postService)
+        {
+            _postService = postService;
+        }
+
         [HttpGet("all/{positionId}")]
         public async Task<IActionResult> GetAllByPositionId(int positionId)
         {
-            return Ok();
-        }
-
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            var posts = await _postService.GetAllByPositionId(positionId);
+            return Ok(CommonResponse<List<PostDto>>.Ok(posts));
         }
 
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post(CreatePostDto createPostDto)
         {
-        }
-
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var post = await _postService.Create(createPostDto);
+            return Ok(CommonResponse<PostDto>.Ok(post));
         }
     }
 }

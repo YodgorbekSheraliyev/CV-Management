@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../components/navbar/NavBar";
-import type { Position } from "../models";
+import type { Position, Post } from "../models";
 import { AttributeType, ComparisonType, UserRole } from "../enums/enums";
 import { useAuth } from "../hooks/auth";
 import { useEffect, useState } from "react";
@@ -13,6 +13,7 @@ import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 import { createCv } from "../api/cvApi";
 import ToastNotification from "../components/notifications/ToastNotification";
 import { useTranslation } from "react-i18next";
+import { createPost, getAllPosts } from "../api/postApi";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
@@ -35,6 +36,7 @@ const PositionPage = () => {
 
   const [position, setPosition] = useState<Position | null>(null);
   const [post, setPost] = useState<string>("");
+  const [posts, setPosts] = useState<Post[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [duplicating, setDuplicating] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -49,6 +51,7 @@ const PositionPage = () => {
   useEffect(() => {
     if (!id) return;
     loadPosition(+id);
+    loadPosts(+id);
   }, [id]);
 
   const loadPosition = async (positionId: number) => {
@@ -60,6 +63,21 @@ const PositionPage = () => {
     } catch (error: any) {
       setToast({
         message: error.message ?? t("positionPage.positionNotFound"),
+        type: "danger",
+      });
+    }
+    setLoading(false);
+  };
+
+  const loadPosts = async (positionId: number) => {
+    setLoading(true);
+
+    try {
+      const res = await getAllPosts(positionId);
+      setPosts(res);
+    } catch (error: any) {
+      setToast({
+        message: error.message ?? t("positionPage.postsNotFound"),
         type: "danger",
       });
     }
@@ -134,11 +152,20 @@ const PositionPage = () => {
   };
 
   const submitPost = async () => {
-    if (!post.trim() || posting) return;
+    if (!post.trim() || posting || !user) return;
     setPosting(true);
     try {
-      setPost("");
+      await createPost({
+        authorId: user?.id,
+        authorName: user.firstName,
+        content: post.trim(),
+        positionId: position?.id!,
+      });
+      loadPosts(position!.id);
+    } catch (error: any) {
+      setToast({ message: error.message, type: "danger" });
     } finally {
+      setPost("");
       setPosting(false);
     }
   };
@@ -212,8 +239,7 @@ const PositionPage = () => {
 
   const accessible = true;
   const cvCount = position.cVsCount;
-  const posts = position.discussion?.posts ?? [];
-  const hasMorePosts = posts.length > visiblePosts;
+  const hasMorePosts = posts?.length ?? 0 > visiblePosts;
 
   return (
     <div className="min-vh-100 bg-light">
@@ -496,9 +522,9 @@ const PositionPage = () => {
                     </div>
 
                     <span className="badge text-bg-light border">
-                      {posts.length}{" "}
+                      {posts?.length}{" "}
                       {t(
-                        posts.length === 1
+                        posts?.length === 1
                           ? "positionPage.post"
                           : "positionPage.posts",
                       )}
@@ -506,13 +532,13 @@ const PositionPage = () => {
                   </div>
                 </div>
 
-                {posts.length === 0 ? (
+                {posts?.length === 0 ? (
                   <div className="p-4 text-center text-muted small">
                     {t("positionPage.noDiscussion")}
                   </div>
                 ) : (
                   <div>
-                    {posts.slice(0, visiblePosts).map((post, index, arr) => (
+                    {posts?.slice(0, visiblePosts).map((post, index, arr) => (
                       <div
                         key={post.id}
                         className={
@@ -531,21 +557,20 @@ const PositionPage = () => {
                           </div>
 
                           <div className="flex-grow-1 min-w-0">
-                            <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
-                              {isRecruiterOrAdmin ? (
-                                <Link
-                                  to={`/profile/${post.authorId}`}
-                                  className="fw-semibold text-decoration-none"
-                                >
-                                  {post.authorName}
-                                </Link>
-                              ) : (
-                                <span className="fw-semibold">
-                                  {post.authorName}
-                                </span>
-                              )}
-                              <span className="text-muted small">
-                                {new Date(post.createdAt).toLocaleString()}
+                            <div className="d-flex justify-content-between flex-wrap align-items-center gap-2 mb-1">
+                              <span className="fw-semibold d-block">
+                                {post.authorName}
+                              </span>
+
+                              <span className="text-muted small text-end">
+                                {new Date(post?.createdAt).toLocaleString(
+                                  "en-GB",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )}
                               </span>
                             </div>
                             <p className="text-muted mb-0">{post.content}</p>
