@@ -1,12 +1,13 @@
 import { Link, NavLink } from "react-router-dom";
 
 import { useAuth } from "../../hooks/auth";
-import { useLocale } from "../../hooks/locale";
 import { UserRole } from "../../enums/enums";
+import LanguageSelector from "../LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const NavBar = () => {
   const { user, logout } = useAuth();
-  const { locale, changeLocale } = useLocale();
+  const { t } = useTranslation();
   const isRecruiterOrAdmin =
     user?.role == UserRole.Recruiter || user?.role == UserRole.Administrator;
 
@@ -38,7 +39,7 @@ const NavBar = () => {
                   isActive ? "nav-link active fw-semibold" : "nav-link"
                 }
               >
-                Home
+                {t("navbar.home")}
               </NavLink>
             </li>
 
@@ -49,7 +50,7 @@ const NavBar = () => {
                   isActive ? "nav-link active fw-semibold" : "nav-link"
                 }
               >
-                Positions
+                {t("navbar.positions")}
               </NavLink>
             </li>
 
@@ -60,7 +61,7 @@ const NavBar = () => {
                   isActive ? "nav-link active fw-semibold" : "nav-link"
                 }
               >
-                My Profile
+                {t("navbar.profile")}
               </NavLink>
             </li>
 
@@ -72,49 +73,14 @@ const NavBar = () => {
                     isActive ? "nav-link active fw-semibold" : "nav-link"
                   }
                 >
-                  Atrributes
+                  {t("navbar.attributes")}
                 </NavLink>
               </li>
             )}
           </ul>
 
           <div className="d-flex align-items-center gap-3">
-            <div className="dropdown">
-              <button
-                className="btn btn-sm btn-outline-secondary dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {locale.toUpperCase()}
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end">
-                <li>
-                  <button
-                    type="button"
-                    className={`dropdown-item ${
-                      locale === "en" ? "active" : ""
-                    }`}
-                    onClick={() => changeLocale("en")}
-                  >
-                    English
-                  </button>
-                </li>
-
-                <li>
-                  <button
-                    type="button"
-                    className={`dropdown-item ${
-                      locale === "uz" ? "active" : ""
-                    }`}
-                    onClick={() => changeLocale("uz")}
-                  >
-                    O'zbekcha
-                  </button>
-                </li>
-              </ul>
-            </div>
+            <LanguageSelector />
 
             {user ? (
               <>
@@ -139,12 +105,12 @@ const NavBar = () => {
                   className="btn btn-sm btn-outline-danger"
                   onClick={logout}
                 >
-                  Logout
+                  {t("navbar.logout")}
                 </button>
               </>
             ) : (
               <Link to="/login" className="btn btn-sm btn-primary">
-                Login
+                {t("navbar.login")}
               </Link>
             )}
           </div>

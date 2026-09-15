@@ -12,6 +12,7 @@ import {
 import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 import { createCv } from "../api/cvApi";
 import ToastNotification from "../components/notifications/ToastNotification";
+import { useTranslation } from "react-i18next";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
@@ -24,6 +25,7 @@ const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
 const DISCUSSION_PAGE_SIZE = 5;
 
 const PositionPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -57,7 +59,7 @@ const PositionPage = () => {
       setPosition(res);
     } catch (error: any) {
       setToast({
-        message: error.message ?? "Could not load position.",
+        message: error.message ?? t("positionPage.positionNotFound"),
         type: "danger",
       });
     }
@@ -75,7 +77,7 @@ const PositionPage = () => {
     } catch (error: any) {
       setShowDeleteConfirm(false);
       setToast({
-        message: error.message ?? "Could not delete position.",
+        message: error.message ?? t("positionPage.deletePosition"),
         type: "danger",
       });
     } finally {
@@ -90,11 +92,16 @@ const PositionPage = () => {
 
     try {
       const duplicatedPosition = await duplicatePosition(position.id, user.id);
-      setToast({ message: "Position duplicated.", type: "success" });
+
+      setToast({
+        message: t("positionPage.positionDuplicated"),
+        type: "success",
+      });
+
       navigate(`/positions/${duplicatedPosition.id}`);
     } catch (error: any) {
       setToast({
-        message: error.message ?? "Could not duplicate position.",
+        message: error.message ?? t("positionPage.duplicatePositionError"),
         type: "danger",
       });
     } finally {
@@ -112,13 +119,13 @@ const PositionPage = () => {
       await createCv(positionId, user.id);
 
       setToast({
-        message: "You have successfully applied for this position!",
+        message: t("positionPage.applySuccess"),
         type: "success",
       });
-      await loadPosition(positionId)
+      await loadPosition(positionId);
     } catch (error: any) {
       setToast({
-        message: error.message ?? "Failed to apply for this position.",
+        message: error.message ?? t("positionPage.applyFailed"),
         type: "danger",
       });
     } finally {
@@ -130,7 +137,6 @@ const PositionPage = () => {
     if (!post.trim() || posting) return;
     setPosting(true);
     try {
-      // Wire up to a real endpoint when available.
       setPost("");
     } finally {
       setPosting(false);
@@ -145,20 +151,26 @@ const PositionPage = () => {
           <div className="placeholder-glow mb-4">
             <span className="placeholder col-3 mb-3" style={{ height: 14 }} />
           </div>
+
           <div className="card border-0 shadow-sm mb-4">
             <div className="card-body p-4 p-md-5 placeholder-glow">
               <span className="placeholder col-2 mb-3" style={{ height: 24 }} />
+
               <span className="placeholder col-6 mb-2" style={{ height: 32 }} />
+
               <span className="placeholder col-8" style={{ height: 16 }} />
             </div>
           </div>
+
           <div className="card border-0 shadow-sm placeholder-glow">
             <div className="card-body p-4">
               <span className="placeholder col-4 mb-3" style={{ height: 18 }} />
+
               <span
                 className="placeholder col-12 mb-2"
                 style={{ height: 40 }}
               />
+
               <span className="placeholder col-12" style={{ height: 40 }} />
             </div>
           </div>
@@ -171,7 +183,9 @@ const PositionPage = () => {
     return (
       <div className="min-vh-100 bg-light">
         <NavBar />
+
         <ToastNotification toast={toast} onClose={() => setToast(null)} />
+
         <main className="container py-5 text-center">
           <div
             className="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center mb-3"
@@ -179,12 +193,17 @@ const PositionPage = () => {
           >
             <i className="bi bi-exclamation-triangle fs-4" />
           </div>
-          <h1 className="h4 fw-bold mb-2">Position not found</h1>
+
+          <h1 className="h4 fw-bold mb-2">
+            {t("positionPage.positionNotFound")}
+          </h1>
+
           <p className="text-muted mb-4">
-            It may have been removed, or the link may be incorrect.
+            {t("positionPage.positionNotFoundDescription")}
           </p>
+
           <Link to="/positions" className="btn btn-outline-secondary px-4">
-            Back to positions
+            {t("positionPage.backToPositions")}
           </Link>
         </main>
       </div>
@@ -206,12 +225,12 @@ const PositionPage = () => {
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
               <Link to="/" className="text-decoration-none">
-                Home
+                {t("positionPage.home")}
               </Link>
             </li>
             <li className="breadcrumb-item">
               <Link to="/positions" className="text-decoration-none">
-                Positions
+                {t("positionPage.positions")}
               </Link>
             </li>
             <li
@@ -238,7 +257,9 @@ const PositionPage = () => {
                       position.isPublic ? "bi-unlock" : "bi-lock"
                     } me-1`}
                   />
-                  {position.isPublic ? "Public" : "Restricted"}
+                  {position.isPublic
+                    ? t("positionPage.public")
+                    : t("positionPage.restricted")}
                 </span>
 
                 <h1 className="h2 fw-bold mb-2">{position.title}</h1>
@@ -246,7 +267,12 @@ const PositionPage = () => {
                 {isRecruiterOrAdmin && (
                   <div className="text-muted small mb-3">
                     <i className="bi bi-file-earmark-text me-1" />
-                    {cvCount} submitted {cvCount === 1 ? "CV" : "CVs"}
+                    {cvCount}{" "}
+                    {t(
+                      cvCount === 1
+                        ? "positionPage.submittedCv"
+                        : "positionPage.submittedCvs",
+                    )}
                   </div>
                 )}
 
@@ -262,7 +288,7 @@ const PositionPage = () => {
                     className="btn btn-outline-secondary px-4"
                   >
                     <i className="bi bi-pencil me-2" />
-                    Edit
+                    {t("positionPage.edit")}
                   </Link>
 
                   <button
@@ -279,7 +305,9 @@ const PositionPage = () => {
                     ) : (
                       <i className="bi bi-copy me-2" />
                     )}
-                    {duplicating ? "Duplicating…" : "Duplicate"}
+                    {duplicating
+                      ? t("positionPage.duplicating")
+                      : t("positionPage.duplicate")}
                   </button>
 
                   <button
@@ -289,7 +317,7 @@ const PositionPage = () => {
                     disabled={deleting || duplicating}
                   >
                     <i className="bi bi-trash me-2" />
-                    Delete
+                    {t("positionPage.delete")}
                   </button>
                 </div>
               )}
@@ -302,26 +330,32 @@ const PositionPage = () => {
             <section className="card border-0 shadow-sm mb-4">
               <div className="card-body p-0">
                 <div className="p-4 border-bottom">
-                  <h2 className="h5 fw-bold mb-1">Access requirements</h2>
+                  <h2 className="h5 fw-bold mb-1">
+                    {t("positionPage.accessRequirements")}
+                  </h2>
                   <p className="text-muted small mb-0">
                     {position.isPublic
-                      ? "This position is public — these rules are shown for reference only."
-                      : "A candidate must meet all of these to access this position."}
+                      ? t("positionPage.publicAccessDescription")
+                      : t("positionPage.restrictedAccessDescription")}
                   </p>
                 </div>
 
                 {position.positionAccessRules.length === 0 ? (
                   <div className="p-4 text-center text-muted small">
-                    No access rules have been added to this position.
+                    {t("positionPage.noAccessRules")}
                   </div>
                 ) : (
                   <div className="table-responsive">
                     <table className="table align-middle mb-0">
                       <thead className="table-light">
                         <tr>
-                          <th className="px-4 py-3">Attribute</th>
-                          <th className="py-3">Type</th>
-                          <th className="py-3">Requirement</th>
+                          <th className="px-4 py-3">
+                            {t("positionPage.attribute")}
+                          </th>
+                          <th className="py-3">{t("positionPage.type")}</th>
+                          <th className="py-3">
+                            {t("positionPage.requirement")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -361,26 +395,30 @@ const PositionPage = () => {
               <div className="card-body p-0">
                 <div className="p-4 border-bottom">
                   <h2 className="h5 fw-bold mb-1">
-                    Attributes included in this CV
+                    {t("positionPage.attributesIncluded")}
                   </h2>
                   <p className="text-muted small mb-0">
-                    Every CV generated for this position shows these fields.
+                    {t("positionPage.attributesIncludedDescription")}
                   </p>
                 </div>
 
                 {position.attributes.length === 0 ? (
                   <div className="p-4 text-center text-muted small">
-                    No attributes have been configured yet.
+                    {t("positionPage.noAttributes")}
                   </div>
                 ) : (
                   <div className="table-responsive">
                     <table className="table align-middle mb-0">
                       <thead className="table-light">
                         <tr>
-                          <th className="px-4 py-3">Attribute</th>
-                          <th className="py-3">Type</th>
+                          <th className="px-4 py-3">
+                            {t("positionPage.attribute")}
+                          </th>
+
+                          <th className="py-3">{t("positionPage.type")}</th>
                         </tr>
                       </thead>
+
                       <tbody>
                         {position.attributes.map((attribute) => (
                           <tr key={attribute.id}>
@@ -389,6 +427,7 @@ const PositionPage = () => {
                                 {attribute.name}
                               </div>
                             </td>
+
                             <td>
                               <span className="badge text-bg-light border">
                                 {ATTRIBUTE_TYPE_LABELS[attribute.type]}
@@ -407,20 +446,25 @@ const PositionPage = () => {
               <div className="card-body p-4">
                 <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
                   <div>
-                    <h2 className="h5 fw-bold mb-1">Relevant projects</h2>
+                    <h2 className="h5 fw-bold mb-1">
+                      {t("positionPage.relevantProjects")}
+                    </h2>
+
                     <p className="text-muted small mb-0">
-                      Projects matching these technologies can be included in
-                      the generated CV.
+                      {t("positionPage.relevantProjectsDescription")}
                     </p>
                   </div>
+
                   <span className="badge text-bg-light border flex-shrink-0">
-                    Max {position.maxProjects}
+                    {t("positionPage.maxProjects", {
+                      count: position.maxProjects,
+                    })}
                   </span>
                 </div>
 
                 {(position?.tags ?? []).length === 0 ? (
                   <p className="text-muted small mb-0">
-                    No technologies specified — projects won't be filtered.
+                    {t("positionPage.noTechnologies")}
                   </p>
                 ) : (
                   <div className="d-flex flex-wrap gap-2">
@@ -442,20 +486,29 @@ const PositionPage = () => {
                 <div className="p-4 border-bottom">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h2 className="h5 fw-bold mb-1">Discussion</h2>
+                      <h2 className="h5 fw-bold mb-1">
+                        {t("positionPage.discussion")}
+                      </h2>
+
                       <p className="text-muted small mb-0">
-                        Questions and discussion about this position.
+                        {t("positionPage.discussionDescription")}
                       </p>
                     </div>
+
                     <span className="badge text-bg-light border">
-                      {posts.length} {posts.length === 1 ? "post" : "posts"}
+                      {posts.length}{" "}
+                      {t(
+                        posts.length === 1
+                          ? "positionPage.post"
+                          : "positionPage.posts",
+                      )}
                     </span>
                   </div>
                 </div>
 
                 {posts.length === 0 ? (
                   <div className="p-4 text-center text-muted small">
-                    No discussion yet — be the first to ask a question.
+                    {t("positionPage.noDiscussion")}
                   </div>
                 ) : (
                   <div>
@@ -510,7 +563,7 @@ const PositionPage = () => {
                             setVisiblePosts((v) => v + DISCUSSION_PAGE_SIZE)
                           }
                         >
-                          Show more posts
+                          {t("positionPage.showMorePosts")}
                         </button>
                       </div>
                     )}
@@ -523,7 +576,7 @@ const PositionPage = () => {
                       htmlFor="discussion"
                       className="form-label fw-semibold"
                     >
-                      Join the discussion
+                      {t("positionPage.joinDiscussion")}
                     </label>
                     <textarea
                       id="discussion"
@@ -531,7 +584,7 @@ const PositionPage = () => {
                       rows={3}
                       value={post}
                       onChange={(e) => setPost(e.target.value)}
-                      placeholder="Write a message…"
+                      placeholder={t("positionPage.writeMessage")}
                     />
                   </div>
                   <div className="d-flex justify-content-end">
@@ -540,7 +593,9 @@ const PositionPage = () => {
                       onClick={submitPost}
                       disabled={!post.trim() || posting}
                     >
-                      {posting ? "Posting…" : "Post message"}
+                      {posting
+                        ? t("positionPage.posting")
+                        : t("positionPage.postMessage")}
                     </button>
                   </div>
                 </div>
@@ -555,7 +610,9 @@ const PositionPage = () => {
                 style={{ top: 16 }}
               >
                 <div className="card-body p-4">
-                  <h2 className="h6 fw-bold mb-3">Your access</h2>
+                  <h2 className="h6 fw-bold mb-3">
+                    {t("positionPage.yourAccess")}
+                  </h2>
                   <div className="d-flex align-items-start gap-3 mb-3">
                     <div
                       className={`rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 ${
@@ -566,19 +623,21 @@ const PositionPage = () => {
                       style={{ width: 40, height: 40 }}
                     >
                       <i
-                        className={`bi ${accessible ? "bi-check-lg" : "bi-x-lg"}`}
+                        className={`bi ${
+                          accessible ? "bi-check-lg" : "bi-x-lg"
+                        }`}
                       />
                     </div>
                     <div>
                       <div className="fw-semibold">
                         {accessible
-                          ? "You have access"
-                          : "You don't have access yet"}
+                          ? t("positionPage.youHaveAccess")
+                          : t("positionPage.youDontHaveAccess")}
                       </div>
                       <div className="text-muted small">
                         {accessible
-                          ? "Your profile currently matches the access requirements."
-                          : "Update your profile attributes to meet the requirements above."}
+                          ? t("positionPage.accessGrantedDescription")
+                          : t("positionPage.accessDeniedDescription")}
                       </div>
                     </div>
                   </div>
@@ -587,11 +646,13 @@ const PositionPage = () => {
                     onClick={() => handleApply(position.id)}
                     className="btn btn-primary w-100"
                   >
-                    {position.hasUserApplied ? "Applied" : "Apply"}
+                    {position.hasUserApplied
+                      ? t("positionPage.applied")
+                      : t("positionPage.apply")}
                   </button>
                   {!accessible && !position.hasUserApplied && (
                     <p className="text-muted small mt-2 mb-0">
-                      Meet the requirements above to unlock applying.
+                      {t("positionPage.meetRequirements")}
                     </p>
                   )}
                 </div>
@@ -600,17 +661,26 @@ const PositionPage = () => {
 
             <section className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
-                <h2 className="h6 fw-bold mb-3">Position information</h2>
+                <h2 className="h6 fw-bold mb-3">
+                  {t("positionPage.positionInformation")}
+                </h2>
                 <div className="d-flex flex-column gap-3">
                   <InfoRow
-                    label="Visibility"
-                    value={position.isPublic ? "Public" : "Restricted"}
+                    label={t("positionPage.visibility")}
+                    value={
+                      position.isPublic
+                        ? t("positionPage.public")
+                        : t("positionPage.restricted")
+                    }
                   />
                   {isRecruiterOrAdmin && (
-                    <InfoRow label="Submitted CVs" value={String(cvCount)} />
+                    <InfoRow
+                      label={t("positionPage.submittedCvs")}
+                      value={String(cvCount)}
+                    />
                   )}
                   <InfoRow
-                    label="Max projects in CV"
+                    label={t("positionPage.maxProjectsInCv")}
                     value={String(position.maxProjects)}
                   />
                 </div>
@@ -628,16 +698,23 @@ const PositionPage = () => {
                       <i className="bi bi-file-earmark-text fs-5" />
                     </div>
                     <div>
-                      <h2 className="h6 fw-bold mb-1">Submitted CVs</h2>
+                      <h2 className="h6 fw-bold mb-1">
+                        {t("positionPage.submittedCvsTitle")}
+                      </h2>
+
                       <p className="text-muted small mb-2">
-                        {cvCount} candidate{cvCount === 1 ? "" : "s"} published
-                        a CV for this position.
+                        {t(
+                          cvCount === 1
+                            ? "positionPage.candidatePublished"
+                            : "positionPage.candidatesPublished",
+                          { count: cvCount },
+                        )}
                       </p>
                       <Link
                         to={`/positions/${position.id}/cvs`}
                         className="small fw-semibold text-decoration-none"
                       >
-                        View all CVs →
+                        {t("positionPage.viewAllCvs")}
                       </Link>
                     </div>
                   </div>
@@ -652,20 +729,20 @@ const PositionPage = () => {
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <span className="text-muted small">
-              © 2026 Recruitment Platform
+              {t("positionPage.footerCopyright")}
             </span>
             <div className="d-flex gap-3">
               <Link
                 to="/positions"
                 className="text-muted small text-decoration-none"
               >
-                Positions
+                {t("positionPage.footerPositions")}
               </Link>
               <Link
                 to="/profile"
                 className="text-muted small text-decoration-none"
               >
-                Profile
+                {t("positionPage.footerProfile")}
               </Link>
             </div>
           </div>
@@ -683,25 +760,30 @@ const PositionPage = () => {
             <div className="modal-content">
               <div className="modal-header border-0">
                 <h2 className="modal-title h5 fw-bold">
-                  Delete this position?
+                  {t("positionPage.deleteTitle")}
                 </h2>
                 <button
                   type="button"
                   className="btn-close"
-                  aria-label="Close"
+                  aria-label={t("common.cancel")}
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={deleting}
                 />
               </div>
               <div className="modal-body">
                 <p className="text-muted mb-0">
-                  This will permanently remove <strong>{position.title}</strong>
-                  {cvCount > 0
-                    ? ` and its ${cvCount} submitted ${
-                        cvCount === 1 ? "CV" : "CVs"
-                      }`
-                    : ""}
-                  . This action can't be undone.
+                  {t("positionPage.deleteDescription", {
+                    title: position.title,
+                    submitted:
+                      cvCount > 0
+                        ? t(
+                            cvCount === 1
+                              ? "positionPage.deleteSubmittedOne"
+                              : "positionPage.deleteSubmittedMany",
+                            { count: cvCount },
+                          )
+                        : "",
+                  })}
                 </p>
               </div>
               <div className="modal-footer border-0">
@@ -711,7 +793,7 @@ const PositionPage = () => {
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={deleting}
                 >
-                  Cancel
+                  {t("positionPage.cancel")}
                 </button>
                 <button
                   type="button"
@@ -719,7 +801,9 @@ const PositionPage = () => {
                   onClick={handleDelete}
                   disabled={deleting}
                 >
-                  {deleting ? "Deleting…" : "Delete position"}
+                  {deleting
+                    ? t("positionPage.deleting")
+                    : t("positionPage.deletePosition")}
                 </button>
               </div>
             </div>

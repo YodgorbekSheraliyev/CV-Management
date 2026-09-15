@@ -1,0 +1,166 @@
+{
+  "navbar": {
+    "home": "Home",
+    "positions": "Positions",
+    "profile": "Profile",
+    "attributes": "Attributes",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading..."
+  },
+  "mainPage": {
+    "recruitmentPlatform": "Recruitment Platform",
+    "heroTitle": "Find the right opportunity.",
+    "heroTitleHighlight": "Build your future.",
+    "heroDescription": "Discover positions that match your skills, create tailored CVs, and showcase your experience through your personal profile.",
+    "browsePositions": "Browse positions",
+    "completeProfile": "Complete my profile",
+
+    "yourProfile": "Your profile",
+    "keepInformationUpdated": "Keep your information up to date",
+    "improveProfile": "Add your projects and skills to improve your profile.",
+    "goToProfile": "Go to profile",
+
+    "latestPositions": "Latest Positions",
+    "latestPositionsDescription": "Recently created or updated positions",
+    "viewAll": "View all",
+
+    "position": "Position",
+    "access": "Access",
+    "tags": "Tags",
+    "public": "Public",
+    "restricted": "Restricted",
+
+    "mostPopular": "Most Popular",
+    "popularDescription": "Ranked by submitted CVs",
+    "cvs": "CVs",
+    "exploreAllPositions": "Explore all positions",
+
+    "standOut": "Make your profile stand out",
+    "standOutDescription": "Add your skills, projects and experience to create better CVs for the positions you want.",
+    "goToMyProfile": "Go to my profile",
+
+    "footerPositions": "Positions",
+    "footerProfile": "Profile",
+    "footerCopyright": "© 2026 Recruitment Platform"
+  },
+  "positionPage": {
+    "positionNotFound": "Position not found",
+    "positionNotFoundDescription": "It may have been removed, or the link may be incorrect.",
+    "backToPositions": "Back to positions",
+
+    "home": "Home",
+    "positions": "Positions",
+
+    "public": "Public",
+    "restricted": "Restricted",
+
+    "submittedCv": "submitted CV",
+    "submittedCvs": "submitted CVs",
+
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "duplicating": "Duplicating…",
+    "delete": "Delete",
+
+    "accessRequirements": "Access requirements",
+    "publicAccessDescription": "This position is public — these rules are shown for reference only.",
+    "restrictedAccessDescription": "A candidate must meet all of these to access this position.",
+    "noAccessRules": "No access rules have been added to this position.",
+
+    "attribute": "Attribute",
+    "type": "Type",
+    "requirement": "Requirement",
+
+    "attributesIncluded": "Attributes included in this CV",
+    "attributesIncludedDescription": "Every CV generated for this position shows these fields.",
+    "noAttributes": "No attributes have been configured yet.",
+
+    "relevantProjects": "Relevant projects",
+    "relevantProjectsDescription": "Projects matching these technologies can be included in the generated CV.",
+    "maxProjects": "Max {{count}}",
+    "noTechnologies": "No technologies specified — projects won't be filtered.",
+
+    "discussion": "Discussion",
+    "discussionDescription": "Questions and discussion about this position.",
+    "post": "post",
+    "posts": "posts",
+    "noDiscussion": "No discussion yet — be the first to ask a question.",
+    "showMorePosts": "Show more posts",
+    "joinDiscussion": "Join the discussion",
+    "writeMessage": "Write a message…",
+    "posting": "Posting…",
+    "postMessage": "Post message",
+
+    "yourAccess": "Your access",
+    "youHaveAccess": "You have access",
+    "youDontHaveAccess": "You don't have access yet",
+    "accessGrantedDescription": "Your profile currently matches the access requirements.",
+    "accessDeniedDescription": "Update your profile attributes to meet the requirements above.",
+    "applied": "Applied",
+    "apply": "Apply",
+    "meetRequirements": "Meet the requirements above to unlock applying.",
+
+    "positionInformation": "Position information",
+    "visibility": "Visibility",
+    "submittedCvs": "Submitted CVs",
+    "maxProjectsInCv": "Max projects in CV",
+
+    "submittedCvsTitle": "Submitted CVs",
+    "candidatePublished": "{{count}} candidate published a CV for this position.",
+    "candidatesPublished": "{{count}} candidates published a CV for this position.",
+    "viewAllCvs": "View all CVs →",
+
+    "footerCopyright": "© 2026 Recruitment Platform",
+    "footerPositions": "Positions",
+    "footerProfile": "Profile",
+
+    "deleteTitle": "Delete this position?",
+    "deleteDescription": "This will permanently remove {{title}}{{submitted}}. This action can't be undone.",
+    "deleteSubmittedOne": " and its {{count}} submitted CV",
+    "deleteSubmittedMany": " and its {{count}} submitted CVs",
+    "cancel": "Cancel",
+    "deleting": "Deleting…",
+    "deletePosition": "Delete position"
+  },
+  "positionsPage": {
+    "title": "Positions",
+    "recruiterDescription": "Manage the shared pool of positions.",
+    "candidateDescription": "Discover positions and create CVs tailored to your opportunities.",
+    "createPosition": "Create position",
+    "loadError": "Couldn't load positions.",
+    "searchPositions": "Search positions",
+    "searchPlaceholder": "Search by title or tag…",
+    "access": "Access",
+    "allPositions": "All positions",
+    "public": "Public",
+    "restricted": "Restricted",
+    "sortBy": "Sort by",
+    "mostCvs": "Most CVs",
+    "titleAz": "Title A–Z",
+    "popular": "Popular",
+    "loading": "Loading positions…",
+    "showing": "Showing",
+    "of": "of",
+    "positions": "positions",
+    "position": "Position",
+    "tags": "Tags",
+    "maxProjects": "Max projects",
+    "maxProjectsValue": "Max {{count}} projects",
+    "cvs": "CVs",
+    "aboutPositions": "About positions",
+    "aboutPositionsDescription": "Each position defines the attributes and projects that can be included in a tailored CV. Restricted positions are only available to candidates who satisfy their access requirements.",
+    "noPositionsFound": "No positions found",
+    "changeSearchOrFilters": "Try changing your search or filters.",
+    "clearFilters": "Clear filters",
+    "footerCopyright": "© 2026 Recruitment Platform",
+    "footerHome": "Home",
+    "footerProfile": "Profile"
+  }
+}

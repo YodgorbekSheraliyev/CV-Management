@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
 import type { PositionSummary } from "../models";
 import { getPositions } from "../api/positionApi";
 import { UserRole } from "../enums/enums";
+import ToastNotification from "../components/notifications/ToastNotification";
 
 const MainPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const isCandidate = user?.role === UserRole.Candidate;
 
   const [positions, setPositions] = useState<PositionSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   useEffect(() => {
     loadPositions();
@@ -23,7 +29,10 @@ const MainPage = () => {
       const res = await getPositions();
       setPositions(res);
     } catch (error: any) {
-      setError(error.message);
+      setToast({
+        message: error.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -38,38 +47,45 @@ const MainPage = () => {
   return (
     <div className="min-vh-100 bg-light">
       <NavBar />
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
       <main className="container py-4 py-md-5">
         <section className="mb-5">
           <div className="row align-items-center g-4">
             <div className="col-lg-7">
               <span className="badge text-bg-primary rounded-pill px-3 py-2 mb-3">
-                Recruitment Platform
+                {t("mainPage.recruitmentPlatform")}
               </span>
+
               <h1 className="display-5 fw-bold mb-3">
-                Find the right opportunity.
+                {t("mainPage.heroTitle")}
                 <br />
-                <span className="text-primary">Build your future.</span>
+                <span className="text-primary">
+                  {t("mainPage.heroTitleHighlight")}
+                </span>
               </h1>
+
               <p className="lead text-muted mb-4">
-                Discover positions that match your skills, create tailored CVs,
-                and showcase your experience through your personal profile.
+                {t("mainPage.heroDescription")}
               </p>
+
               <div className="d-flex flex-wrap gap-2">
                 <Link to="/positions" className="btn btn-primary px-4">
-                  Browse positions
+                  {t("mainPage.browsePositions")}
                 </Link>
+
                 {isCandidate && (
                   <Link
                     to="/profile"
                     className="btn btn-outline-secondary px-4"
                   >
-                    Complete my profile
+                    {t("mainPage.completeProfile")}
                   </Link>
                 )}
               </div>
             </div>
 
+            {/* Candidate Profile Card */}
             {isCandidate && (
               <div className="col-lg-5">
                 <div className="card border-0 shadow-sm">
@@ -81,21 +97,27 @@ const MainPage = () => {
                       >
                         <span className="fs-4">✨</span>
                       </div>
+
                       <div>
-                        <h2 className="h6 fw-bold mb-1">Your profile</h2>
+                        <h2 className="h6 fw-bold mb-1">
+                          {t("mainPage.yourProfile")}
+                        </h2>
+
                         <p className="text-muted small mb-0">
-                          Keep your information up to date
+                          {t("mainPage.keepInformationUpdated")}
                         </p>
                       </div>
                     </div>
+
                     <p className="text-muted small mb-0">
-                      Add your projects and skills to improve your profile.
+                      {t("mainPage.improveProfile")}
                     </p>
+
                     <Link
                       to="/profile"
                       className="btn btn-outline-primary btn-sm w-100 mt-3"
                     >
-                      Go to profile
+                      {t("mainPage.goToProfile")}
                     </Link>
                   </div>
                 </div>
@@ -104,30 +126,30 @@ const MainPage = () => {
           </div>
         </section>
 
-        {error && (
-          <div className="alert alert-danger py-2 small" role="alert">
-            {error}
-          </div>
-        )}
-
+        {/* Positions Section */}
         {!loading && positions.length > 0 && (
           <section className="mb-5">
             <div className="row g-4">
+              {/* Latest Positions */}
               <div className="col-lg-8">
                 <div className="card border-0 shadow-sm h-100">
                   <div className="card-body p-0">
                     <div className="d-flex justify-content-between align-items-center p-4 border-bottom">
                       <div>
-                        <h2 className="h5 fw-bold mb-1">Latest Positions</h2>
+                        <h2 className="h5 fw-bold mb-1">
+                          {t("mainPage.latestPositions")}
+                        </h2>
+
                         <p className="text-muted small mb-0">
-                          Recently created or updated positions
+                          {t("mainPage.latestPositionsDescription")}
                         </p>
                       </div>
+
                       <Link
                         to="/positions"
                         className="btn btn-sm btn-outline-primary"
                       >
-                        View all
+                        {t("mainPage.viewAll")}
                       </Link>
                     </div>
 
@@ -135,11 +157,16 @@ const MainPage = () => {
                       <table className="table table-hover align-middle mb-0">
                         <thead className="table-light">
                           <tr>
-                            <th className="px-4 py-3">Position</th>
-                            <th className="py-3">Access</th>
-                            <th className="py-3">Tags</th>
+                            <th className="px-4 py-3">
+                              {t("mainPage.position")}
+                            </th>
+
+                            <th className="py-3">{t("mainPage.access")}</th>
+
+                            <th className="py-3">{t("mainPage.tags")}</th>
                           </tr>
                         </thead>
+
                         <tbody>
                           {latestPositions.map((position) => (
                             <tr key={position.id}>
@@ -151,6 +178,7 @@ const MainPage = () => {
                                   <div className="fw-semibold">
                                     {position.title}
                                   </div>
+
                                   <div
                                     className="text-muted small text-truncate"
                                     style={{ maxWidth: 320 }}
@@ -159,6 +187,7 @@ const MainPage = () => {
                                   </div>
                                 </Link>
                               </td>
+
                               <td>
                                 <span
                                   className={`badge rounded-pill ${
@@ -167,9 +196,12 @@ const MainPage = () => {
                                       : "text-bg-warning-subtle text-warning-emphasis"
                                   }`}
                                 >
-                                  {position.isPublic ? "Public" : "Restricted"}
+                                  {position.isPublic
+                                    ? t("mainPage.public")
+                                    : t("mainPage.restricted")}
                                 </span>
                               </td>
+
                               <td>
                                 <div className="d-flex flex-wrap gap-1">
                                   {(position.tags ?? [])
@@ -193,13 +225,17 @@ const MainPage = () => {
                 </div>
               </div>
 
+              {/* Most Popular */}
               <div className="col-lg-4">
                 <div className="card border-0 shadow-sm h-100">
                   <div className="card-body p-0">
                     <div className="p-4 border-bottom">
-                      <h2 className="h5 fw-bold mb-1">Most Popular</h2>
+                      <h2 className="h5 fw-bold mb-1">
+                        {t("mainPage.mostPopular")}
+                      </h2>
+
                       <p className="text-muted small mb-0">
-                        Ranked by submitted CVs
+                        {t("mainPage.popularDescription")}
                       </p>
                     </div>
 
@@ -217,16 +253,21 @@ const MainPage = () => {
                             >
                               {index + 1}
                             </div>
+
                             <div className="flex-grow-1">
                               <div className="fw-semibold small">
                                 {position.title}
                               </div>
                             </div>
+
                             <div className="text-end">
                               <div className="fw-bold small">
                                 {position.cVsCount}
                               </div>
-                              <div className="text-muted small">CVs</div>
+
+                              <div className="text-muted small">
+                                {t("mainPage.cvs")}
+                              </div>
                             </div>
                           </div>
                         </Link>
@@ -238,7 +279,7 @@ const MainPage = () => {
                         to="/positions"
                         className="btn btn-outline-primary btn-sm w-100"
                       >
-                        Explore all positions
+                        {t("mainPage.exploreAllPositions")}
                       </Link>
                     </div>
                   </div>
@@ -248,6 +289,7 @@ const MainPage = () => {
           </section>
         )}
 
+        {/* Candidate CTA */}
         {isCandidate && (
           <section>
             <div className="card border-0 bg-primary text-white shadow-sm">
@@ -255,16 +297,17 @@ const MainPage = () => {
                 <div className="row align-items-center g-4">
                   <div className="col-md-8">
                     <h2 className="h4 fw-bold mb-2">
-                      Make your profile stand out
+                      {t("mainPage.standOut")}
                     </h2>
+
                     <p className="mb-0 opacity-75">
-                      Add your skills, projects and experience to create better
-                      CVs for the positions you want.
+                      {t("mainPage.standOutDescription")}
                     </p>
                   </div>
+
                   <div className="col-md-4 text-md-end">
                     <Link to="/profile" className="btn btn-light px-4">
-                      Go to my profile
+                      {t("mainPage.goToMyProfile")}
                     </Link>
                   </div>
                 </div>
@@ -274,24 +317,27 @@ const MainPage = () => {
         )}
       </main>
 
+      {/* Footer */}
       <footer className="border-top bg-white mt-5">
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <span className="text-muted small">
-              © 2026 Recruitment Platform
+              {t("mainPage.footerCopyright")}
             </span>
+
             <div className="d-flex gap-3">
               <Link
                 to="/positions"
                 className="text-muted small text-decoration-none"
               >
-                Positions
+                {t("mainPage.footerPositions")}
               </Link>
+
               <Link
                 to="/profile"
                 className="text-muted small text-decoration-none"
               >
-                Profile
+                {t("mainPage.footerProfile")}
               </Link>
             </div>
           </div>

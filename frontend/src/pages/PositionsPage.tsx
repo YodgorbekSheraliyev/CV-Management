@@ -5,8 +5,10 @@ import type { PositionSummary } from "../models";
 import { useAuth } from "../hooks/auth";
 import { getPositions } from "../api/positionApi";
 import { UserRole } from "../enums/enums";
+import { useTranslation } from "react-i18next";
 
 const PositionsPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const isRecruiterOrAdmin =
     user?.role === UserRole.Recruiter || user?.role === UserRole.Administrator;
@@ -28,7 +30,7 @@ const PositionsPage = () => {
       const res = await getPositions();
       setPositions(res);
     } catch (error: any) {
-      setError(error.message ?? "Couldn't load positions.");
+      setError(error.message ?? t("positionsPage.loadError"));
     } finally {
       setLoading(false);
     }
@@ -70,17 +72,18 @@ const PositionsPage = () => {
         {/* Header */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
           <div>
-            <h1 className="h3 fw-bold mb-1">Positions</h1>
+            <h1 className="h3 fw-bold mb-1">{t("positionsPage.title")}</h1>
+
             <p className="text-muted mb-0">
               {isRecruiterOrAdmin
-                ? "Manage the shared pool of positions."
-                : "Discover positions and create CVs tailored to your opportunities."}
+                ? t("positionsPage.recruiterDescription")
+                : t("positionsPage.candidateDescription")}
             </p>
           </div>
 
           {isRecruiterOrAdmin && (
             <Link to="/positions/new" className="btn btn-primary">
-              + Create position
+              + {t("positionsPage.createPosition")}
             </Link>
           )}
         </div>
@@ -100,7 +103,7 @@ const PositionsPage = () => {
                   htmlFor="position-search"
                   className="form-label small fw-semibold"
                 >
-                  Search positions
+                  {t("positionsPage.searchPositions")}
                 </label>
                 <div className="input-group">
                   <span className="input-group-text bg-white">🔎</span>
@@ -108,7 +111,7 @@ const PositionsPage = () => {
                     id="position-search"
                     type="search"
                     className="form-control"
-                    placeholder="Search by title or tag…"
+                    placeholder={t("positionsPage.searchPlaceholder")}
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                   />
@@ -120,7 +123,7 @@ const PositionsPage = () => {
                   htmlFor="access"
                   className="form-label small fw-semibold"
                 >
-                  Access
+                  {t("positionsPage.access")}
                 </label>
                 <select
                   id="access"
@@ -128,15 +131,21 @@ const PositionsPage = () => {
                   value={access}
                   onChange={(event) => setAccess(event.target.value)}
                 >
-                  <option>All positions</option>
-                  <option>Public</option>
-                  <option>Restricted</option>
+                  <option value="All positions">
+                    {t("positionsPage.allPositions")}
+                  </option>
+
+                  <option value="Public">{t("positionsPage.public")}</option>
+
+                  <option value="Restricted">
+                    {t("positionsPage.restricted")}
+                  </option>
                 </select>
               </div>
 
               <div className="col-6 col-lg-2">
                 <label htmlFor="sort" className="form-label small fw-semibold">
-                  Sort by
+                  {t("positionsPage.sortBy")}
                 </label>
                 <select
                   id="sort"
@@ -144,8 +153,11 @@ const PositionsPage = () => {
                   value={sort}
                   onChange={(event) => setSort(event.target.value)}
                 >
-                  <option>Most CVs</option>
-                  <option>Title A–Z</option>
+                  <option value="Most CVs">{t("positionsPage.mostCvs")}</option>
+
+                  <option value="Title A–Z">
+                    {t("positionsPage.titleAz")}
+                  </option>
                 </select>
               </div>
             </div>
@@ -153,7 +165,7 @@ const PositionsPage = () => {
             {positions.length > 0 && (
               <div className="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
                 <span className="text-muted small align-self-center me-1">
-                  Popular:
+                  {t("positionsPage.popular")}:
                 </span>
                 {Array.from(
                   new Set(
@@ -176,17 +188,20 @@ const PositionsPage = () => {
         </div>
 
         {loading ? (
-          <div className="text-center text-muted py-5">Loading positions…</div>
+          <div className="text-center text-muted py-5">
+            {t("positionsPage.loading")}
+          </div>
         ) : (
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <div className="text-muted small">
-                Showing{" "}
+                {t("positionsPage.showing")}{" "}
                 <strong className="text-dark">
                   {filteredPositions.length}
                 </strong>{" "}
-                of <strong className="text-dark">{positions.length}</strong>{" "}
-                positions
+                {t("positionsPage.of")}{" "}
+                <strong className="text-dark">{positions.length}</strong>{" "}
+                {t("positionsPage.positions")}
               </div>
             </div>
 
@@ -196,12 +211,20 @@ const PositionsPage = () => {
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
-                      <th className="px-4 py-3">Position</th>
-                      <th className="py-3">Access</th>
-                      <th className="py-3">Tags</th>
-                      <th className="py-3">Max projects</th>
+                      <th className="px-4 py-3">
+                        {t("positionsPage.position")}
+                      </th>
+
+                      <th className="py-3">{t("positionsPage.access")}</th>
+
+                      <th className="py-3">{t("positionsPage.tags")}</th>
+
+                      <th className="py-3">{t("positionsPage.maxProjects")}</th>
+
                       {isRecruiterOrAdmin && (
-                        <th className="py-3 text-center">CVs</th>
+                        <th className="py-3 text-center">
+                          {t("positionsPage.cvs")}
+                        </th>
                       )}
                     </tr>
                   </thead>
@@ -229,11 +252,11 @@ const PositionsPage = () => {
                         <td>
                           {position.isPublic ? (
                             <span className="badge rounded-pill text-bg-success-subtle text-success-emphasis">
-                              Public
+                              {t("positionsPage.public")}
                             </span>
                           ) : (
                             <span className="badge rounded-pill text-bg-warning-subtle text-warning-emphasis">
-                              Restricted
+                              {t("positionsPage.restricted")}
                             </span>
                           )}
                         </td>
@@ -295,7 +318,9 @@ const PositionsPage = () => {
                               : "text-bg-warning-subtle text-warning-emphasis"
                           }`}
                         >
-                          {position.isPublic ? "Public" : "Restricted"}
+                          {position.isPublic
+                            ? t("positionsPage.public")
+                            : t("positionsPage.restricted")}
                         </span>
                       </div>
 
@@ -318,11 +343,13 @@ const PositionsPage = () => {
                         <div className="d-flex gap-3">
                           {isRecruiterOrAdmin && (
                             <span className="small text-muted">
-                              {position.cVsCount ?? 0} CVs
+                              {position.cVsCount ?? 0} {t("positionsPage.cvs")}
                             </span>
                           )}
                           <span className="small text-muted">
-                            Max {position.maxProjects} projects
+                            {t("positionsPage.maxProjectsValue", {
+                              count: position.maxProjects,
+                            })}
                           </span>
                         </div>
                       </div>
@@ -341,11 +368,12 @@ const PositionsPage = () => {
           <div className="d-flex gap-3">
             <span className="fs-5">ℹ️</span>
             <div>
-              <div className="fw-semibold mb-1">About positions</div>
+              <div className="fw-semibold mb-1">
+                {t("positionsPage.aboutPositions")}
+              </div>
+
               <div className="text-muted small">
-                Each position defines the attributes and projects that can be
-                included in a tailored CV. Restricted positions are only
-                available to candidates who satisfy their access requirements.
+                {t("positionsPage.aboutPositionsDescription")}
               </div>
             </div>
           </div>
@@ -356,17 +384,17 @@ const PositionsPage = () => {
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <span className="text-muted small">
-              © 2026 Recruitment Platform
+              {t("positionsPage.footerCopyright")}
             </span>
             <div className="d-flex gap-3">
               <Link to="/" className="text-muted small text-decoration-none">
-                Home
+                {t("positionsPage.footerHome")}
               </Link>
               <Link
                 to="/profile"
                 className="text-muted small text-decoration-none"
               >
-                Profile
+                {t("positionsPage.footerProfile")}
               </Link>
             </div>
           </div>
@@ -377,14 +405,20 @@ const PositionsPage = () => {
 };
 
 const EmptyState = () => {
+  const { t } = useTranslation();
   return (
     <div className="text-center py-5 px-4">
       <div className="fs-1 mb-3">🔎</div>
-      <h2 className="h5 fw-bold">No positions found</h2>
+
+      <h2 className="h5 fw-bold">{t("positionsPage.noPositionsFound")}</h2>
+
       <p className="text-muted small mb-3">
-        Try changing your search or filters.
+        {t("positionsPage.changeSearchOrFilters")}
       </p>
-      <button className="btn btn-outline-primary btn-sm">Clear filters</button>
+
+      <button className="btn btn-outline-primary btn-sm">
+        {t("positionsPage.clearFilters")}
+      </button>
     </div>
   );
 };

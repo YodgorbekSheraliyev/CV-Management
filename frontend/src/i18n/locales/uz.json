@@ -1,0 +1,166 @@
+{
+  "navbar": {
+    "home": "Bosh sahifa",
+    "positions": "Vakansiyalar",
+    "profile": "Profil",
+    "attributes": "Attributlar",
+    "logout": "Chiqish",
+    "login": "Kirish"
+  },
+  "common": {
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "loading": "Yuklanmoqda..."
+  },
+  "mainPage": {
+    "recruitmentPlatform": "Ishga joylashish platformasi",
+    "heroTitle": "O'zingizga mos imkoniyatni toping.",
+    "heroTitleHighlight": "Kelajagingizni yarating.",
+    "heroDescription": "Ko'nikmalaringizga mos vakansiyalarni toping, maxsus CV yarating va shaxsiy profilingiz orqali tajribangizni namoyish eting.",
+    "browsePositions": "Vakansiyalarni ko'rish",
+    "completeProfile": "Profilimni to'ldirish",
+
+    "yourProfile": "Sizning profilingiz",
+    "keepInformationUpdated": "Ma'lumotlaringizni yangilab turing",
+    "improveProfile": "Profilingizni yaxshilash uchun loyihalaringiz va ko'nikmalaringizni qo'shing.",
+    "goToProfile": "Profilga o'tish",
+
+    "latestPositions": "So'nggi vakansiyalar",
+    "latestPositionsDescription": "Yaqinda yaratilgan yoki yangilangan vakansiyalar",
+    "viewAll": "Barchasini ko'rish",
+
+    "position": "Vakansiya",
+    "access": "Kirish",
+    "tags": "Teglar",
+    "public": "Ochiq",
+    "restricted": "Cheklangan",
+
+    "mostPopular": "Eng mashhur",
+    "popularDescription": "Yuborilgan CV lar soni bo'yicha",
+    "cvs": "CV lar",
+    "exploreAllPositions": "Barcha vakansiyalarni ko'rish",
+
+    "standOut": "Profilingizni ajralib turadigan qiling",
+    "standOutDescription": "Istagan vakansiyalaringiz uchun yaxshiroq CV yaratish maqsadida ko'nikmalaringiz, loyihalaringiz va tajribangizni qo'shing.",
+    "goToMyProfile": "Profilimga o'tish",
+
+    "footerPositions": "Vakansiyalar",
+    "footerProfile": "Profil",
+    "footerCopyright": "© 2026 Ishga joylashish platformasi"
+  },
+  "positionPage": {
+    "positionNotFound": "Vakansiya topilmadi",
+    "positionNotFoundDescription": "U o'chirilgan bo'lishi yoki havola noto'g'ri bo'lishi mumkin.",
+    "backToPositions": "Vakansiyalarga qaytish",
+
+    "home": "Bosh sahifa",
+    "positions": "Vakansiyalar",
+
+    "public": "Ochiq",
+    "restricted": "Cheklangan",
+
+    "submittedCv": "yuborilgan CV",
+    "submittedCvs": "yuborilgan CV lar",
+
+    "edit": "Tahrirlash",
+    "duplicate": "Nusxalash",
+    "duplicating": "Nusxalanmoqda…",
+    "delete": "O'chirish",
+
+    "accessRequirements": "Kirish talablari",
+    "publicAccessDescription": "Bu vakansiya ochiq — ushbu qoidalar faqat ma'lumot uchun ko'rsatilgan.",
+    "restrictedAccessDescription": "Nomzod ushbu vakansiyaga kirish uchun barcha talablarga javob berishi kerak.",
+    "noAccessRules": "Ushbu vakansiyaga kirish qoidalari qo'shilmagan.",
+
+    "attribute": "Atribut",
+    "type": "Tur",
+    "requirement": "Talab",
+
+    "attributesIncluded": "Ushbu CV ga kiritilgan atributlar",
+    "attributesIncludedDescription": "Ushbu vakansiya uchun yaratilgan har bir CV ushbu maydonlarni ko'rsatadi.",
+    "noAttributes": "Hali hech qanday atribut sozlanmagan.",
+
+    "relevantProjects": "Mos loyihalar",
+    "relevantProjectsDescription": "Ushbu texnologiyalarga mos loyihalar yaratilgan CV ga kiritilishi mumkin.",
+    "maxProjects": "Maks. {{count}}",
+    "noTechnologies": "Texnologiyalar ko'rsatilmagan — loyihalar filtrlanmaydi.",
+
+    "discussion": "Muhokama",
+    "discussionDescription": "Ushbu vakansiya haqidagi savollar va muhokamalar.",
+    "post": "post",
+    "posts": "post",
+    "noDiscussion": "Hali muhokama yo'q — birinchi bo'lib savol bering.",
+    "showMorePosts": "Ko'proq postlarni ko'rsatish",
+    "joinDiscussion": "Muhokamaga qo'shilish",
+    "writeMessage": "Xabar yozing…",
+    "posting": "Yuborilmoqda…",
+    "postMessage": "Xabar yuborish",
+
+    "yourAccess": "Sizning kirishingiz",
+    "youHaveAccess": "Sizda kirish huquqi mavjud",
+    "youDontHaveAccess": "Sizda hali kirish huquqi yo'q",
+    "accessGrantedDescription": "Profilingiz hozirda kirish talablariga mos keladi.",
+    "accessDeniedDescription": "Yuqoridagi talablarga javob berish uchun profilingizdagi atributlarni yangilang.",
+    "applied": "Topshirilgan",
+    "apply": "Topshirish",
+    "meetRequirements": "Ariza topshirish imkoniyatini ochish uchun yuqoridagi talablarga javob bering.",
+
+    "positionInformation": "Vakansiya ma'lumotlari",
+    "visibility": "Ko'rinish",
+    "submittedCvs": "Yuborilgan CV lar",
+    "maxProjectsInCv": "CV dagi maksimal loyihalar",
+
+    "submittedCvsTitle": "Yuborilgan CV lar",
+    "candidatePublished": "{{count}} nomzod ushbu vakansiya uchun CV e'lon qilgan.",
+    "candidatesPublished": "{{count}} nomzod ushbu vakansiya uchun CV e'lon qilgan.",
+    "viewAllCvs": "Barcha CV larni ko'rish →",
+
+    "footerCopyright": "© 2026 Ishga joylashish platformasi",
+    "footerPositions": "Vakansiyalar",
+    "footerProfile": "Profil",
+
+    "deleteTitle": "Ushbu vakansiyani o'chirish?",
+    "deleteDescription": "Bu {{title}}{{submitted}} ni butunlay o'chiradi. Bu amalni bekor qilib bo'lmaydi.",
+    "deleteSubmittedOne": " va uning {{count}} ta yuborilgan CV sini",
+    "deleteSubmittedMany": " va uning {{count}} ta yuborilgan CV larini",
+    "cancel": "Bekor qilish",
+    "deleting": "O'chirilmoqda…",
+    "deletePosition": "Vakansiyani o'chirish"
+  },
+  "positionsPage": {
+    "title": "Lavozimlar",
+    "recruiterDescription": "Umumiy lavozimlar ro‘yxatini boshqaring.",
+    "candidateDescription": "Lavozimlarni toping va imkoniyatlaringizga mos CV yarating.",
+    "createPosition": "Lavozim yaratish",
+    "loadError": "Lavozimlarni yuklab bo‘lmadi.",
+    "searchPositions": "Lavozimlarni qidirish",
+    "searchPlaceholder": "Nom yoki teg bo‘yicha qidiring…",
+    "access": "Kirish",
+    "allPositions": "Barcha lavozimlar",
+    "public": "Ochiq",
+    "restricted": "Cheklangan",
+    "sortBy": "Saralash",
+    "mostCvs": "Eng ko‘p CV",
+    "titleAz": "Nom bo‘yicha A–Z",
+    "popular": "Mashhur",
+    "loading": "Lavozimlar yuklanmoqda…",
+    "showing": "Ko‘rsatilmoqda",
+    "of": "dan",
+    "positions": "lavozim",
+    "position": "Lavozim",
+    "tags": "Teglar",
+    "maxProjects": "Maksimal loyihalar",
+    "maxProjectsValue": "Maksimal {{count}} ta loyiha",
+    "cvs": "CV",
+    "aboutPositions": "Lavozimlar haqida",
+    "aboutPositionsDescription": "Har bir lavozim moslashtirilgan CV ga kiritilishi mumkin bo‘lgan atributlar va loyihalarni belgilaydi. Cheklangan lavozimlar faqat kirish talablariga javob beradigan nomzodlar uchun mavjud.",
+    "noPositionsFound": "Lavozimlar topilmadi",
+    "changeSearchOrFilters": "Qidiruv yoki filtrlarni o‘zgartirib ko‘ring.",
+    "clearFilters": "Filtrlarni tozalash",
+    "footerCopyright": "© 2026 Recruitment Platform",
+    "footerHome": "Bosh sahifa",
+    "footerProfile": "Profil"
+  }
+}
