@@ -2,6 +2,7 @@
 using backend.Dtos.Auth;
 using backend.Localization;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -28,6 +29,13 @@ namespace backend.Controllers
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
             var token = await _authService.Register(registerDto);
+            return Ok(CommonResponse<string>.Ok(token));
+        }
+
+        [HttpPost("google")]
+        public async Task<IActionResult> GoogleAuth(GoogleAuthDto dto)
+        {
+            var token = await _authService.GoogleAuthAsync(dto);
             return Ok(CommonResponse<string>.Ok(token));
         }
     }

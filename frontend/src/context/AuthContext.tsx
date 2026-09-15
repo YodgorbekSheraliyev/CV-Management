@@ -23,6 +23,15 @@ interface DecodedType {
   exp: number;
 }
 
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface GoogleAuthRequest {
+  idToken: string;
+}
+
 export interface AuthContextValue {
   user: User | null;
   setUser: Dispatch<SetStateAction<User | null>>;
@@ -36,6 +45,7 @@ export interface AuthContextValue {
     password: string;
   }) => Promise<string>;
   logout: () => void;
+  googleAuth: (idToken: string) => Promise<any>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -117,6 +127,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return token;
   };
 
+  const googleAuth = async (idToken: string) => {
+    const response = await api.post<CommonResponse<string>>("/auth/google", {
+      idToken,
+    });
+
+    const token = response.data.data!;
+
+    const decoded = jwtDecode<DecodedType>(token);
+
+    localStorage.setItem(TOKEN_KEY, token);
+
+    const userId = getUserIdFromToken(decoded);
+
+    const currentUser = await getUser(userId);
+
+    setUser(currentUser);
+    setIsAuthenticated(true);
+
+    return token;
+  };
+
   const register = async (input: {
     firstName: string;
     lastName: string;
@@ -157,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      googleAuth,
     }),
     [user, isAuthenticated, isLoading],
   );

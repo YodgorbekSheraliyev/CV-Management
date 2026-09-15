@@ -3,10 +3,11 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/auth";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, error, setError } = useAuth();
+  const { register, error, setError, googleAuth } = useAuth();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -34,6 +35,25 @@ const RegisterPage = () => {
         err instanceof Error
           ? err.message
           : "Unable to create your account. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSuccess(idToken: string) {
+    setError("");
+    setLoading(true);
+
+    try {
+      await googleAuth(idToken);
+
+      navigate("/");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to sign in with Google. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -157,6 +177,19 @@ const RegisterPage = () => {
                     )}
                   </button>
                 </form>
+
+                <div className="d-flex align-items-center my-4">
+                  <hr className="flex-grow-1" />
+
+                  <span className="px-3 text-muted small">OR</span>
+
+                  <hr className="flex-grow-1" />
+                </div>
+
+                <GoogleSignInButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={setError}
+                />
 
                 <div className="text-center mt-4">
                   <span className="text-muted">Already have an account? </span>

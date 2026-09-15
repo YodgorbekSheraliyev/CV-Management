@@ -1,11 +1,14 @@
 ﻿using backend.Data;
 using backend.Dtos.Auth;
 using backend.enums;
+using backend.Exceptions;
 using backend.Localization;
 using backend.Models;
+using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.SqlServer.Server;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -70,6 +73,91 @@ namespace backend.Services
             return GenerateToken(user);
         }
 
+        public async Task<string> GoogleAuthAsync(GoogleAuthDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.IdToken))
+            {
+                throw new ArgumentException(_localizer["GoogleIDTokenRequired"]);
+            }
+            
+            var googleClientId = _config["Google:ClientId"];
+            if (string.IsNullOrWhiteSpace(googleClientId))
+            {
+                throw new InvalidOperationException(_localizer["GoogleClientIdNotConfigured"]);
+            }
+
+            GoogleJsonWebSignature.Payload payload;
+
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync( 
+                    dto.IdToken,
+                    new GoogleJsonWebSignature.ValidationSettings
+                    {
+                        Audience = new[]
+                        {
+                            googleClientId
+                        }
+                    });
+            }
+            catch (InvalidJwtException)
+            {
+                throw new UnauthorizedAccessException("Invalid Google ID token.");
+            }
+
+            if (string.IsNullOrWhiteSpace(payload.Email))
+            {
+                throw new ForbiddenException(_localizer["GoogleAccountEmailNotProvided"]);
+            }
+
+            if (!payload.EmailVerified)
+            {
+                throw new ForbiddenException(_localizer["GoogleEmailNotVerified"]);
+            }
+
+            var email = payload.Email.Trim().ToLowerInvariant();
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user is null)
+            {
+                var firstNameAttrib = await _db.Attributes.FirstOrDefaultAsync(x => x.Name == "First Name");
+                var lastNameAttrib = await _db.Attributes.FirstOrDefaultAsync(x => x.Name == "Last Name");
+
+                if (firstNameAttrib is null || lastNameAttrib is null)
+                {
+                    throw new InvalidOperationException(_localizer["BuiltInAttributesNotFound"]);
+                }
+
+                user = new User
+                {
+                    Email = email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
+                    Role = UserRole.Candidate
+                };
+
+                await _db.Users.AddAsync(user);
+                await _db.SaveChangesAsync();
+
+                await _db.AttributeValues.AddRangeAsync(
+                    new AttributeValue 
+                    {
+                        UserId = user.Id,
+                        AttributeId = firstNameAttrib.Id,
+                        Value = payload.GivenName ?? string.Empty
+                    },
+                    new AttributeValue
+                    {
+                        UserId = user.Id,
+                        AttributeId = lastNameAttrib.Id,
+                        Value = payload.FamilyName ?? string.Empty
+                    });
+
+                await _db.SaveChangesAsync();
+            }
+
+            return GenerateToken(user);
+        }
         private string GenerateToken(User user)
         {
             var claims = new Claim[] {
