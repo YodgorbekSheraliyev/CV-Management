@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: myapp-backend:latest
+    container_name: backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__Database=Server=mssql,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};Encrypt=false;TrustServerCertificate=true;
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__ExpiresInDays=50
+      - Google__ClientId=${GOOGLE_CLIENT_ID}
+    ports:
+      - "9080:8080"
+    volumes:
+      - ${APPDATA:-/tmp}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+    depends_on:
+      mssql:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: myapp-frontend:latest
+    container_name: frontend
+    environment:
+      - VITE_API_URL=http://${SERVER_IP}:9080/api
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+    ports:
+      - "5174:5173"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_PASSWORD\" -C -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - app-network
+    restart: always
+    env_file:
+      - .env
+
+volumes:
+  mssql_data:
+
+networks:
+  app-network:
+    driver: bridge
