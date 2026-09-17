@@ -3,22 +3,28 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/auth";
+import { UserRole } from "../enums/enums";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import ToastNotification from "../components/notifications/ToastNotification";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, error, setError, googleAuth } = useAuth();
+  const { register, googleAuth } = useAuth();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<UserRole>(UserRole.Candidate);
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError("");
     setLoading(true);
 
     try {
@@ -27,41 +33,44 @@ const RegisterPage = () => {
         lastName,
         email,
         password,
+        role,
+      });
+      setToast({
+        message: "Successfully completed registration",
+        type: "success",
       });
 
       navigate("/");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to create your account. Please try again.",
-      );
+      setToast({
+        message: "Unable to create your account. Please try again.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   async function handleGoogleSuccess(idToken: string) {
-    setError("");
     setLoading(true);
 
     try {
-      await googleAuth(idToken);
+      await googleAuth(idToken, role);
+      setToast({ message: "Successfully registered", type: "success" });
 
       navigate("/");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to sign in with Google. Please try again.",
-      );
+      setToast({
+        message: "Unable to sign in with Google. Please try again.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-vh-100 bg-light d-flex align-items-center">
+    <div className="min-vh-100 bg-light d-flex align-items-center py-5">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
@@ -74,12 +83,83 @@ const RegisterPage = () => {
                   </p>
                 </div>
 
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    {error}
-                  </div>
-                )}
+                <ToastNotification
+                  toast={toast}
+                  onClose={() => setToast(null)}
+                />
 
+                {/* Role selection */}
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">
+                    I want to register as
+                  </label>
+
+                  <div className="row g-3">
+                    {/* Candidate */}
+                    <div className="col-6">
+                      <button
+                        type="button"
+                        className={`btn w-100 text-start p-3 h-100 ${
+                          role === UserRole.Candidate
+                            ? "btn-primary"
+                            : "btn-outline-secondary"
+                        }`}
+                        onClick={() => setRole(UserRole.Candidate)}
+                      >
+                        <div className="text-center">
+                          <div className="fs-2 mb-2">
+                            <i className="bi bi-person"></i>
+                          </div>
+
+                          <div className="fw-semibold">Candidate</div>
+
+                          <small
+                            className={
+                              role === UserRole.Candidate
+                                ? "text-white-50"
+                                : "text-muted"
+                            }
+                          >
+                            Find opportunities
+                          </small>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Recruiter */}
+                    <div className="col-6">
+                      <button
+                        type="button"
+                        className={`btn w-100 text-start p-3 h-100 ${
+                          role === UserRole.Recruiter
+                            ? "btn-primary"
+                            : "btn-outline-secondary"
+                        }`}
+                        onClick={() => setRole(UserRole.Recruiter)}
+                      >
+                        <div className="text-center">
+                          <div className="fs-2 mb-2">
+                            <i className="bi bi-briefcase"></i>
+                          </div>
+
+                          <div className="fw-semibold">Recruiter</div>
+
+                          <small
+                            className={
+                              role === UserRole.Recruiter
+                                ? "text-white-50"
+                                : "text-muted"
+                            }
+                          >
+                            Find candidates
+                          </small>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Registration form */}
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-md-6 mb-3">
@@ -178,6 +258,7 @@ const RegisterPage = () => {
                   </button>
                 </form>
 
+                {/* Divider */}
                 <div className="d-flex align-items-center my-4">
                   <hr className="flex-grow-1" />
 
@@ -186,9 +267,10 @@ const RegisterPage = () => {
                   <hr className="flex-grow-1" />
                 </div>
 
+                {/* Google registration */}
                 <GoogleSignInButton
                   onSuccess={handleGoogleSuccess}
-                  onError={setError}
+                  onError={(message) => setToast({ message, type: "danger" })}
                 />
 
                 <div className="text-center mt-4">

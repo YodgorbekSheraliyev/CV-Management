@@ -66,16 +66,28 @@ const NavBar = () => {
             </li>
 
             {isRecruiterOrAdmin && (
-              <li className="nav-item">
-                <NavLink
-                  to="/attribute"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active fw-semibold" : "nav-link"
-                  }
-                >
-                  {t("navbar.attributes")}
-                </NavLink>
-              </li>
+              <>
+                <li className="nav-item">
+                  <NavLink
+                    to="/applications"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active fw-semibold" : "nav-link"
+                    }
+                  >
+                    {t("navbar.applications")}
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/attribute"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active fw-semibold" : "nav-link"
+                    }
+                  >
+                    {t("navbar.attributes")}
+                  </NavLink>
+                </li>
+              </>
             )}
           </ul>
 

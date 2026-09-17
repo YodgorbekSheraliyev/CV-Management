@@ -2,6 +2,7 @@
 using backend.Dtos;
 using backend.Dtos.Attribute;
 using backend.Dtos.Position;
+using backend.Dtos.Tag;
 using backend.enums;
 using backend.Exceptions;
 using backend.Localization;
@@ -104,7 +105,9 @@ namespace backend.Services
                     AttributeId = r.AttributeId,
                     ComparisonType = r.ComparisonType,
                     Value = r.Value
-                }).ToList()
+                }).ToList(),
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
             _db.Positions.Add(position);
@@ -186,6 +189,8 @@ namespace backend.Services
                     ComparisonType = r.ComparisonType,
                     Value = r.Value
                 }).ToList(),
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
             _db.Positions.Add(duplicate);

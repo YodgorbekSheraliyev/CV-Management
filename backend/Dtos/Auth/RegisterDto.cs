@@ -14,5 +14,6 @@ namespace backend.Dtos.Auth
         public string Email { get; set; }
         [Required(ErrorMessage = "PasswordRequired")]
         public string Password { get; set; }
+        public UserRole Role { get; set; }
     }
 }

@@ -48,6 +48,7 @@ builder.Services.AddControllers().AddDataAnnotationsLocalization(options =>
 }).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -84,6 +85,7 @@ builder.Services.AddScoped<PositionService>();
 builder.Services.AddScoped<CvService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<ApplicationService>();
 
 var app = builder.Build();
 app.UseCors(builder => builder

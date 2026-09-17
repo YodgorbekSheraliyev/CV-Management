@@ -1,6 +1,6 @@
 ﻿namespace backend.Models
 {
-    public class Position
+    public class Position: ModelBase
     {
         public int Id { get; set; }
         public string Title { get; set; }

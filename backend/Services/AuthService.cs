@@ -47,7 +47,7 @@ namespace backend.Services
             {
                 Email = registerDto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Role = UserRole.Candidate,
+                Role = registerDto.Role,
             };
 
             await _db.Users.AddAsync(user);
@@ -79,7 +79,7 @@ namespace backend.Services
             {
                 throw new ArgumentException(_localizer["GoogleIDTokenRequired"]);
             }
-            
+
             var googleClientId = _config["Google:ClientId"];
             if (string.IsNullOrWhiteSpace(googleClientId))
             {
@@ -90,7 +90,7 @@ namespace backend.Services
 
             try
             {
-                payload = await GoogleJsonWebSignature.ValidateAsync( 
+                payload = await GoogleJsonWebSignature.ValidateAsync(
                     dto.IdToken,
                     new GoogleJsonWebSignature.ValidationSettings
                     {
@@ -123,7 +123,6 @@ namespace backend.Services
             {
                 var firstNameAttrib = await _db.Attributes.FirstOrDefaultAsync(x => x.Name == "First Name");
                 var lastNameAttrib = await _db.Attributes.FirstOrDefaultAsync(x => x.Name == "Last Name");
-
                 if (firstNameAttrib is null || lastNameAttrib is null)
                 {
                     throw new InvalidOperationException(_localizer["BuiltInAttributesNotFound"]);
@@ -133,14 +132,14 @@ namespace backend.Services
                 {
                     Email = email,
                     Password = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
-                    Role = UserRole.Candidate
+                    Role = dto.Role
                 };
 
                 await _db.Users.AddAsync(user);
                 await _db.SaveChangesAsync();
 
                 await _db.AttributeValues.AddRangeAsync(
-                    new AttributeValue 
+                    new AttributeValue
                     {
                         UserId = user.Id,
                         AttributeId = firstNameAttrib.Id,

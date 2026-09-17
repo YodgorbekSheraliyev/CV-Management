@@ -11,6 +11,7 @@ import EditPositionPage from "./pages/EditPositionPage";
 import AttributeManagement from "./pages/AttributeManagement";
 import PositionCvsPage from "./pages/PositionCvsPage";
 import CvPage from "./pages/CvPage";
+import ApplicationsPage from "./pages/ApplicationsPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/positions/:id/cvs" element={<PositionCvsPage />} />
         <Route path="/attribute" element={<AttributeManagement />} />
         <Route path="/cvs/:id" element={<CvPage />} />
+        <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/" element={<MainPage />} />
       </Route>
     </Routes>

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { parsePeriod } from "../../utils";
 import type { PeriodValue } from "../fields/ValueField";
-import { createAttributeValue, updateAttributeValue } from "../../api/attributeValueApi";
+import {
+  createAttributeValue,
+  updateAttributeValue,
+} from "../../api/attributeValueApi";
 import AttributeIcon from "../icons/AttributeIcon";
 import ValueField from "../fields/ValueField";
 import type { AttributeValue, User } from "../../models";

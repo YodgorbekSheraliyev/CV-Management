@@ -30,6 +30,7 @@ export interface LoginRequest {
 
 export interface GoogleAuthRequest {
   idToken: string;
+  role: UserRole
 }
 
 export interface AuthContextValue {
@@ -43,12 +44,13 @@ export interface AuthContextValue {
     lastName: string;
     email: string;
     password: string;
+    role: UserRole
   }) => Promise<string>;
   logout: () => void;
-  googleAuth: (idToken: string) => Promise<any>;
+  googleAuth: (idToken: string, role?: UserRole) => Promise<any>;
 }
 
-export const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue>(undefined!);
 
 function isExpired(decoded: DecodedType): boolean {
   return Date.now() >= decoded.exp * 1000;
@@ -127,19 +129,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return token;
   };
 
-  const googleAuth = async (idToken: string) => {
+  const googleAuth = async (idToken: string, role?: UserRole) => {
     const response = await api.post<CommonResponse<string>>("/auth/google", {
       idToken,
+      role
     });
 
     const token = response.data.data!;
-
     const decoded = jwtDecode<DecodedType>(token);
-
     localStorage.setItem(TOKEN_KEY, token);
-
     const userId = getUserIdFromToken(decoded);
-
     const currentUser = await getUser(userId);
 
     setUser(currentUser);
@@ -153,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     lastName: string;
     email: string;
     password: string;
+    role: UserRole
   }) => {
     const response = await api.post<CommonResponse<string>>(
       "/auth/register",

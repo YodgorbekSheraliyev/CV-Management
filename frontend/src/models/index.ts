@@ -38,7 +38,7 @@ export interface AttributeValue {
 export interface CV extends CVSummary {
   attributes: CvAttribute[];
   projects: Project[];
-  isLikedByCurrentUser: boolean
+  isLikedByCurrentUser: boolean;
 }
 
 export interface CvAttribute {
@@ -56,7 +56,6 @@ export interface CVSummary {
   status: CVStatus;
   createdAt: string;
 }
-
 
 export interface Like {
   id: number;
@@ -76,7 +75,7 @@ export interface Position {
   cVsCount: number;
   isPublic: boolean;
   maxProjects?: number;
-  hasUserApplied: boolean
+  hasUserApplied: boolean;
 }
 
 export interface PositionSummary {
@@ -120,4 +119,14 @@ export interface Project {
 export interface Tag {
   id: number;
   name: string;
+}
+
+export interface Application {
+  cvId: number;
+  candidateId: number;
+  candidateName: string;
+  positionId: number;
+  positionTitle: string;
+  level: string | null;
+  createdAt: string;
 }
