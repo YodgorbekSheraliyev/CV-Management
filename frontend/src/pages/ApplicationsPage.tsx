@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { getAllApplications } from "../api/applicationsApi";
 import ToastNotification from "../components/notifications/ToastNotification";
 import type { Application } from "../models";
-import { Link } from "react-router-dom";
 
 const ApplicationsPage = () => {
+  const { t } = useTranslation();
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState<string>("");
   const [levelFilter, setLevelFilter] = useState("");
@@ -103,14 +105,14 @@ const ApplicationsPage = () => {
 
       <div className="container py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">Applications</h2>
+          <h2 className="mb-0">{t("applicationsPage.title")}</h2>
 
           <button
             className="btn btn-danger"
             disabled={selectedIds.length === 0}
             onClick={handleDelete}
           >
-            Delete
+            {t("applicationsPage.delete")}
             {selectedIds.length > 0 && ` (${selectedIds.length})`}
           </button>
         </div>
@@ -119,7 +121,7 @@ const ApplicationsPage = () => {
         <div className="card mb-4">
           <div className="card-body">
             <div className="row g-3">
-              <div className="d-flex  flex-column flex-md-row gap-5">
+              <div className="d-flex flex-column flex-md-row gap-5">
                 <div className="position-relative col-md-4 col-sm-3">
                   <i
                     className="bi bi-search position-absolute text-muted"
@@ -133,7 +135,7 @@ const ApplicationsPage = () => {
                   <input
                     type="search"
                     className="form-control bg-light ps-5"
-                    placeholder="Search attributes..."
+                    placeholder={t("applicationsPage.searchPlaceholder")}
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                   />
@@ -142,12 +144,12 @@ const ApplicationsPage = () => {
                   <select
                     className="form-select"
                     value={levelFilter}
-                    onChange={(e) => setLevelFilter(e.target.value)}
+                    onChange={(event) => setLevelFilter(event.target.value)}
                   >
-                    <option value="">All levels</option>
+                    <option value="">{t("applicationsPage.allLevels")}</option>
 
                     {levels.map((level) => (
-                      <option key={level} value={level!}>
+                      <option key={level} value={level}>
                         {level}
                       </option>
                     ))}
@@ -170,13 +172,14 @@ const ApplicationsPage = () => {
                       className="form-check-input"
                       checked={allVisibleSelected}
                       onChange={toggleAll}
+                      aria-label={t("applicationsPage.selectAll")}
                     />
                   </th>
 
-                  <th>Candidate</th>
-                  <th>Position</th>
-                  <th>Level</th>
-                  <th>Applied</th>
+                  <th>{t("applicationsPage.candidate")}</th>
+                  <th>{t("applicationsPage.position")}</th>
+                  <th>{t("applicationsPage.level")}</th>
+                  <th>{t("applicationsPage.applied")}</th>
                 </tr>
               </thead>
 
@@ -184,7 +187,7 @@ const ApplicationsPage = () => {
                 {filteredApplications.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="text-center py-5 text-muted">
-                      No applications found.
+                      {t("applicationsPage.noApplications")}
                     </td>
                   </tr>
                 ) : (
@@ -196,6 +199,9 @@ const ApplicationsPage = () => {
                           className="form-check-input"
                           checked={selectedIds.includes(application.cvId)}
                           onChange={() => toggleApplication(application.cvId)}
+                          aria-label={t("applicationsPage.selectApplication", {
+                            candidate: application.candidateName,
+                          })}
                         />
                       </td>
 

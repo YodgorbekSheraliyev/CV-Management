@@ -271,14 +271,81 @@
     },
 
     "categories": {
+      "Certification": "Sertifikatlar",
+      "DomainKnowledge": "Soha bilimlari",
       "PersonalInformation": "Shaxsiy ma’lumotlar",
+      "SoftSkills": "Yumshoq ko‘nikmalar",
       "TechnicalSkills": "Texnik ko‘nikmalar",
-      "WorkExperience": "Ish tajribasi",
-      "Education": "Ta’lim"
+      "Education": "Ta’lim",
+      "WorkAuthorization": "Ishlash huquqi",
+      "WorkPreference": "Ishlash afzalliklari",
+      "Salary": "Maosh"
     }
   },
   "toast": {
     "success": "Muvaffaqiyatli",
     "close": "Bildirishnomani yopish"
+  },
+  "applicationsPage": {
+    "title": "Arizalar",
+    "delete": "O‘chirish",
+    "searchPlaceholder": "Arizalarni qidirish...",
+    "allLevels": "Barcha darajalar",
+    "selectAll": "Barcha arizalarni tanlash",
+    "candidate": "Nomzod",
+    "position": "Lavozim",
+    "level": "Daraja",
+    "applied": "Topshirilgan sana",
+    "noApplications": "Arizalar topilmadi.",
+    "selectApplication": "{{candidate}} arizasini tanlash"
+  },
+  "createPositionPage": {
+    "backToPositions": "Lavozimlarga qaytish",
+    "title": "Lavozim yaratish",
+    "description": "Kirish qoidalari, atributlar va loyiha filtrlari bilan qayta foydalanish mumkin bo‘lgan CV shablonini yarating.",
+    "createPosition": "Lavozim yaratish",
+    "creating": "Yaratilmoqda…",
+    "loadAttributesFailed": "Atributlarni yuklab bo‘lmadi.",
+    "createPositionFailed": "Lavozimni yaratib bo‘lmadi."
+  },
+  "positionForm": {
+    "errors": {
+      "titleRequired": "Lavozim nomi kiritilishi shart.",
+      "maxProjectsNegative": "Maksimal loyihalar soni manfiy bo‘lishi mumkin emas."
+    },
+    "basicInformation": {
+      "title": "Asosiy ma’lumotlar",
+      "description": "Ushbu lavozim uchun ko‘rsatiladigan asosiy ma’lumotlarni belgilang.",
+      "titleLabel": "Nom",
+      "titlePlaceholder": "masalan, Junior Node.JS Developer",
+      "descriptionLabel": "Qisqa tavsif",
+      "descriptionPlaceholder": "Lavozimni tavsiflang..."
+    },
+    "access": {
+      "title": "Kirish qoidalari",
+      "description": "Qaysi nomzodlar ushbu lavozimga kira olishini belgilang.",
+      "publicPosition": "Ochiq lavozim",
+      "publicDescription": "Ochiq lavozimlardan barcha autentifikatsiyadan o'tgan nomzodlar foydalanishi mumkin.",
+      "candidateFilters": "Nomzod filtrlari",
+      "candidateFiltersDescription": "Nomzod ushbu lavozimga kirish uchun barcha kirish qoidalariga javob berishi kerak.",
+      "addRule": "Qoida qo‘shish",
+      "noRules": "Kirish qoidalari mavjud emas",
+      "noRulesDescription": "Muayyan atributlarga mos nomzodlar uchun kirishni cheklash uchun qoida qo‘shing."
+    },
+    "cvAttributes": {
+      "title": "CV atributlari",
+      "description": "Yaratiladigan CV larda mavjud bo‘lishi kerak bo‘lgan atributlarni Atributlar kutubxonasidan tanlang.",
+      "noAttributes": "Atributlar mavjud emas.",
+      "selectedAttributes": "Tanlangan atributlar"
+    },
+    "projects": {
+      "title": "Loyihalar",
+      "description": "Nomzodning mos loyihalarini tanlashda ishlatiladigan texnologiya teglarini belgilang.",
+      "maximumProjects": "Maksimal loyihalar",
+      "maximumProjectsDescription": "Yaratiladigan CV da ko‘rsatilishi mumkin bo‘lgan mos loyihalarning maksimal soni.",
+      "projectTags": "Loyiha teglari",
+      "projectTagsDescription": "Nomzod loyihalarini filtrlashda ishlatiladigan texnologiya teglarini tanlang."
+    },
+    "loadingAttributes": "Atributlar yuklanmoqda..."
   }
 }

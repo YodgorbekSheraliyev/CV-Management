@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
+import ToastNotification from "../components/notifications/ToastNotification";
 import { createPosition } from "../api/positionApi";
 import { getAttributes } from "../api/attributeApi";
 import type { Attribute } from "../models";
@@ -11,12 +13,16 @@ import PositionForm, {
 
 const CreatePositionPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loadingAttributes, setLoadingAttributes] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   useEffect(() => {
     loadAttributes();
@@ -28,24 +34,32 @@ const CreatePositionPage = () => {
       const result = await getAttributes();
       setAttributes(result ?? []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load attributes.",
-      );
+      setToast({
+        message:
+          err instanceof Error
+            ? err.message
+            : t("createPositionPage.loadAttributesFailed"),
+        type: "danger",
+      });
     } finally {
       setLoadingAttributes(false);
     }
   };
 
   const handleSubmit = async (values: PositionFormValues) => {
-    setError(null);
+    setToast(null);
     setSaving(true);
     try {
       await createPosition(values, user!.id);
       navigate("/positions");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create position.",
-      );
+      setToast({
+        message:
+          err instanceof Error
+            ? err.message
+            : t("createPositionPage.createPositionFailed"),
+        type: "danger",
+      });
     } finally {
       setSaving(false);
     }
@@ -54,6 +68,7 @@ const CreatePositionPage = () => {
   return (
     <div>
       <NavBar />
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
       <div className="container py-4 py-lg-5">
         <div className="row justify-content-center">
           <div className="col-12 col-xl-9">
@@ -63,22 +78,22 @@ const CreatePositionPage = () => {
                 className="btn btn-link text-decoration-none px-0 mb-2"
                 onClick={() => navigate("/positions")}
               >
-                ← Back to positions
+                ← {t("createPositionPage.backToPositions")}
               </button>
-              <h1 className="h3 fw-bold mb-1">Create Position</h1>
+              <h1 className="h3 fw-bold mb-1">
+                {t("createPositionPage.title")}
+              </h1>
               <p className="text-muted mb-0">
-                Create a reusable CV template with access rules, attributes, and
-                project filters.
+                {t("createPositionPage.description")}
               </p>
             </div>
 
             <PositionForm
               attributes={attributes}
               loadingAttributes={loadingAttributes}
-              submitLabel="Create Position"
-              submittingLabel="Creating…"
+              submitLabel={t("createPositionPage.createPosition")}
+              submittingLabel={t("createPositionPage.creating")}
               saving={saving}
-              error={error}
               onSubmit={handleSubmit}
               onCancel={() => navigate("/positions")}
             />

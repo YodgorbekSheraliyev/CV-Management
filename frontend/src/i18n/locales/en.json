@@ -271,14 +271,81 @@
     },
 
     "categories": {
+      "Certification": "Certification",
+      "DomainKnowledge": "Domain Knowledge",
       "PersonalInformation": "Personal Information",
+      "SoftSkills": "Soft Skills",
       "TechnicalSkills": "Technical Skills",
-      "WorkExperience": "Work Experience",
-      "Education": "Education"
+      "Education": "Education",
+      "WorkAuthorization": "Work Authorization",
+      "WorkPreference": "Work Preference",
+      "Salary": "Salary"
     }
   },
   "toast": {
     "success": "Success",
     "close": "Close notification"
+  },
+  "applicationsPage": {
+    "title": "Applications",
+    "delete": "Delete",
+    "searchPlaceholder": "Search applications...",
+    "allLevels": "All levels",
+    "selectAll": "Select all applications",
+    "candidate": "Candidate",
+    "position": "Position",
+    "level": "Level",
+    "applied": "Applied",
+    "noApplications": "No applications found.",
+    "selectApplication": "Select application from {{candidate}}"
+  },
+  "createPositionPage": {
+    "backToPositions": "Back to positions",
+    "title": "Create Position",
+    "description": "Create a reusable CV template with access rules, attributes, and project filters.",
+    "createPosition": "Create Position",
+    "creating": "Creating…",
+    "loadAttributesFailed": "Failed to load attributes.",
+    "createPositionFailed": "Failed to create position."
+  },
+  "positionForm": {
+    "errors": {
+      "titleRequired": "Position title is required.",
+      "maxProjectsNegative": "Maximum projects cannot be negative."
+    },
+    "basicInformation": {
+      "title": "Basic information",
+      "description": "Define the basic information displayed for this position.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Junior Node.JS Developer",
+      "descriptionLabel": "Short description",
+      "descriptionPlaceholder": "Describe the position..."
+    },
+    "access": {
+      "title": "Access rules",
+      "description": "Control which candidates can access this position.",
+      "publicPosition": "Public position",
+      "publicDescription": "Public positions are accessible to all authenticated candidates.",
+      "candidateFilters": "Candidate filters",
+      "candidateFiltersDescription": "A candidate must satisfy the access rules to access this position.",
+      "addRule": "Add rule",
+      "noRules": "No access rules",
+      "noRulesDescription": "Add a rule to restrict access to candidates matching specific attributes."
+    },
+    "cvAttributes": {
+      "title": "CV attributes",
+      "description": "Select attributes from the Attribute Library that should be available in generated CVs.",
+      "noAttributes": "No attributes are available.",
+      "selectedAttributes": "Selected attributes"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Define which technology tags are used to select relevant candidate projects.",
+      "maximumProjects": "Maximum projects",
+      "maximumProjectsDescription": "Maximum number of matching projects that can appear in a generated CV.",
+      "projectTags": "Project tags",
+      "projectTagsDescription": "Select technology tags used when filtering candidate projects."
+    },
+    "loadingAttributes": "Loading attributes..."
   }
 }

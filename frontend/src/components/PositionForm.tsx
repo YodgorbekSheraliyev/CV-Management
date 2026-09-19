@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ComparisonType } from "../enums/enums";
 import type { Attribute } from "../models";
 import { getDefaultComparison, getDefaultValue } from "../utils";
@@ -14,7 +15,7 @@ export interface AccessRule {
 }
 
 export interface PositionFormValues {
-  id: number
+  id: number;
   title: string;
   description: string;
   attributeIds: number[];
@@ -31,9 +32,9 @@ interface PositionFormProps {
   submitLabel: string;
   submittingLabel: string;
   saving: boolean;
-  error: string | null;
   onSubmit: (values: PositionFormValues) => void;
   onCancel: () => void;
+  onValidationError?: (message: string) => void;
 }
 
 const EMPTY_FORM: PositionFormValues = {
@@ -54,14 +55,14 @@ const PositionForm = ({
   submitLabel,
   submittingLabel,
   saving,
-  error,
   onSubmit,
   onCancel,
+  onValidationError,
 }: PositionFormProps) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState<PositionFormValues>(
     initialValues ?? EMPTY_FORM,
   );
-  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialValues) setForm(initialValues);
@@ -141,14 +142,13 @@ const PositionForm = ({
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLocalError(null);
 
     if (!form.title.trim()) {
-      setLocalError("Position title is required.");
+      onValidationError?.(t("positionForm.errors.titleRequired"));
       return;
     }
     if (form.maxProjects < 0) {
-      setLocalError("Maximum projects cannot be negative.");
+      onValidationError?.(t("positionForm.errors.maxProjectsNegative"));
       return;
     }
 
@@ -159,27 +159,19 @@ const PositionForm = ({
     });
   };
 
-  const displayedError = error ?? localError;
-
   return (
     <form onSubmit={handleSubmit}>
-      {displayedError && (
-        <div className="alert alert-danger" role="alert">
-          {displayedError}
-        </div>
-      )}
-
       {/* BASIC INFORMATION */}
       <section className="card border-0 shadow-sm mb-4">
         <div className="card-body p-4">
           <SectionHeader
-            title="Basic information"
-            description="Define the basic information displayed for this position."
+            title={t("positionForm.basicInformation.title")}
+            description={t("positionForm.basicInformation.description")}
           />
 
           <div className="mb-3">
             <label htmlFor="position-title" className="form-label fw-semibold">
-              Title
+              {t("positionForm.basicInformation.titleLabel")}
             </label>
             <input
               id="position-title"
@@ -187,7 +179,7 @@ const PositionForm = ({
               className="form-control form-control-lg"
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
-              placeholder="e.g. Junior Node.JS Developer"
+              placeholder={t("positionForm.basicInformation.titlePlaceholder")}
               maxLength={200}
               required
               autoFocus
@@ -199,7 +191,7 @@ const PositionForm = ({
               htmlFor="position-description"
               className="form-label fw-semibold"
             >
-              Short description
+              {t("positionForm.basicInformation.descriptionLabel")}
             </label>
             <textarea
               id="position-description"
@@ -207,7 +199,9 @@ const PositionForm = ({
               rows={4}
               value={form.description}
               onChange={(e) => updateField("description", e.target.value)}
-              placeholder="Describe the position..."
+              placeholder={t(
+                "positionForm.basicInformation.descriptionPlaceholder",
+              )}
               maxLength={1000}
             />
           </div>
@@ -218,8 +212,8 @@ const PositionForm = ({
       <section className="card border-0 shadow-sm mb-4">
         <div className="card-body p-4">
           <SectionHeader
-            title="Access rules"
-            description="Control which candidates can access this position."
+            title={t("positionForm.access.title")}
+            description={t("positionForm.access.description")}
           />
 
           <div className="form-check form-switch mb-4">
@@ -235,10 +229,10 @@ const PositionForm = ({
               htmlFor="public-position"
               className="form-check-label fw-semibold"
             >
-              Public position
+              {t("positionForm.access.publicPosition")}
             </label>
             <div className="form-text">
-              Public positions are accessible to all authenticated candidates.
+              {t("positionForm.access.publicDescription")}
             </div>
           </div>
 
@@ -246,10 +240,11 @@ const PositionForm = ({
             <div className="border rounded-3 p-3">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                  <div className="fw-semibold">Candidate filters</div>
+                  <div className="fw-semibold">
+                    {t("positionForm.access.candidateFilters")}
+                  </div>
                   <div className="small text-muted">
-                    A candidate must satisfy the access rules to access this
-                    position.
+                    {t("positionForm.access.candidateFiltersDescription")}
                   </div>
                 </div>
                 <button
@@ -261,16 +256,17 @@ const PositionForm = ({
                     ruleAttributes.length >= attributes.length
                   }
                 >
-                  + Add rule
+                  + {t("positionForm.access.addRule")}
                 </button>
               </div>
 
               {form.accessRules.length === 0 ? (
                 <div className="text-center text-muted py-4 border rounded-3 bg-light">
-                  <div className="fw-semibold mb-1">No access rules</div>
+                  <div className="fw-semibold mb-1">
+                    {t("positionForm.access.noRules")}
+                  </div>
                   <div className="small">
-                    Add a rule to restrict access to candidates matching
-                    specific attributes.
+                    {t("positionForm.access.noRulesDescription")}
                   </div>
                 </div>
               ) : (
@@ -279,6 +275,7 @@ const PositionForm = ({
                     const attribute = attributes.find(
                       (item) => item.id === rule.attributeId,
                     );
+
                     if (!attribute) return null;
 
                     return (
@@ -306,15 +303,15 @@ const PositionForm = ({
       <section className="card border-0 shadow-sm mb-4">
         <div className="card-body p-4">
           <SectionHeader
-            title="CV attributes"
-            description="Select attributes from the Attribute Library that should be available in generated CVs."
+            title={t("positionForm.cvAttributes.title")}
+            description={t("positionForm.cvAttributes.description")}
           />
 
           {loadingAttributes ? (
             <LoadingAttributes />
           ) : attributes.length === 0 ? (
             <div className="alert alert-light border mb-0">
-              No attributes are available.
+              {t("positionForm.cvAttributes.noAttributes")}
             </div>
           ) : (
             <>
@@ -327,7 +324,7 @@ const PositionForm = ({
               {selectedAttributes.length > 0 && (
                 <div className="mt-3">
                   <div className="small fw-semibold text-muted mb-2">
-                    Selected attributes
+                    {t("positionForm.cvAttributes.selectedAttributes")}
                   </div>
                   <div className="d-flex flex-wrap gap-2">
                     {selectedAttributes.map((attribute) => (
@@ -350,13 +347,13 @@ const PositionForm = ({
       <section className="card border-0 shadow-sm mb-4">
         <div className="card-body p-4">
           <SectionHeader
-            title="Projects"
-            description="Define which technology tags are used to select relevant candidate projects."
+            title={t("positionForm.projects.title")}
+            description={t("positionForm.projects.description")}
           />
 
           <div className="mb-3">
             <label htmlFor="max-projects" className="form-label fw-semibold">
-              Maximum projects
+              {t("positionForm.projects.maximumProjects")}
             </label>
             <input
               id="max-projects"
@@ -370,19 +367,20 @@ const PositionForm = ({
               }
             />
             <div className="form-text">
-              Maximum number of matching projects that can appear in a generated
-              CV.
+              {t("positionForm.projects.maximumProjectsDescription")}
             </div>
           </div>
 
           <div>
-            <label className="form-label fw-semibold">Project tags</label>
+            <label className="form-label fw-semibold">
+              {t("positionForm.projects.projectTags")}
+            </label>
             <TagSelector
               selectedTagIds={form.tagIds}
               onChange={(tagIds) => updateField("tagIds", tagIds)}
             />
             <div className="form-text">
-              Select technology tags used when filtering candidate projects.
+              {t("positionForm.projects.projectTagsDescription")}
             </div>
           </div>
         </div>
@@ -396,7 +394,7 @@ const PositionForm = ({
           onClick={onCancel}
           disabled={saving}
         >
-          Cancel
+          {t("common.cancel")}
         </button>
         <button
           type="submit"
@@ -420,14 +418,17 @@ const PositionForm = ({
   );
 };
 
-const LoadingAttributes = () => (
-  <div className="text-center py-4 text-muted">
-    <span
-      className="spinner-border spinner-border-sm me-2"
-      aria-hidden="true"
-    />
-    Loading attributes…
-  </div>
-);
+const LoadingAttributes = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="text-center py-4 text-muted">
+      <span
+        className="spinner-border spinner-border-sm me-2"
+        aria-hidden="true"
+      />
+      {t("positionForm.loadingAttributes")}
+    </div>
+  );
+};
 
 export default PositionForm;
