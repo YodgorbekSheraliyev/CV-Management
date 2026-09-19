@@ -164,5 +164,121 @@
     "footerCopyright": "© 2026 Recruitment Platform",
     "footerHome": "Home",
     "footerProfile": "Profile"
+  },
+  "attributeManagement": {
+    "title": "Attributes",
+    "description": "Create and manage the attributes available throughout the platform.",
+    "addAttribute": "Add Attribute",
+
+    "statistics": {
+      "totalAttributes": "Total attributes",
+      "attributeTypes": "Attribute types"
+    },
+
+    "filters": {
+      "searchPlaceholder": "Search attributes...",
+      "allCategories": "All categories",
+      "allTypes": "All types"
+    },
+
+    "selection": {
+      "selected": "{{count}} selected",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteCount": "Delete ({{count}})",
+      "selectOneToEdit": "Select one attribute to edit.",
+      "clear": "Clear",
+      "selectAll": "Select all visible attributes",
+      "allSelected": "All visible attributes selected",
+      "selectAttribute": "Select {{name}}",
+      "selectAttributeForActions": "Select an attribute for actions"
+    },
+
+    "list": {
+      "allAttributes": "All Attributes",
+      "attribute": "attribute",
+      "attributes": "attributes",
+      "noAttributesFound": "No attributes found",
+      "noAttributesYet": "No attributes yet",
+      "tryChangingSearchOrFilter": "Try changing your search or filter.",
+      "createFirstAttribute": "Create your first attribute to get started.",
+      "createAttribute": "Create Attribute",
+      "noDescription": "No description provided",
+      "id": "ID",
+      "showing": "Showing",
+      "of": "of"
+    },
+
+    "modal": {
+      "createTitle": "Create Attribute",
+      "editTitle": "Edit Attribute",
+      "createDescription": "Add a new attribute to the platform.",
+      "editDescription": "Update the attribute information.",
+
+      "name": "Name",
+      "namePlaceholder": "e.g. Years of Experience",
+      "category": "Category",
+      "type": "Attribute Type",
+      "options": "Options",
+      "optionPlaceholder": "Option {{number}}",
+      "addOption": "Add option",
+      "description": "Description",
+      "optional": "optional",
+      "descriptionPlaceholder": "Describe what this attribute represents...",
+
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "create": "Create Attribute",
+      "saveChanges": "Save Changes"
+    },
+
+    "deleteModal": {
+      "singleTitle": "Delete attribute?",
+      "multipleTitle": "Delete {{count}} attributes?",
+      "singleDescription": "Are you sure you want to delete",
+      "multipleDescription": "Are you sure you want to delete these attributes?",
+      "cancel": "Cancel",
+      "deleting": "Deleting...",
+      "delete": "Delete",
+      "deleteMultiple": "Delete {{count}}"
+    },
+
+    "loading": "Loading attributes...",
+
+    "errors": {
+      "nameRequired": "Attribute name is required.",
+      "dropdownOptionsRequired": "Dropdown attributes must have at least one option.",
+      "saveFailed": "Failed to save attribute.",
+      "deleteFailed": "Failed to delete one or more attributes."
+    },
+
+    "success": {
+      "created": "Attribute created successfully.",
+      "updated": "Attribute updated successfully.",
+      "deletedSingle": "\"{{name}}\" was deleted successfully.",
+      "deletedMultiple": "{{count}} attributes were deleted successfully."
+    },
+
+    "types": {
+      "String": "String",
+      "Text": "Text",
+      "Image": "Image",
+      "Numeric": "Numeric",
+      "Date": "Date",
+      "Period": "Period",
+      "Boolean": "Boolean",
+      "Dropdown": "Dropdown"
+    },
+
+    "categories": {
+      "PersonalInformation": "Personal Information",
+      "TechnicalSkills": "Technical Skills",
+      "WorkExperience": "Work Experience",
+      "Education": "Education"
+    }
+  },
+  "toast": {
+    "success": "Success",
+    "close": "Close notification"
   }
 }

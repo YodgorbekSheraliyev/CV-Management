@@ -22,9 +22,7 @@ interface UpdateUserData {
 
 const ProfilePage = () => {
   const { user, setUser } = useAuth();
-
   const [activeTab, setActiveTab] = useState<Tab>("me");
-
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "danger";
@@ -42,7 +40,6 @@ const ProfilePage = () => {
         type: "success",
       });
       setUser?.(updatedUser);
-
       setToast({
         message: "Profile updated successfully.",
         type: "success",

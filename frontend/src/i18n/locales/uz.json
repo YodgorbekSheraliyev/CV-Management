@@ -164,5 +164,121 @@
     "footerCopyright": "© 2026 Recruitment Platform",
     "footerHome": "Bosh sahifa",
     "footerProfile": "Profil"
+  },
+  "attributeManagement": {
+    "title": "Atributlar",
+    "description": "Platformada mavjud bo‘lgan atributlarni yaratish va boshqarish.",
+    "addAttribute": "Atribut qo‘shish",
+
+    "statistics": {
+      "totalAttributes": "Jami atributlar",
+      "attributeTypes": "Atribut turlari"
+    },
+
+    "filters": {
+      "searchPlaceholder": "Atributlarni qidirish...",
+      "allCategories": "Barcha kategoriyalar",
+      "allTypes": "Barcha turlar"
+    },
+
+    "selection": {
+      "selected": "{{count}} ta tanlangan",
+      "edit": "Tahrirlash",
+      "delete": "O‘chirish",
+      "deleteCount": "O‘chirish ({{count}})",
+      "selectOneToEdit": "Tahrirlash uchun bitta atribut tanlang.",
+      "clear": "Tozalash",
+      "selectAll": "Barcha ko‘rinadigan atributlarni tanlash",
+      "allSelected": "Barcha ko‘rinadigan atributlar tanlangan",
+      "selectAttribute": "{{name}} atributini tanlash",
+      "selectAttributeForActions": "Amallar uchun atribut tanlang"
+    },
+
+    "list": {
+      "allAttributes": "Barcha atributlar",
+      "attribute": "atribut",
+      "attributes": "atribut",
+      "noAttributesFound": "Atributlar topilmadi",
+      "noAttributesYet": "Hali atributlar mavjud emas",
+      "tryChangingSearchOrFilter": "Qidiruv yoki filtrlarni o‘zgartirib ko‘ring.",
+      "createFirstAttribute": "Boshlash uchun birinchi atributingizni yarating.",
+      "createAttribute": "Atribut yaratish",
+      "noDescription": "Tavsif kiritilmagan",
+      "id": "ID",
+      "showing": "Ko‘rsatilmoqda",
+      "of": "dan"
+    },
+
+    "modal": {
+      "createTitle": "Atribut yaratish",
+      "editTitle": "Atributni tahrirlash",
+      "createDescription": "Platformaga yangi atribut qo‘shish.",
+      "editDescription": "Atribut ma’lumotlarini yangilash.",
+
+      "name": "Nom",
+      "namePlaceholder": "masalan, Ish tajribasi yillari",
+      "category": "Kategoriya",
+      "type": "Atribut turi",
+      "options": "Variantlar",
+      "optionPlaceholder": "{{number}}-variant",
+      "addOption": "Variant qo‘shish",
+      "description": "Tavsif",
+      "optional": "ixtiyoriy",
+      "descriptionPlaceholder": "Ushbu atribut nimani anglatishini yozing...",
+
+      "cancel": "Bekor qilish",
+      "saving": "Saqlanmoqda...",
+      "create": "Atribut yaratish",
+      "saveChanges": "O‘zgarishlarni saqlash"
+    },
+
+    "deleteModal": {
+      "singleTitle": "Atribut o‘chirilsinmi?",
+      "multipleTitle": "{{count}} ta atribut o‘chirilsinmi?",
+      "singleDescription": "Ushbu atributni o‘chirishni xohlaysizmi?",
+      "multipleDescription": "Ushbu atributlarni o‘chirishni xohlaysizmi?",
+      "cancel": "Bekor qilish",
+      "deleting": "O‘chirilmoqda...",
+      "delete": "O‘chirish",
+      "deleteMultiple": "{{count}} tasini o‘chirish"
+    },
+
+    "loading": "Atributlar yuklanmoqda...",
+
+    "errors": {
+      "nameRequired": "Atribut nomi kiritilishi shart.",
+      "dropdownOptionsRequired": "Dropdown atributida kamida bitta variant bo‘lishi kerak.",
+      "saveFailed": "Atributni saqlashda xatolik yuz berdi.",
+      "deleteFailed": "Bir yoki bir nechta atributni o‘chirishda xatolik yuz berdi."
+    },
+
+    "success": {
+      "created": "Atribut muvaffaqiyatli yaratildi.",
+      "updated": "Atribut muvaffaqiyatli yangilandi.",
+      "deletedSingle": "\"{{name}}\" muvaffaqiyatli o‘chirildi.",
+      "deletedMultiple": "{{count}} ta atribut muvaffaqiyatli o‘chirildi."
+    },
+
+    "types": {
+      "String": "Matn",
+      "Text": "Kengaytirilgan matn",
+      "Image": "Rasm",
+      "Numeric": "Son",
+      "Date": "Sana",
+      "Period": "Davr",
+      "Boolean": "Mantiqiy",
+      "Dropdown": "Ro‘yxat"
+    },
+
+    "categories": {
+      "PersonalInformation": "Shaxsiy ma’lumotlar",
+      "TechnicalSkills": "Texnik ko‘nikmalar",
+      "WorkExperience": "Ish tajribasi",
+      "Education": "Ta’lim"
+    }
+  },
+  "toast": {
+    "success": "Muvaffaqiyatli",
+    "close": "Bildirishnomani yopish"
   }
 }

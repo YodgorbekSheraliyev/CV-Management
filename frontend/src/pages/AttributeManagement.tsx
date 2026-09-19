@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { AttributeCategory, AttributeType, UserRole } from "../enums/enums";
 import type { Attribute } from "../models";
@@ -12,8 +13,8 @@ import {
 } from "../api/attributeApi";
 
 import NavBar from "../components/navbar/NavBar";
-import { ATTRIBUTE_TYPE_LABELS, CATEGORY_LABELS } from "../constants";
 import { useAuth } from "../hooks/auth";
+import ToastNotification from "../components/notifications/ToastNotification";
 
 interface AttributeForm {
   name: string;
@@ -32,6 +33,7 @@ const emptyForm: AttributeForm = {
 };
 
 export default function AttributeManagement() {
+  const { t } = useTranslation();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [form, setForm] = useState<AttributeForm>(emptyForm);
   const [search, setSearch] = useState("");
@@ -46,8 +48,10 @@ export default function AttributeManagement() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
 
   const { user } = useAuth();
 
@@ -62,43 +66,86 @@ export default function AttributeManagement() {
   async function loadAttributes() {
     try {
       setLoading(true);
-      setError(null);
 
       const data = await getAttributes();
       setAttributes(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load attributes.",
-      );
+    } catch (err: any) {
+      setToast({
+        message: err.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   const attributeTypes = useMemo(
-    () =>
-      Object.entries(ATTRIBUTE_TYPE_LABELS).map(([type, label]) => ({
-        type: Number(type) as AttributeType,
-        label,
-      })),
-    [],
+    () => [
+      {
+        type: AttributeType.String,
+        label: t("attributeManagement.types.String"),
+      },
+      {
+        type: AttributeType.Text,
+        label: t("attributeManagement.types.Text"),
+      },
+      {
+        type: AttributeType.Image,
+        label: t("attributeManagement.types.Image"),
+      },
+      {
+        type: AttributeType.Numeric,
+        label: t("attributeManagement.types.Numeric"),
+      },
+      {
+        type: AttributeType.Date,
+        label: t("attributeManagement.types.Date"),
+      },
+      {
+        type: AttributeType.Period,
+        label: t("attributeManagement.types.Period"),
+      },
+      {
+        type: AttributeType.Boolean,
+        label: t("attributeManagement.types.Boolean"),
+      },
+      {
+        type: AttributeType.Dropdown,
+        label: t("attributeManagement.types.Dropdown"),
+      },
+    ],
+    [t],
   );
 
   const attributeCategories = useMemo(
     () =>
-      Object.entries(CATEGORY_LABELS).map(([category, label]) => ({
-        category: Number(category) as AttributeCategory,
-        label,
-      })),
-    [],
+      Object.values(AttributeCategory)
+        .filter((value) => typeof value === "number")
+        .map((category) => ({
+          category: category as AttributeCategory,
+          label: t(
+            `attributeManagement.categories.${AttributeCategory[category as number]}`,
+          ),
+        })),
+    [t],
   );
+
+  const getTypeLabel = (type: AttributeType) =>
+    t(`attributeManagement.types.${AttributeType[type]}`, {
+      defaultValue: String(type),
+    });
+
+  const getCategoryLabel = (category: AttributeCategory) =>
+    t(`attributeManagement.categories.${AttributeCategory[category]}`, {
+      defaultValue: String(category),
+    });
 
   const filteredAttributes = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return attributes.filter((attribute) => {
-      const typeLabel = ATTRIBUTE_TYPE_LABELS[attribute.type] ?? "";
-      const categoryLabel = CATEGORY_LABELS[attribute.category] ?? "";
+      const typeLabel = getTypeLabel(attribute.type);
+      const categoryLabel = getCategoryLabel(attribute.category);
 
       const matchesSearch =
         !query ||
@@ -108,12 +155,13 @@ export default function AttributeManagement() {
         categoryLabel.toLowerCase().includes(query);
 
       const matchesType = typeFilter === "all" || attribute.type === typeFilter;
+
       const matchesCategory =
-        categoryFilter == "all" || attribute.category == categoryFilter;
+        categoryFilter === "all" || attribute.category === categoryFilter;
 
       return matchesSearch && matchesType && matchesCategory;
     });
-  }, [attributes, search, typeFilter, categoryFilter]);
+  }, [attributes, search, typeFilter, categoryFilter, t]);
 
   const selectedAttributes = useMemo(
     () => attributes.filter((attribute) => selectedIds.includes(attribute.id)),
@@ -161,7 +209,6 @@ export default function AttributeManagement() {
   function openCreateModal() {
     setEditingId(null);
     setForm(emptyForm);
-    setError(null);
     setShowModal(true);
   }
 
@@ -176,7 +223,6 @@ export default function AttributeManagement() {
       options: attribute.options ? [...attribute.options] : [],
     });
 
-    setError(null);
     setShowModal(true);
   }
 
@@ -186,7 +232,6 @@ export default function AttributeManagement() {
     setShowModal(false);
     setEditingId(null);
     setForm(emptyForm);
-    setError(null);
   }
 
   function handleTypeChange(type: AttributeType) {
@@ -226,7 +271,10 @@ export default function AttributeManagement() {
     const name = form.name.trim();
 
     if (!name) {
-      setError("Attribute name is required.");
+      setToast({
+        message: t("attributeManagement.errors.nameRequired"),
+        type: "danger",
+      });
       return;
     }
 
@@ -236,17 +284,17 @@ export default function AttributeManagement() {
         : [];
 
     if (form.type === AttributeType.Dropdown && options.length === 0) {
-      setError("Dropdown attributes must have at least one option.");
+      setToast({
+        message: t("attributeManagement.errors.dropdownOptionsRequired"),
+        type: "danger",
+      });
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
 
       if (editingId === null) {
-        // POST /attribute
-        // API expects: Omit<Attribute, "id" | "isBuiltIn">
         const payload: Omit<Attribute, "id" | "isBuiltIn"> = {
           name,
           category: form.category,
@@ -254,15 +302,13 @@ export default function AttributeManagement() {
           description: form.description.trim() || undefined,
           options,
         };
-
         const created = await createAttribute(payload);
-
         setAttributes((current) => [...current, created]);
-
-        setSuccess("Attribute created successfully.");
+        setToast({
+          message: t("attributeManagement.success.created"),
+          type: "success",
+        });
       } else {
-        // PUT /attribute
-        // API expects: Omit<Attribute, "isBuiltIn">
         const payload: Omit<Attribute, "isBuiltIn"> = {
           id: editingId,
           name,
@@ -273,24 +319,27 @@ export default function AttributeManagement() {
         };
 
         const updated = await updateAttribute(payload);
-
         setAttributes((current) =>
           current.map((attribute) =>
             attribute.id === editingId ? updated : attribute,
           ),
         );
 
-        setSuccess("Attribute updated successfully.");
+        setToast({
+          message: t("attributeManagement.success.updated"),
+          type: "success",
+        });
       }
 
       setShowModal(false);
       setEditingId(null);
       setForm(emptyForm);
       clearSelection();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save attribute.",
-      );
+    } catch {
+      setToast({
+        message: t("attributeManagement.errors.saveFailed"),
+        type: "danger",
+      });
     } finally {
       setSaving(false);
     }
@@ -300,7 +349,6 @@ export default function AttributeManagement() {
     if (selectedAttributes.length === 0) return;
 
     setDeleteTargets(selectedAttributes);
-    setError(null);
   }
 
   async function handleDelete() {
@@ -308,7 +356,6 @@ export default function AttributeManagement() {
 
     try {
       setDeleting(true);
-      setError(null);
 
       await Promise.all(
         deleteTargets.map((attribute) => deleteAttribute({ id: attribute.id })),
@@ -323,21 +370,28 @@ export default function AttributeManagement() {
       );
 
       if (deleteTargets.length === 1) {
-        setSuccess(`"${deleteTargets[0].name}" was deleted successfully.`);
+        setToast({
+          message: t("attributeManagement.success.deletedSingle", {
+            name: deleteTargets[0].name,
+          }),
+          type: "success",
+        });
       } else {
-        setSuccess(
-          `${deleteTargets.length} attributes were deleted successfully.`,
-        );
+        setToast({
+          message: t("attributeManagement.success.deletedMultiple", {
+            count: deleteTargets.length,
+          }),
+          type: "success",
+        });
       }
 
       setSelectedIds([]);
       setDeleteTargets([]);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to delete one or more attributes.",
-      );
+    } catch {
+      setToast({
+        message: t("attributeManagement.errors.deleteFailed"),
+        type: "danger",
+      });
     } finally {
       setDeleting(false);
     }
@@ -350,7 +404,6 @@ export default function AttributeManagement() {
       <NavBar />
 
       <div className="container-fluid py-4 px-3 px-lg-4 container py-4 py-md-5">
-        {/* Header */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
           <div>
             <div className="d-flex align-items-center gap-2">
@@ -365,12 +418,13 @@ export default function AttributeManagement() {
                 <i className="bi bi-sliders2" />
               </div>
 
-              <h3 className="fw-semibold mb-0">Attributes</h3>
+              <h3 className="fw-semibold mb-0">
+                {t("attributeManagement.title")}
+              </h3>
             </div>
 
             <p className="text-muted mb-0 mt-2">
-              Create and manage the attributes available throughout the
-              platform.
+              {t("attributeManagement.description")}
             </p>
           </div>
 
@@ -380,42 +434,11 @@ export default function AttributeManagement() {
             onClick={openCreateModal}
           >
             <i className="bi bi-plus-lg" />
-            Add Attribute
+            {t("attributeManagement.addAttribute")}
           </button>
         </div>
 
-        {/* Notifications */}
-        {success && (
-          <div
-            className="alert alert-success alert-dismissible fade show border-0 shadow-sm"
-            role="alert"
-          >
-            <i className="bi bi-check-circle me-2" />
-            {success}
-
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setSuccess(null)}
-            />
-          </div>
-        )}
-
-        {error && !showModal && (
-          <div
-            className="alert alert-danger alert-dismissible fade show border-0 shadow-sm"
-            role="alert"
-          >
-            <i className="bi bi-exclamation-circle me-2" />
-            {error}
-
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setError(null)}
-            />
-          </div>
-        )}
+        <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
         {/* Statistics */}
         <div className="row g-3 mb-4">
@@ -435,7 +458,9 @@ export default function AttributeManagement() {
                   </div>
 
                   <div>
-                    <div className="small text-muted">Total attributes</div>
+                    <div className="small text-muted">
+                      {t("attributeManagement.statistics.totalAttributes")}
+                    </div>
 
                     <div className="fs-4 fw-semibold">{attributes.length}</div>
                   </div>
@@ -460,7 +485,9 @@ export default function AttributeManagement() {
                   </div>
 
                   <div>
-                    <div className="small text-muted">Attribute types</div>
+                    <div className="small text-muted">
+                      {t("attributeManagement.statistics.attributeTypes")}
+                    </div>
 
                     <div className="fs-4 fw-semibold">{typeCount}</div>
                   </div>
@@ -488,16 +515,17 @@ export default function AttributeManagement() {
                 <input
                   type="search"
                   className="form-control bg-light ps-5"
-                  placeholder="Search attributes..."
+                  placeholder={t(
+                    "attributeManagement.filters.searchPlaceholder",
+                  )}
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
               </div>
+
               <select
                 className="form-select"
-                style={{
-                  maxWidth: "180px",
-                }}
+                style={{ maxWidth: "180px" }}
                 value={categoryFilter}
                 onChange={(event) => {
                   const value = event.target.value;
@@ -509,7 +537,9 @@ export default function AttributeManagement() {
                   );
                 }}
               >
-                <option value="all">All categories</option>
+                <option value="all">
+                  {t("attributeManagement.filters.allCategories")}
+                </option>
 
                 {attributeCategories.map(({ category, label }) => (
                   <option key={category} value={category}>
@@ -520,9 +550,7 @@ export default function AttributeManagement() {
 
               <select
                 className="form-select"
-                style={{
-                  maxWidth: "180px",
-                }}
+                style={{ maxWidth: "180px" }}
                 value={typeFilter}
                 onChange={(event) => {
                   const value = event.target.value;
@@ -532,7 +560,9 @@ export default function AttributeManagement() {
                   );
                 }}
               >
-                <option value="all">All types</option>
+                <option value="all">
+                  {t("attributeManagement.filters.allTypes")}
+                </option>
 
                 {attributeTypes.map(({ type, label }) => (
                   <option key={type} value={type}>
@@ -549,7 +579,9 @@ export default function AttributeManagement() {
               <div className="px-3 px-md-4 py-2">
                 <div className="d-flex align-items-center gap-2">
                   <span className="small fw-semibold text-primary">
-                    {selectedIds.length} selected
+                    {t("attributeManagement.selection.selected", {
+                      count: selectedIds.length,
+                    })}
                   </span>
 
                   <div className="vr mx-1" />
@@ -565,7 +597,7 @@ export default function AttributeManagement() {
                       }}
                     >
                       <i className="bi bi-pencil me-1" />
-                      Edit
+                      {t("attributeManagement.selection.edit")}
                     </button>
                   )}
 
@@ -575,13 +607,15 @@ export default function AttributeManagement() {
                     onClick={openDeleteModal}
                   >
                     <i className="bi bi-trash me-1" />
-                    Delete
+
+                    {t("attributeManagement.selection.delete")}
+
                     {selectedIds.length > 1 && ` (${selectedIds.length})`}
                   </button>
 
                   {selectedIds.length > 1 && (
                     <span className="small text-muted">
-                      Select one attribute to edit.
+                      {t("attributeManagement.selection.selectOneToEdit")}
                     </span>
                   )}
 
@@ -590,7 +624,7 @@ export default function AttributeManagement() {
                     className="btn btn-sm btn-link text-muted text-decoration-none ms-auto"
                     onClick={clearSelection}
                   >
-                    Clear
+                    {t("attributeManagement.selection.clear")}
                   </button>
                 </div>
               </div>
@@ -601,17 +635,21 @@ export default function AttributeManagement() {
           <div className="px-3 px-md-4 py-3 border-bottom">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h5 className="mb-1 fw-semibold">All Attributes</h5>
+                <h5 className="mb-1 fw-semibold">
+                  {t("attributeManagement.list.allAttributes")}
+                </h5>
 
                 <div className="small text-muted">
                   {filteredAttributes.length}{" "}
-                  {filteredAttributes.length === 1 ? "attribute" : "attributes"}
+                  {filteredAttributes.length === 1
+                    ? t("attributeManagement.list.attribute")
+                    : t("attributeManagement.list.attributes")}
                 </div>
               </div>
 
               {selectedIds.length === 0 && filteredAttributes.length > 0 && (
                 <small className="text-muted">
-                  Select an attribute for actions
+                  {t("attributeManagement.selection.selectAttributeForActions")}
                 </small>
               )}
             </div>
@@ -626,7 +664,9 @@ export default function AttributeManagement() {
                   role="status"
                 />
 
-                <div className="text-muted">Loading attributes...</div>
+                <div className="text-muted">
+                  {t("attributeManagement.loading")}
+                </div>
               </div>
             ) : filteredAttributes.length === 0 ? (
               <div className="text-center py-5 px-4">
@@ -642,27 +682,29 @@ export default function AttributeManagement() {
                 </div>
 
                 <h5 className="fw-semibold">
-                  {search || typeFilter !== "all"
-                    ? "No attributes found"
-                    : "No attributes yet"}
+                  {search || typeFilter !== "all" || categoryFilter !== "all"
+                    ? t("attributeManagement.list.noAttributesFound")
+                    : t("attributeManagement.list.noAttributesYet")}
                 </h5>
 
                 <p className="text-muted mb-3">
-                  {search || typeFilter !== "all"
-                    ? "Try changing your search or filter."
-                    : "Create your first attribute to get started."}
+                  {search || typeFilter !== "all" || categoryFilter !== "all"
+                    ? t("attributeManagement.list.tryChangingSearchOrFilter")
+                    : t("attributeManagement.list.createFirstAttribute")}
                 </p>
 
-                {!search && typeFilter === "all" && (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={openCreateModal}
-                  >
-                    <i className="bi bi-plus-lg me-2" />
-                    Create Attribute
-                  </button>
-                )}
+                {!search &&
+                  typeFilter === "all" &&
+                  categoryFilter === "all" && (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={openCreateModal}
+                    >
+                      <i className="bi bi-plus-lg me-2" />
+                      {t("attributeManagement.list.createAttribute")}
+                    </button>
+                  )}
               </div>
             ) : (
               <div className="list-group list-group-flush">
@@ -674,13 +716,13 @@ export default function AttributeManagement() {
                       className="form-check-input mt-0"
                       checked={allFilteredSelected}
                       onChange={toggleSelectAll}
-                      aria-label="Select all attributes"
+                      aria-label={t("attributeManagement.selection.selectAll")}
                     />
 
                     <small className="text-muted">
                       {allFilteredSelected
-                        ? "All visible attributes selected"
-                        : "Select all visible attributes"}
+                        ? t("attributeManagement.selection.allSelected")
+                        : t("attributeManagement.selection.selectAll")}
                     </small>
                   </div>
                 </div>
@@ -696,12 +738,9 @@ export default function AttributeManagement() {
                         selected ? "bg-primary-subtle" : ""
                       }`}
                       onClick={() => toggleSelection(attribute.id)}
-                      style={{
-                        cursor: "pointer",
-                      }}
+                      style={{ cursor: "pointer" }}
                     >
                       <div className="d-flex align-items-center gap-3">
-                        {/* Checkbox */}
                         <div
                           className="flex-shrink-0"
                           onClick={(event) => event.stopPropagation()}
@@ -711,11 +750,15 @@ export default function AttributeManagement() {
                             className="form-check-input"
                             checked={selected}
                             onChange={() => toggleSelection(attribute.id)}
-                            aria-label={`Select ${attribute.name}`}
+                            aria-label={t(
+                              "attributeManagement.selection.selectAttribute",
+                              {
+                                name: attribute.name,
+                              },
+                            )}
                           />
                         </div>
 
-                        {/* Icon */}
                         <div
                           className={`d-flex align-items-center justify-content-center flex-shrink-0 ${
                             selected
@@ -731,7 +774,6 @@ export default function AttributeManagement() {
                           <i className="bi bi-sliders" />
                         </div>
 
-                        {/* Information */}
                         <div className="flex-grow-1 min-w-0">
                           <div className="d-flex align-items-center gap-2 flex-wrap">
                             <h6 className="mb-0 fw-semibold">
@@ -746,7 +788,7 @@ export default function AttributeManagement() {
                                 fontWeight: 500,
                               }}
                             >
-                              {ATTRIBUTE_TYPE_LABELS[attribute.type]}
+                              {getTypeLabel(attribute.type)}
                             </span>
 
                             <span
@@ -757,18 +799,20 @@ export default function AttributeManagement() {
                                 fontWeight: 500,
                               }}
                             >
-                              {CATEGORY_LABELS[attribute.category]}
+                              {getCategoryLabel(attribute.category)}
                             </span>
                           </div>
 
                           <div className="small text-muted mt-1 text-truncate">
-                            {attribute.description || "No description provided"}
+                            {attribute.description ||
+                              t("attributeManagement.list.noDescription")}
                           </div>
                         </div>
 
-                        {/* ID */}
                         <div className="d-none d-md-block flex-shrink-0 text-end">
-                          <div className="small text-muted">ID</div>
+                          <div className="small text-muted">
+                            {t("attributeManagement.list.id")}
+                          </div>
 
                           <div className="small fw-medium">{attribute.id}</div>
                         </div>
@@ -785,13 +829,18 @@ export default function AttributeManagement() {
             <div className="card-footer bg-white border-top px-3 px-md-4 py-3">
               <div className="d-flex justify-content-between align-items-center">
                 <small className="text-muted">
-                  Showing <strong>{filteredAttributes.length}</strong> of{" "}
-                  <strong>{attributes.length}</strong> attributes
+                  {t("attributeManagement.list.showing")}{" "}
+                  <strong>{filteredAttributes.length}</strong>{" "}
+                  {t("attributeManagement.list.of")}{" "}
+                  <strong>{attributes.length}</strong>{" "}
+                  {t("attributeManagement.list.attributes")}
                 </small>
 
                 {selectedIds.length > 0 && (
                   <small className="text-muted">
-                    {selectedIds.length} selected
+                    {t("attributeManagement.selection.selected", {
+                      count: selectedIds.length,
+                    })}
                   </small>
                 )}
               </div>
@@ -817,14 +866,14 @@ export default function AttributeManagement() {
                     <div>
                       <h5 className="modal-title fw-semibold">
                         {editingId === null
-                          ? "Create Attribute"
-                          : "Edit Attribute"}
+                          ? t("attributeManagement.modal.createTitle")
+                          : t("attributeManagement.modal.editTitle")}
                       </h5>
 
                       <p className="text-muted small mb-0 mt-1">
                         {editingId === null
-                          ? "Add a new attribute to the platform."
-                          : "Update the attribute information."}
+                          ? t("attributeManagement.modal.createDescription")
+                          : t("attributeManagement.modal.editDescription")}
                       </p>
                     </div>
 
@@ -837,21 +886,17 @@ export default function AttributeManagement() {
                   </div>
 
                   <div className="modal-body px-4">
-                    {error && (
-                      <div className="alert alert-danger py-2">
-                        <i className="bi bi-exclamation-circle me-2" />
-                        {error}
-                      </div>
-                    )}
-
-                    {/* Name */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">Name</label>
+                      <label className="form-label fw-medium">
+                        {t("attributeManagement.modal.name")}
+                      </label>
 
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="e.g. Years of Experience"
+                        placeholder={t(
+                          "attributeManagement.modal.namePlaceholder",
+                        )}
                         value={form.name}
                         onChange={(event) =>
                           setForm((current) => ({
@@ -863,9 +908,10 @@ export default function AttributeManagement() {
                       />
                     </div>
 
-                    {/* Category */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">Category</label>
+                      <label className="form-label fw-medium">
+                        {t("attributeManagement.modal.category")}
+                      </label>
 
                       <select
                         className="form-select"
@@ -887,10 +933,9 @@ export default function AttributeManagement() {
                       </select>
                     </div>
 
-                    {/* Type */}
                     <div className="mb-3">
                       <label className="form-label fw-medium">
-                        Attribute Type
+                        {t("attributeManagement.modal.type")}
                       </label>
 
                       <div className="dropdown">
@@ -900,7 +945,7 @@ export default function AttributeManagement() {
                           data-bs-toggle="dropdown"
                           aria-expanded="false"
                         >
-                          {ATTRIBUTE_TYPE_LABELS[form.type]}
+                          {getTypeLabel(form.type)}
                         </button>
 
                         <ul className="dropdown-menu w-100">
@@ -921,17 +966,23 @@ export default function AttributeManagement() {
                       </div>
                     </div>
 
-                    {/* Dropdown options */}
                     {form.type === AttributeType.Dropdown && (
                       <div className="mb-3">
-                        <label className="form-label fw-medium">Options</label>
+                        <label className="form-label fw-medium">
+                          {t("attributeManagement.modal.options")}
+                        </label>
 
                         {form.options.map((option, index) => (
                           <div key={index} className="d-flex gap-2 mb-2">
                             <input
                               type="text"
                               className="form-control"
-                              placeholder={`Option ${index + 1}`}
+                              placeholder={t(
+                                "attributeManagement.modal.optionPlaceholder",
+                                {
+                                  number: index + 1,
+                                },
+                              )}
                               value={option}
                               onChange={(event) =>
                                 updateOption(index, event.target.value)
@@ -954,22 +1005,25 @@ export default function AttributeManagement() {
                           onClick={addOption}
                         >
                           <i className="bi bi-plus-lg me-1" />
-                          Add option
+                          {t("attributeManagement.modal.addOption")}
                         </button>
                       </div>
                     )}
 
-                    {/* Description */}
                     <div className="mb-2">
                       <label className="form-label fw-medium">
-                        Description{" "}
-                        <span className="text-muted fw-normal">(optional)</span>
+                        {t("attributeManagement.modal.description")}{" "}
+                        <span className="text-muted fw-normal">
+                          ({t("attributeManagement.modal.optional")})
+                        </span>
                       </label>
 
                       <textarea
                         className="form-control"
                         rows={3}
-                        placeholder="Describe what this attribute represents..."
+                        placeholder={t(
+                          "attributeManagement.modal.descriptionPlaceholder",
+                        )}
                         value={form.description}
                         onChange={(event) =>
                           setForm((current) => ({
@@ -988,7 +1042,7 @@ export default function AttributeManagement() {
                       onClick={closeModal}
                       disabled={saving}
                     >
-                      Cancel
+                      {t("attributeManagement.modal.cancel")}
                     </button>
 
                     <button
@@ -1000,17 +1054,17 @@ export default function AttributeManagement() {
                       {saving ? (
                         <>
                           <span className="spinner-border spinner-border-sm me-2" />
-                          Saving...
+                          {t("attributeManagement.modal.saving")}
                         </>
                       ) : editingId === null ? (
                         <>
                           <i className="bi bi-plus-lg me-2" />
-                          Create Attribute
+                          {t("attributeManagement.modal.create")}
                         </>
                       ) : (
                         <>
                           <i className="bi bi-check-lg me-2" />
-                          Save Changes
+                          {t("attributeManagement.modal.saveChanges")}
                         </>
                       )}
                     </button>
@@ -1051,14 +1105,18 @@ export default function AttributeManagement() {
 
                     <h5 className="fw-semibold">
                       {deleteTargets.length === 1
-                        ? "Delete attribute?"
-                        : `Delete ${deleteTargets.length} attributes?`}
+                        ? t("attributeManagement.deleteModal.singleTitle")
+                        : t("attributeManagement.deleteModal.multipleTitle", {
+                            count: deleteTargets.length,
+                          })}
                     </h5>
 
                     <p className="text-muted small mb-3">
                       {deleteTargets.length === 1
-                        ? "Are you sure you want to delete"
-                        : "Are you sure you want to delete these attributes?"}
+                        ? t("attributeManagement.deleteModal.singleDescription")
+                        : t(
+                            "attributeManagement.deleteModal.multipleDescription",
+                          )}
                     </p>
 
                     <div
@@ -1083,7 +1141,7 @@ export default function AttributeManagement() {
                             </div>
 
                             <div className="small text-muted mt-1">
-                              {ATTRIBUTE_TYPE_LABELS[attribute.type]}
+                              {getTypeLabel(attribute.type)}
                             </div>
                           </div>
 
@@ -1101,7 +1159,7 @@ export default function AttributeManagement() {
                         onClick={() => setDeleteTargets([])}
                         disabled={deleting}
                       >
-                        Cancel
+                        {t("attributeManagement.deleteModal.cancel")}
                       </button>
 
                       <button
@@ -1113,14 +1171,20 @@ export default function AttributeManagement() {
                         {deleting ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-2" />
-                            Deleting...
+                            {t("attributeManagement.deleteModal.deleting")}
                           </>
                         ) : (
                           <>
                             <i className="bi bi-trash me-1" />
+
                             {deleteTargets.length === 1
-                              ? "Delete"
-                              : `Delete ${deleteTargets.length}`}
+                              ? t("attributeManagement.deleteModal.delete")
+                              : t(
+                                  "attributeManagement.deleteModal.deleteMultiple",
+                                  {
+                                    count: deleteTargets.length,
+                                  },
+                                )}
                           </>
                         )}
                       </button>
