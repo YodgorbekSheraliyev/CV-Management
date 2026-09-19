@@ -13,6 +13,7 @@ import type { CommonResponse } from "../api/axios";
 import api from "../api/axios";
 import { jwtDecode } from "jwt-decode";
 import { getUser } from "../api/userApi";
+import { convertRoleToEnum } from "../utils";
 
 const TOKEN_KEY = "token";
 
@@ -133,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const googleAuth = async (idToken: string, role?: UserRole) => {
     const response = await api.post<CommonResponse<string>>("/auth/google", {
       idToken,
-      role,
+      role: role && convertRoleToEnum(role),
     });
 
     const token = response.data.data!;
@@ -151,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const facebookAuth = async (accessToken: string, role?: UserRole) => {
     const response = await api.post<CommonResponse<string>>("/auth/facebook", {
       accessToken,
-      role,
+      role: role && convertRoleToEnum(role!),
     });
 
     const token = response.data.data!;
@@ -173,10 +174,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string;
     role: UserRole;
   }) => {
-    const response = await api.post<CommonResponse<string>>(
-      "/auth/register",
-      input,
-    );
+    const response = await api.post<CommonResponse<string>>("/auth/register", {
+      ...input,
+      role: convertRoleToEnum(input.role),
+    });
     const token = response.data.data!;
     const decoded = jwtDecode<DecodedType>(token);
 

@@ -1,6 +1,6 @@
 import type { PeriodValue } from "../components/fields/ValueField";
 import { ATTRIBUTE_TYPE_LABELS } from "../constants";
-import { AttributeType, ComparisonType } from "../enums/enums";
+import { AttributeType, ComparisonType, UserRole } from "../enums/enums";
 
 export function parsePeriod(raw: string | null | undefined): PeriodValue {
   if (!raw) {
@@ -124,3 +124,15 @@ export const getDefaultComparison = (type: AttributeType) => {
   return ComparisonType.Equal;
 };
 
+export function convertRoleToEnum(role: UserRole): number {
+  switch (role) {
+    case UserRole.Candidate:
+      return 0;
+    case UserRole.Recruiter:
+      return 1;
+    case UserRole.Administrator:
+      return 2;
+    default:
+      return 0;
+  }
+}
