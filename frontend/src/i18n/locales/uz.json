@@ -532,5 +532,12 @@
       "loadFailed": "Yuborilgan CVlarni yuklab bo‘lmadi.",
       "noPermission": "Yuborilgan CVlarni ko‘rish huquqiga ega emassiz."
     }
+  },
+  "imageField": {
+    "selected": "Tanlangan",
+    "preview": "Ko‘rib chiqish",
+    "remove": "O‘chirish",
+    "selectedImage": "Tanlangan rasm",
+    "selectFromDevice": "Qurilmangizdan rasm tanlang."
   }
 }

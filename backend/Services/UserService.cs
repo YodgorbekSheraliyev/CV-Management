@@ -96,10 +96,7 @@ namespace backend.Services
 
             if (updateUserDto.LastName is not null)
             {
-                var lastName = attributeValues
-                    .FirstOrDefault(x =>
-                        x.AttributeId == (int)BuiltInAttributes.LastName);
-
+                var lastName = attributeValues.FirstOrDefault(x =>x.AttributeId == (int)BuiltInAttributes.LastName);
                 if (lastName is null)
                 {
                     lastName = new AttributeValue

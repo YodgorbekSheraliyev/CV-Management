@@ -181,5 +181,51 @@ namespace backend.Services
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<string> UploadUserImage(int userId, IFormFile image)
+        {
+            string extension = Path.GetExtension(image.FileName);
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            if (!allowedExtensions.Contains(extension.ToLower()))
+            {
+                throw new BadRequestException(_localizer["InvalidImageFormat"]);
+            }
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            Directory.CreateDirectory(uploadsFolder);
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            var imageAttribValue = await _db.AttributeValues
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == (int)BuiltInAttributes.ImageUrl);
+            var prevImageUrl = imageAttribValue?.Value;
+            if(imageAttribValue is null)
+            {
+                imageAttribValue = new AttributeValue
+                {
+                    UserId = userId,
+                    AttributeId = (int)BuiltInAttributes.ImageUrl,
+                    Value = uniqueFileName
+                };
+                await _db.AttributeValues.AddAsync(imageAttribValue);
+            }
+            else
+            {
+                imageAttribValue.Value = uniqueFileName;
+            }
+            await _db.SaveChangesAsync();
+
+            if (prevImageUrl is not null)
+            {
+                var prevImagePath = Path.Combine(uploadsFolder, prevImageUrl);
+                if (File.Exists(prevImagePath))
+                {
+                    File.Delete(prevImagePath);
+                }
+            }
+            return uniqueFileName;
+        }
     }
 }

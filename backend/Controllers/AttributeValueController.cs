@@ -38,6 +38,13 @@ namespace backend.Controllers
             return Ok(CommonResponse<AttributeValueDto>.Ok(result));
         }
 
+        [HttpPost("image")]
+        public async Task<IActionResult> UploadUserImage([FromForm] IFormFile image)
+        {
+            var imageUrl = await _attributeValueService.UploadUserImage(CurrentUserId, image);
+            return Ok(CommonResponse<string>.Ok($"{Request.Scheme}://{Request.Host}/uploads/{imageUrl}"));
+        }
+
         [HttpPut]
         public async Task<IActionResult> Update(UpdateAttributeValueDto updateAttributeValueDto)
         {

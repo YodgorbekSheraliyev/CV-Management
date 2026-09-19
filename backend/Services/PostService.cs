@@ -22,15 +22,17 @@ namespace backend.Services
 
         public async Task<List<PostDto>> GetAllByPositionId(int positionId)
         {
-            return await _db.Posts.Where(p => p.PositionId == positionId).Select(p => new PostDto
-            {
-                Id = p.Id,
-                AuthorId = p.AuthorId,
-                AuthorName = p.AuthorName,
-                Content = p.Content,
-                PositionId = p.PositionId,
-                CreatedAt = p.CreatedAt
-            }).OrderByDescending(p => p.CreatedAt).ToListAsync();
+            return await _db.Posts
+                .Where(p => p.PositionId == positionId)
+                .Select(p => new PostDto
+                {
+                    Id = p.Id,
+                    AuthorId = p.AuthorId,
+                    AuthorName = p.AuthorName,
+                    Content = p.Content,
+                    PositionId = p.PositionId,
+                    CreatedAt = p.CreatedAt
+                }).OrderBy(p => p.CreatedAt).ToListAsync();
         }
 
         public async Task<PostDto> Create(CreatePostDto createPostDto)

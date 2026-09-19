@@ -6,6 +6,7 @@ import ToastNotification from "../notifications/ToastNotification";
 import type { Attribute, AttributeValue, User } from "../../models";
 import { getAttributes } from "../../api/attributeApi";
 import {
+  createAttributeValue,
   deleteAttributeValue,
   getAttributeValuesByUserId,
 } from "../../api/attributeValueApi";
@@ -49,7 +50,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
     }
   };
 
-  const handleSelectAttribute = (attribute: Attribute) => {
+  const handleSelectAttribute = async (attribute: Attribute) => {
     const alreadyExists = attributeValues.some(
       (x) => x.attribute.id === attribute.id,
     );
@@ -75,27 +76,22 @@ const InfoSection = ({ user }: InfoSectionProps) => {
     }
 
     const temporaryAttributeValue = {
-      id: -Date.now(),
       attributeId: attribute.id,
       userId: user.id,
       value: "",
       attribute,
     } as AttributeValue;
 
-    setAttributeValues((current) => [...current, temporaryAttributeValue]);
+    const newAttributeValue = await createAttributeValue(
+      temporaryAttributeValue,
+    );
+    setAttributeValues((current) => [...current, newAttributeValue]);
     setOpenId(temporaryAttributeValue.id);
     setIsAttributeModalOpen(false);
   };
 
   const handleDelete = async (attributeValue: AttributeValue) => {
     try {
-      if (attributeValue.id < 0) {
-        setAttributeValues((current) =>
-          current.filter((x) => x.id !== attributeValue.id),
-        );
-        return;
-      }
-
       await deleteAttributeValue({ id: attributeValue.id });
       await loadAttributeValues();
     } catch (err: any) {
@@ -104,6 +100,10 @@ const InfoSection = ({ user }: InfoSectionProps) => {
         type: "danger",
       });
     }
+  };
+
+  const handleValueChange = async () => {
+    await loadAttributeValues();
   };
 
   useEffect(() => {
@@ -144,13 +144,13 @@ const InfoSection = ({ user }: InfoSectionProps) => {
               <AttributeRow
                 key={aValue.id}
                 attributeValue={aValue}
-                user={user}
                 isOpen={openId === aValue.id}
                 onToggle={() =>
                   setOpenId((current) =>
                     current === aValue.id ? null : aValue.id,
                   )
                 }
+                onChange={handleValueChange}
                 onDelete={handleDelete}
               />
             ))}

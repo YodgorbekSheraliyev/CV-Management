@@ -7,15 +7,17 @@ import {
 } from "../../api/attributeValueApi";
 import AttributeIcon from "../icons/AttributeIcon";
 import ValueField from "../fields/ValueField";
-import type { AttributeValue, User } from "../../models";
+import type { AttributeValue } from "../../models";
 import { AttributeType } from "../../enums/enums";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 interface AttributeRowProps {
   attributeValue: AttributeValue;
-  user: User;
   isOpen: boolean;
   onToggle: () => void;
   onDelete: (attributeValue: AttributeValue) => void;
+  onChange: () => void;
 }
 
 function formatDisplayValue(attributeValue: AttributeValue): string {
@@ -35,10 +37,10 @@ function formatDisplayValue(attributeValue: AttributeValue): string {
 
 export default function AttributeRow({
   attributeValue,
-  user,
   isOpen,
   onToggle,
   onDelete,
+  onChange,
 }: AttributeRowProps) {
   const initialValue = attributeValue.value;
   const [value, setValue] = useState(initialValue ?? "");
@@ -89,6 +91,7 @@ export default function AttributeRow({
 
       setIsChanged(false);
       onToggle();
+      onChange();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save value.");
     } finally {
@@ -114,9 +117,17 @@ export default function AttributeRow({
             <span className="d-block fw-semibold">
               {attributeValue.attribute.name}
             </span>
-            <span className="d-block small text-muted text-truncate">
-              {formatDisplayValue(attributeValue)}
-            </span>
+            {attributeValue.attribute.type === AttributeType.Text ? (
+              <div className="small text-muted">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {formatDisplayValue(attributeValue)}
+                </ReactMarkdown>
+              </div>
+            ) : attributeValue.attribute.type == AttributeType.Image ? null : (
+              <span className="d-block small text-muted text-truncate">
+                {formatDisplayValue(attributeValue)}
+              </span>
+            )}
           </span>
 
           <i

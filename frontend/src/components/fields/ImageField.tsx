@@ -1,9 +1,8 @@
-/*
- * IMAGE FIELD
- */
-
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ImageIcon from "../icons/ImageIcon";
+import { uploadUserImage } from "../../api/attributeValueApi";
+// import { uploadUserImage } from "../../api/userApi";
 
 interface ImageFieldProps {
   value: string;
@@ -11,19 +10,16 @@ interface ImageFieldProps {
 }
 
 function ImageField({ value, onChange }: ImageFieldProps) {
+  const { t } = useTranslation();
   const [fileName, setFileName] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    /*
-     * If the existing value is a URL, we don't have a
-     * local file name.
-     */
-    if (!value.startsWith("data:")) {
-      setFileName("");
-    }
+    setFileName("");
   }, [value]);
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -31,25 +27,31 @@ function ImageField({ value, onChange }: ImageFieldProps) {
     }
 
     if (!file.type.startsWith("image/")) {
+      setError(t("imageField.invalidType"));
       return;
     }
 
+    setError("");
     setFileName(file.name);
+    setUploading(true);
 
-    const reader = new FileReader();
+    try {
+      const imageUrl = await uploadUserImage(file);
 
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        onChange(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(file);
+      onChange(imageUrl);
+    } catch {
+      setError(t("imageField.uploadFailed"));
+      setFileName("");
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
   }
 
   function handleRemove() {
     onChange("");
     setFileName("");
+    setError("");
   }
 
   return (
@@ -64,39 +66,47 @@ function ImageField({ value, onChange }: ImageFieldProps) {
           className="form-control"
           accept="image/*"
           onChange={handleFileChange}
+          disabled={uploading}
           autoFocus
         />
       </div>
 
       {fileName && (
         <div className="form-text">
-          Selected: <strong>{fileName}</strong>
+          {uploading ? (
+            t("imageField.uploading")
+          ) : (
+            <>
+              {t("imageField.selected")}: <strong>{fileName}</strong>
+            </>
+          )}
         </div>
       )}
+
+      {error && <div className="text-danger small mt-2">{error}</div>}
 
       {value && (
         <div className="mt-3">
           <div className="d-flex justify-content-between align-items-center mb-2">
-            <span className="small text-muted">Preview</span>
+            <span className="small text-muted">{t("imageField.preview")}</span>
 
             <button
               type="button"
               className="btn btn-sm btn-outline-danger"
               onClick={handleRemove}
+              disabled={uploading}
             >
-              Remove
+              {t("imageField.remove")}
             </button>
           </div>
 
           <div
             className="border rounded-3 p-2 text-center bg-light"
-            style={{
-              minHeight: "160px",
-            }}
+            style={{ minHeight: "160px" }}
           >
             <img
               src={value}
-              alt="Selected"
+              alt={t("imageField.selectedImage")}
               className="img-fluid rounded-2"
               style={{
                 maxHeight: "220px",
@@ -107,7 +117,7 @@ function ImageField({ value, onChange }: ImageFieldProps) {
         </div>
       )}
 
-      <div className="form-text">Select an image from your device.</div>
+      <div className="form-text">{t("imageField.selectFromDevice")}</div>
     </div>
   );
 }

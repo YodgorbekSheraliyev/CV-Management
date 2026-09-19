@@ -7,8 +7,7 @@ namespace backend.Dtos.AttributeValue
     {
         [Required(ErrorMessage = "AttributeIdRequired")]
         public int AttributeId { get; set; }
-        [Required(ErrorMessage = "ValueRequired")]
-        public string Value { get; set; }
+        public string? Value { get; set; }
         public string? PeriodEnd { get; set; }
     }
 }

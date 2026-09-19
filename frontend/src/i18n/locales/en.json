@@ -532,5 +532,12 @@
       "loadFailed": "Could not load submitted CVs.",
       "noPermission": "You do not have permission to view submitted CVs."
     }
+  },
+  "imageField": {
+    "selected": "Selected",
+    "preview": "Preview",
+    "remove": "Remove",
+    "selectedImage": "Selected image",
+    "selectFromDevice": "Select an image from your device."
   }
 }

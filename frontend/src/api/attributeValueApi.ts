@@ -34,3 +34,13 @@ export const deleteAttributeValue = async (
     data: attributeValue,
   });
 };
+
+export const uploadUserImage = async (image: File) => {
+  const formData = new FormData();
+  formData.append("image", image);
+  const { data: response } = await api.post<CommonResponse<string>>(
+    `/attributevalue/image`,
+    formData,
+  );
+  return response.data;
+};

@@ -106,6 +106,7 @@ using (var scope = app.Services.CreateScope())
     await dataContext.Database.MigrateAsync();
 }
 
+app.UseStaticFiles();
 app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
