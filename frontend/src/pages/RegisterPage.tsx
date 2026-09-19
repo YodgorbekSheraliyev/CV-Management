@@ -5,11 +5,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/auth";
 import { UserRole } from "../enums/enums";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import FacebookSignInButton from "../components/FacebookSignInButton";
 import ToastNotification from "../components/notifications/ToastNotification";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, googleAuth } = useAuth();
+  const { register, googleAuth, facebookAuth } = useAuth();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -62,6 +63,27 @@ const RegisterPage = () => {
     } catch (err) {
       setToast({
         message: "Unable to sign in with Google. Please try again.",
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFacebookSuccess(accessToken: string) {
+    setLoading(true);
+
+    try {
+      await facebookAuth(accessToken, role);
+      setToast({
+        message: "Successfully registered",
+        type: "success",
+      });
+
+      navigate("/");
+    } catch (err) {
+      setToast({
+        message: "Unable to sign in with Facebook. Please try again.",
         type: "danger",
       });
     } finally {
@@ -267,11 +289,19 @@ const RegisterPage = () => {
                   <hr className="flex-grow-1" />
                 </div>
 
-                {/* Google registration */}
-                <GoogleSignInButton
-                  onSuccess={handleGoogleSuccess}
-                  onError={(message) => setToast({ message, type: "danger" })}
-                />
+                <div className="my-3 d-flex flex-column gap-2">
+                  {/* Google registration */}
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={(message) => setToast({ message, type: "danger" })}
+                  />
+
+                  {/* Facebook registration */}
+                  <FacebookSignInButton
+                    onSuccess={handleFacebookSuccess}
+                    onError={(message) => setToast({ message, type: "danger" })}
+                  />
+                </div>
 
                 <div className="text-center mt-4">
                   <span className="text-muted">Already have an account? </span>

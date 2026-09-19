@@ -21,7 +21,6 @@ namespace backend.Controllers
         {
             _userService = userService;
         }
-
         [HttpGet("{userId:int}")]
         public async Task<IActionResult> GetUserProfile(int userId)
         {

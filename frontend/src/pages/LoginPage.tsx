@@ -2,16 +2,22 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { useAuth } from "../hooks/auth";
+import ToastNotification from "../components/notifications/ToastNotification";
+import FacebookSignInButton from "../components/FacebookSignInButton";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, googleAuth, error, setError } = useAuth();
+  const { login, googleAuth, facebookAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -19,18 +25,16 @@ const LoginPage = () => {
 
       navigate("/");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to log in. Please try again.",
-      );
+      setToast({
+        message: "Unable to login your account. Please try again.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   async function handleGoogleSuccess(idToken: string) {
-    setError("");
     setLoading(true);
 
     try {
@@ -38,11 +42,31 @@ const LoginPage = () => {
 
       navigate("/");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to sign in with Google. Please try again.",
-      );
+      setToast({
+        message: "Unable to login with Google account. Please try again.",
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFacebookSuccess(accessToken: string) {
+    setLoading(true);
+
+    try {
+      await facebookAuth(accessToken);
+      setToast({
+        message: "Successfully registered",
+        type: "success",
+      });
+
+      navigate("/");
+    } catch (err) {
+      setToast({
+        message: "Unable to sign in with Facebook. Please try again.",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -63,11 +87,10 @@ const LoginPage = () => {
                   </p>
                 </div>
 
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    {error}
-                  </div>
-                )}
+                <ToastNotification
+                  toast={toast}
+                  onClose={() => setToast(null)}
+                />
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
@@ -139,10 +162,17 @@ const LoginPage = () => {
                   <hr className="flex-grow-1" />
                 </div>
 
-                <GoogleSignInButton
-                  onSuccess={handleGoogleSuccess}
-                  onError={setError}
-                />
+                <div className="my-3 d-flex flex-column gap-2">
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={(message) => setToast({ message, type: "danger" })}
+                  />
+
+                  <FacebookSignInButton
+                    onSuccess={handleFacebookSuccess}
+                    onError={(message) => setToast({ message, type: "danger" })}
+                  />
+                </div>
 
                 <div className="text-center mt-4">
                   <span className="text-muted">Don't have an account? </span>

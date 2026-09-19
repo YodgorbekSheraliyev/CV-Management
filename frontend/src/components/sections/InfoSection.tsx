@@ -39,7 +39,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
 
   const loadAttributeValues = async () => {
     try {
-      const res = await getAttributeValuesByUserId(user.id);
+      const res = await getAttributeValuesByUserId();
       setAttributeValues(res.filter((x) => !x.attribute.isBuiltIn));
     } catch (err: any) {
       setToast({

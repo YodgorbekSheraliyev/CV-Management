@@ -42,44 +42,81 @@ const GoogleSignInButton = ({
 }: GoogleSignInButtonProps) => {
   const buttonRef = useRef<HTMLDivElement>(null);
 
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+  }, [onSuccess, onError]);
+
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
-      onError?.("Google authentication is not configured.");
+      onErrorRef.current?.("Google authentication is not configured.");
       return;
     }
 
-    const initializeGoogle = () => {
+    const renderGoogleButton = () => {
       if (!window.google || !buttonRef.current) {
         return;
       }
+
+      const container = buttonRef.current;
+
+      // Use the available width, but never exceed 350px.
+      const width = Math.min(350, container.clientWidth);
 
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: (response) => {
           if (!response.credential) {
-            onError?.("Google authentication failed.");
+            onErrorRef.current?.("Google authentication failed.");
             return;
           }
 
-          onSuccess(response.credential);
+          onSuccessRef.current(response.credential);
         },
       });
 
-      buttonRef.current.innerHTML = "";
+      container.innerHTML = "";
 
-      window.google.accounts.id.renderButton(buttonRef.current, {
+      window.google.accounts.id.renderButton(container, {
         theme: "outline",
         size: "large",
-        width: 350,
+        width,
         text: "continue_with",
       });
     };
 
+    const initializeGoogle = () => {
+      if (!window.google) {
+        return;
+      }
+
+      renderGoogleButton();
+
+      // Re-render when the available width changes.
+      if (buttonRef.current) {
+        const resizeObserver = new ResizeObserver(() => {
+          renderGoogleButton();
+        });
+
+        resizeObserver.observe(buttonRef.current);
+
+        return resizeObserver;
+      }
+
+      return undefined;
+    };
+
     if (window.google) {
-      initializeGoogle();
-      return;
+      const observer = initializeGoogle();
+
+      return () => {
+        observer?.disconnect();
+      };
     }
 
     const interval = window.setInterval(() => {
@@ -92,9 +129,11 @@ const GoogleSignInButton = ({
     return () => {
       window.clearInterval(interval);
     };
-  }, [onSuccess, onError]);
+  }, []);
 
-  return <div ref={buttonRef} className="d-flex justify-content-center" />;
+  return (
+    <div ref={buttonRef} className="d-flex justify-content-center w-100" />
+  );
 };
 
 export default GoogleSignInButton;

@@ -38,7 +38,12 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
+}).AddFacebook(options =>
+{
+    options.AppId = builder.Configuration["Facebook:AppId"]!;
+    options.AppSecret = builder.Configuration["Facebook:AppSecret"]!;
 });
+
 builder.Services.AddControllers().AddDataAnnotationsLocalization(options =>
 {
     options.DataAnnotationLocalizerProvider = (type, factory) =>
@@ -48,7 +53,6 @@ builder.Services.AddControllers().AddDataAnnotationsLocalization(options =>
 }).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -100,7 +104,6 @@ using (var scope = app.Services.CreateScope())
     await dataContext.Database.MigrateAsync();
 }
 
-//app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();

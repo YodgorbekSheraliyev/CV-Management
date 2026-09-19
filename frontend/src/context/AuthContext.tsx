@@ -30,7 +30,7 @@ export interface LoginRequest {
 
 export interface GoogleAuthRequest {
   idToken: string;
-  role: UserRole
+  role: UserRole;
 }
 
 export interface AuthContextValue {
@@ -44,10 +44,11 @@ export interface AuthContextValue {
     lastName: string;
     email: string;
     password: string;
-    role: UserRole
+    role: UserRole;
   }) => Promise<string>;
   logout: () => void;
   googleAuth: (idToken: string, role?: UserRole) => Promise<any>;
+  facebookAuth: (accessToken: string, role?: UserRole) => Promise<any>;
 }
 
 export const AuthContext = createContext<AuthContextValue>(undefined!);
@@ -132,7 +133,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const googleAuth = async (idToken: string, role?: UserRole) => {
     const response = await api.post<CommonResponse<string>>("/auth/google", {
       idToken,
-      role
+      role,
+    });
+
+    const token = response.data.data!;
+    const decoded = jwtDecode<DecodedType>(token);
+    localStorage.setItem(TOKEN_KEY, token);
+    const userId = getUserIdFromToken(decoded);
+    const currentUser = await getUser(userId);
+
+    setUser(currentUser);
+    setIsAuthenticated(true);
+
+    return token;
+  };
+
+  const facebookAuth = async (accessToken: string, role?: UserRole) => {
+    const response = await api.post<CommonResponse<string>>("/auth/facebook", {
+      accessToken,
+      role,
     });
 
     const token = response.data.data!;
@@ -152,7 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     lastName: string;
     email: string;
     password: string;
-    role: UserRole
+    role: UserRole;
   }) => {
     const response = await api.post<CommonResponse<string>>(
       "/auth/register",
@@ -189,6 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       googleAuth,
+      facebookAuth,
     }),
     [user, isAuthenticated, isLoading],
   );

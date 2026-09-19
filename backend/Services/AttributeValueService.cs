@@ -47,7 +47,7 @@ namespace backend.Services
 
             return values;
         }
-        public async Task<AttributeValueDto> Create(CreateAttributeValueDto createAttributeValueDto)
+        public async Task<AttributeValueDto> Create(CreateAttributeValueDto createAttributeValueDto, int userId)
         {
             Models.Attribute attribute = await _db.Attributes.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == createAttributeValueDto.AttributeId);
@@ -86,7 +86,7 @@ namespace backend.Services
             AttributeValue attributeValue = new AttributeValue
             {
                 AttributeId = createAttributeValueDto.AttributeId,
-                UserId = createAttributeValueDto.UserId,
+                UserId = userId,
                 Value = valueToStore
             };
 
@@ -97,7 +97,7 @@ namespace backend.Services
             {
                 Id = attributeValue.Id,
                 AttributeId = createAttributeValueDto.AttributeId,
-                UserId = createAttributeValueDto.UserId,
+                UserId = userId,
                 Value = createAttributeValueDto.Value,
                 Attribute = new AttributeDto
                 {
@@ -111,9 +111,11 @@ namespace backend.Services
             };
         }
 
-        public async Task<AttributeValueDto> Update(UpdateAttributeValueDto updateAttributeValueDto)
+        public async Task<AttributeValueDto> Update(UpdateAttributeValueDto updateAttributeValueDto, int userId)
         {
-            AttributeValue attributeValue = await _db.AttributeValues.Include(x => x.Attribute).FirstOrDefaultAsync(x => x.UserId == updateAttributeValueDto.UserId && x.AttributeId == updateAttributeValueDto.AttributeId);
+            AttributeValue attributeValue = await _db.AttributeValues
+                .Include(x => x.Attribute)
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == updateAttributeValueDto.AttributeId);
             if (attributeValue is null)
             {
                 throw new NotFoundException(_localizer["AttributeValueNotFound"]);
@@ -146,7 +148,7 @@ namespace backend.Services
 
             }
 
-            attributeValue.UserId = updateAttributeValueDto.UserId;
+            attributeValue.UserId = userId;
             attributeValue.AttributeId = updateAttributeValueDto.AttributeId;
             attributeValue.Value = valueToStore;
             await _db.SaveChangesAsync();
@@ -154,7 +156,7 @@ namespace backend.Services
             {
                 Id = attributeValue.Id,
                 AttributeId = attributeValue.AttributeId,
-                UserId = attributeValue.UserId,
+                UserId = userId,
                 Value = attributeValue.Value,
                 Attribute = new AttributeDto
                 {

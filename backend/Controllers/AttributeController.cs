@@ -9,7 +9,7 @@ using Microsoft.Extensions.Localization;
 
 namespace backend.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AttributeController : ControllerBase
@@ -38,6 +38,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Recruiter")]
         public async Task<IActionResult> Create([FromBody] CreateAttributeDto createAttributeDto)
         {
             var result = await _attributeService.Create(createAttributeDto);
@@ -46,13 +47,15 @@ namespace backend.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateAttributeDto updateAttributeDto)
+        [Authorize(Roles = "Administrator,Recruiter")]
+        public async Task<IActionResult> Update([FromBody] UpdateAttributeDto updateAttributeDto)
         {
             var result = await _attributeService.Update(updateAttributeDto);
             return Ok(CommonResponse<AttributeDto>.Ok(result));
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator,Recruiter")]
         public async Task<IActionResult> Delete(DeleteAttributeDto deleteAttributeDto)
         {
             await _attributeService.Delete(deleteAttributeDto);

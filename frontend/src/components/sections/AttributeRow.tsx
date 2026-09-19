@@ -48,18 +48,19 @@ export default function AttributeRow({
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dirty, setDirty] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
     setValue(initialValue ?? "");
     setPeriod(parsePeriod(initialValue));
+    setIsChanged(false);
   }, [initialValue]);
 
   function handleCancel() {
     setValue(initialValue ?? "");
     setPeriod(parsePeriod(initialValue));
     setError(null);
-    setDirty(false);
+    setIsChanged(false);
     onToggle();
   }
 
@@ -68,17 +69,15 @@ export default function AttributeRow({
     setError(null);
 
     try {
-      const attrib: Omit<AttributeValue, "id" | "attribute"> =
+      const attrib =
         attributeValue.attribute.type === AttributeType.Period
           ? {
               attributeId: attributeValue.attribute.id,
-              userId: user.id,
               value: period.start,
               periodEnd: period.end,
             }
           : {
               attributeId: attributeValue.attribute.id,
-              userId: user.id,
               value,
             };
 
@@ -88,7 +87,7 @@ export default function AttributeRow({
         await createAttributeValue(attrib);
       }
 
-      setDirty(false);
+      setIsChanged(false);
       onToggle();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save value.");
@@ -99,7 +98,7 @@ export default function AttributeRow({
 
   return (
     <div className="list-group-item p-0">
-      {/* Row header — always visible */}
+      {/* Header */}
       <div className="d-flex align-items-center gap-3 p-3">
         <button
           type="button"
@@ -125,6 +124,7 @@ export default function AttributeRow({
           />
         </button>
 
+        {/* Actions */}
         <div className="dropdown flex-shrink-0">
           <button
             type="button"
@@ -161,8 +161,8 @@ export default function AttributeRow({
         </div>
       </div>
 
-      {/* Expandable edit area */}
-      <div className={`collapse ${isOpen ? "show" : ""}`}>
+      {/* Editor */}
+      {isOpen && (
         <div className="border-top bg-light-subtle p-3">
           {attributeValue.attribute.description && (
             <p className="small text-muted mb-3">
@@ -175,13 +175,13 @@ export default function AttributeRow({
             value={value}
             onChange={(newValue) => {
               setValue(newValue);
-              setDirty(true);
+              setIsChanged(true);
               setError(null);
             }}
             period={period}
             onPeriodChange={(newPeriod) => {
               setPeriod(newPeriod);
-              setDirty(true);
+              setIsChanged(true);
               setError(null);
             }}
           />
@@ -206,7 +206,7 @@ export default function AttributeRow({
               type="button"
               className="btn btn-primary btn-sm"
               onClick={handleSave}
-              disabled={saving || !dirty}
+              disabled={saving || !isChanged}
             >
               {saving ? (
                 <>
@@ -225,7 +225,7 @@ export default function AttributeRow({
             </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,12 +1,14 @@
 ﻿using backend.Dtos;
 using backend.Dtos.Application;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles ="Administrator,Recruiter")]
     public class ApplicationsController:ControllerBase
     {
         private readonly ApplicationService _applicationService;

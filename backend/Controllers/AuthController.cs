@@ -38,5 +38,12 @@ namespace backend.Controllers
             var token = await _authService.GoogleAuthAsync(dto);
             return Ok(CommonResponse<string>.Ok(token));
         }
+
+        [HttpPost("facebook")]
+        public async Task<IActionResult> FacebookAuth(FacebookAuthDto dto)
+        {
+            var token = await _authService.FacebookAuthAsync(dto);
+            return Ok(CommonResponse<string>.Ok(token));
+        }
     }
 }

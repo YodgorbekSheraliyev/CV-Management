@@ -12,7 +12,6 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class PositionsController : ControllerBase
     {
         private readonly PositionService _positionService;
@@ -23,7 +22,6 @@ namespace backend.Controllers
         }
 
         [HttpGet("all")]
-        [Authorize(Roles = "Recruiter,Administrator,Candidate")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _positionService.GetAll();
