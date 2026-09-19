@@ -347,5 +347,190 @@
       "projectTagsDescription": "Nomzod loyihalarini filtrlashda ishlatiladigan texnologiya teglarini tanlang."
     },
     "loadingAttributes": "Atributlar yuklanmoqda..."
+  },
+  "cvPage": {
+    "loading": "CV yuklanmoqda...",
+    "notFound": "CV topilmadi.",
+    "backToMyCvs": "CVlarimga qaytish",
+
+    "status": {
+      "draft": "Qoralama",
+      "published": "E’lon qilingan",
+      "other": "Boshqa"
+    },
+
+    "actions": {
+      "like": "Yoqdi",
+      "liked": "Yoqdi",
+      "viewPosition": "Lavozimni ko‘rish",
+      "publish": "E’lon qilish",
+      "publishing": "E’lon qilinmoqda...",
+      "delete": "O‘chirish",
+      "save": "Saqlash",
+      "saving": "Saqlanmoqda...",
+      "cancel": "Bekor qilish",
+      "deleteCv": "CVni o‘chirish",
+      "deleting": "O‘chirilmoqda..."
+    },
+
+    "errors": {
+      "invalidId": "CV ID noto‘g‘ri.",
+      "loadFailed": "CVni yuklab bo‘lmadi.",
+      "updateAttributeFailed": "Atributni yangilab bo‘lmadi.",
+      "deleteFailed": "CVni o‘chirib bo‘lmadi.",
+      "publishFailed": "CVni e’lon qilib bo‘lmadi.",
+      "likeFailed": "Amalni bajarib bo‘lmadi."
+    },
+
+    "toast": {
+      "attributeUpdated": "Atribut yangilandi.",
+      "published": "CV e’lon qilindi."
+    },
+
+    "publish": {
+      "fillAll": "CVni recruiterlar uchun e’lon qilishdan oldin barcha belgilangan maydonlarni to‘ldiring."
+    },
+
+    "attribute": {
+      "notFilled": "To‘ldirilmagan"
+    },
+
+    "likes": {
+      "one": "yoqtirish",
+      "many": "yoqtirish"
+    },
+
+    "projects": {
+      "title": "Mos loyihalar",
+      "present": "Hozirgi"
+    },
+
+    "deleteModal": {
+      "title": "Ushbu CV o‘chirilsinmi?",
+      "description": "Bu {{position}} uchun CVingizni butunlay o‘chiradi. Bu amalni bekor qilib bo‘lmaydi."
+    }
+  },
+  "editPositionPage": {
+    "backToPosition": "Lavozimga qaytish",
+    "title": "Lavozimni tahrirlash",
+    "editing": "\"{{title}}\" tahrirlanmoqda",
+    "description": "Ushbu lavozim tafsilotlari, kirish qoidalari va CV atributlarini yangilang.",
+    "loading": "Lavozim yuklanmoqda...",
+    "notFound": "Lavozim topilmadi.",
+    "saveChanges": "O‘zgarishlarni saqlash",
+    "saving": "Saqlanmoqda...",
+    "errors": {
+      "loadFailed": "Lavozimni yuklab bo‘lmadi.",
+      "loadAttributesFailed": "Atributlarni yuklab bo‘lmadi.",
+      "updateFailed": "Lavozimni yangilab bo‘lmadi."
+    }
+  },
+  "loginPage": {
+    "welcomeBack": "Xush kelibsiz",
+    "description": "Rekrutment hisobingizga kiring",
+    "email": "Elektron pochta manzili",
+    "emailPlaceholder": "you@example.com",
+    "password": "Parol",
+    "passwordPlaceholder": "Parolingizni kiriting",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "signIn": "Kirish",
+    "signingIn": "Kirilmoqda...",
+    "or": "YOKI",
+    "noAccount": "Hisobingiz yo‘qmi?",
+    "createAccount": "Hisob yaratish",
+    "footer": "To‘g‘ri imkoniyatlarni toping. Kelajagingizni yarating.",
+    "errors": {
+      "login": "Hisobingizga kirib bo‘lmadi. Iltimos, qayta urinib ko‘ring.",
+      "google": "Google hisobi orqali kirib bo‘lmadi. Iltimos, qayta urinib ko‘ring.",
+      "facebook": "Facebook orqali kirib bo‘lmadi. Iltimos, qayta urinib ko‘ring."
+    },
+    "success": {
+      "facebook": "Muvaffaqiyatli ro‘yxatdan o‘tildi"
+    }
+  },
+  "registerPage": {
+    "title": "Hisobingizni yarating",
+    "description": "Rekrutment platformamizga qo‘shiling",
+    "role": {
+      "label": "Men quyidagicha ro‘yxatdan o‘tmoqchiman",
+      "candidate": {
+        "title": "Nomzod",
+        "description": "Imkoniyatlarni toping"
+      },
+      "recruiter": {
+        "title": "Rekruter",
+        "description": "Nomzodlarni toping"
+      }
+    },
+    "firstName": "Ism",
+    "firstNamePlaceholder": "Ali",
+    "lastName": "Familiya",
+    "lastNamePlaceholder": "Valiyev",
+    "email": "Elektron pochta manzili",
+    "emailPlaceholder": "you@example.com",
+    "password": "Parol",
+    "passwordPlaceholder": "Parol yarating",
+    "passwordHint": "Parol kamida 8 ta belgidan iborat bo‘lishi kerak.",
+    "createAccount": "Hisob yaratish",
+    "creatingAccount": "Hisob yaratilmoqda...",
+    "or": "YOKI",
+    "alreadyHaveAccount": "Hisobingiz allaqachon bormi?",
+    "signIn": "Kirish",
+    "footer": "To‘g‘ri imkoniyatlarni toping. Kelajagingizni yarating.",
+    "success": {
+      "registration": "Ro‘yxatdan o‘tish muvaffaqiyatli yakunlandi",
+      "social": "Ro‘yxatdan muvaffaqiyatli o‘tildi"
+    },
+    "errors": {
+      "registration": "Hisob yaratib bo‘lmadi. Iltimos, qayta urinib ko‘ring.",
+      "google": "Google orqali kirib bo‘lmadi. Iltimos, qayta urinib ko‘ring.",
+      "facebook": "Facebook orqali kirib bo‘lmadi. Iltimos, qayta urinib ko‘ring."
+    }
+  },
+  "profilePage": {
+    "title": "Mening profilim",
+    "description": "Shaxsiy ma’lumotlaringiz, loyihalaringiz va CVlaringizni boshqaring.",
+    "profileImage": "Profil rasmi",
+    "locationNotProvided": "Manzil kiritilmagan",
+    "loginRequired": "Profilingizni ko‘rish uchun tizimga kiring.",
+    "tabs": {
+      "personal": "Shaxsiy",
+      "additionalInfo": "Qo‘shimcha ma’lumot",
+      "projects": "Loyihalar",
+      "cvs": "CVlar"
+    },
+    "success": {
+      "changesSaved": "O‘zgarishlar muvaffaqiyatli saqlandi",
+      "profileUpdated": "Profil muvaffaqiyatli yangilandi."
+    },
+    "errors": {
+      "updateFailed": "Foydalanuvchi profilini yangilab bo‘lmadi."
+    }
+  },
+  "positionCvsPage": {
+    "breadcrumb": "breadcrumb",
+    "backToPositions": "Lavozimlarga qaytish",
+    "backToPosition": "Lavozimga qaytish",
+    "loading": "Yuborilgan CVlar yuklanmoqda…",
+    "submittedCvs": "Yuborilgan CVlar",
+    "submittedCv": "yuborilgan CV",
+    "candidatesSubmitted": "Ushbu lavozim uchun CV yuborgan nomzodlar:",
+    "noCvs": "Hali CV yuborilmagan",
+    "noCvsDescription": "Ushbu lavozim uchun CV yuborgan nomzodlar shu yerda ko‘rsatiladi.",
+    "cvNumber": "CV #{{id}}",
+    "notAvailable": "—",
+    "viewCv": "CVni ko‘rish",
+    "footer": "© 2026 Rekrutment platformasi",
+    "table": {
+      "candidate": "Nomzod",
+      "cv": "CV",
+      "submitted": "Yuborilgan",
+      "actions": "Amallar"
+    },
+    "errors": {
+      "positionNotFound": "Lavozim topilmadi.",
+      "loadFailed": "Yuborilgan CVlarni yuklab bo‘lmadi.",
+      "noPermission": "Yuborilgan CVlarni ko‘rish huquqiga ega emassiz."
+    }
   }
 }

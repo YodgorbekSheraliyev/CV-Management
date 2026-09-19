@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { getPositionById, getPositionCvs } from "../api/positionApi";
 import { useAuth } from "../hooks/auth";
@@ -8,6 +8,7 @@ import { UserRole } from "../enums/enums";
 import type { CVSummary, Position, User } from "../models";
 
 const PositionCvsPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -17,13 +18,11 @@ const PositionCvsPage = () => {
 
   const [position, setPosition] = useState<Position | null>(null);
   const [cvs, setCvs] = useState<CVSummary[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id || !user) return;
-
     loadData(Number(id));
   }, [id, user]);
 
@@ -40,14 +39,16 @@ const PositionCvsPage = () => {
       ]);
 
       if (!positionResult) {
-        throw new Error("Position not found.");
+        throw new Error(t("positionCvsPage.errors.positionNotFound"));
       }
 
       setPosition(positionResult);
       setCvs(cvsResult);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Could not load submitted CVs.",
+        err instanceof Error
+          ? err.message
+          : t("positionCvsPage.errors.loadFailed"),
       );
     } finally {
       setLoading(false);
@@ -61,11 +62,11 @@ const PositionCvsPage = () => {
 
         <main className="container py-5">
           <div className="alert alert-danger">
-            You do not have permission to view submitted CVs.
+            {t("positionCvsPage.errors.noPermission")}
           </div>
 
           <Link to="/positions" className="btn btn-outline-secondary">
-            Back to positions
+            {t("positionCvsPage.backToPositions")}
           </Link>
         </main>
       </div>
@@ -78,7 +79,9 @@ const PositionCvsPage = () => {
         <NavBar />
 
         <main className="container py-5">
-          <div className="text-center text-muted">Loading submitted CVs…</div>
+          <div className="text-center text-muted">
+            {t("positionCvsPage.loading")}
+          </div>
         </main>
       </div>
     );
@@ -91,7 +94,7 @@ const PositionCvsPage = () => {
 
         <main className="container py-5">
           <div className="alert alert-danger mb-3">
-            {error ?? "Position not found."}
+            {error ?? t("positionCvsPage.errors.positionNotFound")}
           </div>
 
           <button
@@ -99,7 +102,7 @@ const PositionCvsPage = () => {
             className="btn btn-outline-secondary"
             onClick={() => navigate("/positions")}
           >
-            Back to positions
+            {t("positionCvsPage.backToPositions")}
           </button>
         </main>
       </div>
@@ -111,18 +114,17 @@ const PositionCvsPage = () => {
       <NavBar />
 
       <main className="container py-4 py-md-5">
-        {/* Breadcrumb */}
-        <nav aria-label="breadcrumb" className="mb-4">
+        <nav aria-label={t("positionCvsPage.breadcrumb")} className="mb-4">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
               <Link to="/" className="text-decoration-none">
-                Home
+                {t("common.home")}
               </Link>
             </li>
 
             <li className="breadcrumb-item">
               <Link to="/positions" className="text-decoration-none">
-                Positions
+                {t("common.positions")}
               </Link>
             </li>
 
@@ -136,12 +138,11 @@ const PositionCvsPage = () => {
             </li>
 
             <li className="breadcrumb-item active" aria-current="page">
-              Submitted CVs
+              {t("positionCvsPage.submittedCvs")}
             </li>
           </ol>
         </nav>
 
-        {/* Header */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4 p-md-5">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
@@ -150,13 +151,15 @@ const PositionCvsPage = () => {
                   to={`/positions/${position.id}`}
                   className="text-decoration-none small"
                 >
-                  ← Back to position
+                  ← {t("positionCvsPage.backToPosition")}
                 </Link>
 
-                <h1 className="h3 fw-bold mt-2 mb-1">Submitted CVs</h1>
+                <h1 className="h3 fw-bold mt-2 mb-1">
+                  {t("positionCvsPage.submittedCvs")}
+                </h1>
 
                 <p className="text-muted mb-0">
-                  Candidates who submitted a CV for{" "}
+                  {t("positionCvsPage.candidatesSubmitted")}{" "}
                   <span className="fw-semibold">{position.title}</span>
                 </p>
               </div>
@@ -165,14 +168,15 @@ const PositionCvsPage = () => {
                 <div className="display-6 fw-bold">{position.cVsCount}</div>
 
                 <div className="text-muted small">
-                  {cvs?.length === 1 ? "submitted CV" : "submitted CVs"}
+                  {cvs?.length === 1
+                    ? t("positionCvsPage.submittedCv")
+                    : t("positionCvsPage.submittedCvs")}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CV list */}
         {cvs?.length === 0 ? (
           <section className="card border-0 shadow-sm">
             <div className="card-body py-5 text-center">
@@ -186,10 +190,10 @@ const PositionCvsPage = () => {
                 <i className="bi bi-file-earmark-text fs-3 text-muted" />
               </div>
 
-              <h2 className="h5 fw-bold">No CVs submitted yet</h2>
+              <h2 className="h5 fw-bold">{t("positionCvsPage.noCvs")}</h2>
 
               <p className="text-muted mb-0">
-                Candidates who submit a CV for this position will appear here.
+                {t("positionCvsPage.noCvsDescription")}
               </p>
             </div>
           </section>
@@ -200,10 +204,19 @@ const PositionCvsPage = () => {
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
-                      <th className="px-4 py-3">Candidate</th>
-                      <th className="py-3">CV</th>
-                      <th className="py-3">Submitted</th>
-                      <th className="py-3 text-end px-4">Actions</th>
+                      <th className="px-4 py-3">
+                        {t("positionCvsPage.table.candidate")}
+                      </th>
+
+                      <th className="py-3">{t("positionCvsPage.table.cv")}</th>
+
+                      <th className="py-3">
+                        {t("positionCvsPage.table.submitted")}
+                      </th>
+
+                      <th className="py-3 text-end px-4">
+                        {t("positionCvsPage.table.actions")}
+                      </th>
                     </tr>
                   </thead>
 
@@ -223,7 +236,7 @@ const PositionCvsPage = () => {
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <span className="text-muted small">
-              © 2026 Recruitment Platform
+              {t("positionCvsPage.footer")}
             </span>
 
             <div className="d-flex gap-3">
@@ -231,14 +244,14 @@ const PositionCvsPage = () => {
                 to="/positions"
                 className="text-muted small text-decoration-none"
               >
-                Positions
+                {t("common.positions")}
               </Link>
 
               <Link
                 to="/profile"
                 className="text-muted small text-decoration-none"
               >
-                Profile
+                {t("common.profile")}
               </Link>
             </div>
           </div>
@@ -250,10 +263,12 @@ const PositionCvsPage = () => {
 
 interface CvRowProps {
   cv: CVSummary;
-  user: User
+  user: User;
 }
 
 const CvRow = ({ cv, user }: CvRowProps) => {
+  const { t } = useTranslation();
+
   const candidateName = `${user?.firstName} ${user.lastName}`;
   const submittedAt = cv.createdAt;
 
@@ -273,11 +288,8 @@ const CvRow = ({ cv, user }: CvRowProps) => {
 
           <div>
             <div className="fw-semibold">{candidateName}</div>
-            {user.email && (
-              <div className="text-muted small">
-                {user.email}
-              </div>
-            )}
+
+            {user.email && <div className="text-muted small">{user.email}</div>}
           </div>
         </div>
       </td>
@@ -285,24 +297,24 @@ const CvRow = ({ cv, user }: CvRowProps) => {
       <td>
         <div className="d-flex align-items-center gap-2">
           <i className="bi bi-file-earmark-person text-primary" />
-
-          <span className="small fw-semibold">CV #{cv.id}</span>
+          <span className="small fw-semibold">
+            {t("positionCvsPage.cvNumber", { id: cv.id })}
+          </span>
         </div>
       </td>
 
       <td>
         <span className="text-muted small">
-          {submittedAt ? new Date(submittedAt).toLocaleString() : "—"}
+          {submittedAt
+            ? new Date(submittedAt).toLocaleString()
+            : t("positionCvsPage.notAvailable")}
         </span>
       </td>
 
       <td className="text-end px-4">
-        <Link
-          to={`/cvs/${cv.id}`}
-          className="btn btn-sm btn-outline-primary"
-        >
+        <Link to={`/cvs/${cv.id}`} className="btn btn-sm btn-outline-primary">
           <i className="bi bi-eye me-1" />
-          View CV
+          {t("positionCvsPage.viewCv")}
         </Link>
       </td>
     </tr>

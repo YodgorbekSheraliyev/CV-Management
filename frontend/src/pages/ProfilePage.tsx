@@ -1,13 +1,11 @@
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
-
 import MeSection from "../components/sections/MeSection";
 import InfoSection from "../components/sections/InfoSection";
 import ProjectsSection from "../components/sections/ProjectsSection";
 import CvsSection from "../components/sections/CvsSection";
-
 import { updateUser } from "../api/userApi";
 import { UserRole } from "../enums/enums";
 import ToastNotification from "../components/notifications/ToastNotification";
@@ -21,6 +19,7 @@ interface UpdateUserData {
 }
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const { user, setUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("me");
   const [toast, setToast] = useState<{
@@ -36,17 +35,17 @@ const ProfilePage = () => {
     try {
       const updatedUser = await updateUser(user.id, data);
       setToast({
-        message: "Changes saved successfully",
+        message: t("profilePage.success.changesSaved"),
         type: "success",
       });
       setUser?.(updatedUser);
       setToast({
-        message: "Profile updated successfully.",
+        message: t("profilePage.success.profileUpdated"),
         type: "success",
       });
     } catch (err: any) {
       setToast({
-        message: err?.message ?? "Could not update user profile.",
+        message: err?.message ?? t("profilePage.errors.updateFailed"),
         type: "danger",
       });
     }
@@ -59,7 +58,7 @@ const ProfilePage = () => {
 
         <main className="container py-5">
           <div className="alert alert-info">
-            Please log in to view your profile.
+            {t("profilePage.loginRequired")}
           </div>
         </main>
       </div>
@@ -77,12 +76,12 @@ const ProfilePage = () => {
   }[] = [
     {
       value: "me",
-      label: "Personal",
+      label: t("profilePage.tabs.personal"),
       icon: "bi-person",
     },
     {
       value: "info",
-      label: "Additional info",
+      label: t("profilePage.tabs.additionalInfo"),
       icon: "bi-list-ul",
     },
   ];
@@ -91,12 +90,12 @@ const ProfilePage = () => {
     tabs.push(
       {
         value: "projects",
-        label: "Projects",
+        label: t("profilePage.tabs.projects"),
         icon: "bi-kanban",
       },
       {
         value: "cvs",
-        label: "CVs",
+        label: t("profilePage.tabs.cvs"),
         icon: "bi-file-earmark-person",
       },
     );
@@ -105,23 +104,18 @@ const ProfilePage = () => {
   return (
     <div className="min-vh-100 bg-light">
       <NavBar />
+
       <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
       <main className="container py-4 py-md-5">
-        {/* Page heading */}
         <div className="mb-4">
-          <h1 className="h3 fw-bold mb-1">My profile</h1>
-
-          <p className="text-muted mb-0">
-            Manage your personal information, projects, and CVs.
-          </p>
+          <h1 className="h3 fw-bold mb-1">{t("profilePage.title")}</h1>
+          <p className="text-muted mb-0">{t("profilePage.description")}</p>
         </div>
 
-        {/* Profile header */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4">
             <div className="d-flex flex-column flex-md-row align-items-md-center gap-3">
-              {/* Avatar */}
               <div
                 className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
                 style={{
@@ -132,7 +126,7 @@ const ProfilePage = () => {
                 {user.imageUrl ? (
                   <img
                     src={user.imageUrl}
-                    alt="Profile"
+                    alt={t("profilePage.profileImage")}
                     className="w-100 h-100 object-fit-cover"
                   />
                 ) : (
@@ -140,7 +134,6 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              {/* User information */}
               <div className="flex-grow-1">
                 <h2 className="h4 fw-bold mb-1">
                   {user.firstName} {user.lastName}
@@ -154,7 +147,7 @@ const ProfilePage = () => {
 
                   <span>
                     <i className="bi bi-geo-alt me-2" />
-                    {user.location || "Location not provided"}
+                    {user.location || t("profilePage.locationNotProvided")}
                   </span>
                 </div>
               </div>
@@ -162,7 +155,6 @@ const ProfilePage = () => {
           </div>
         </section>
 
-        {/* Tabs */}
         <section className="card border-0 shadow-sm mb-4">
           <div className="card-body p-2">
             <div className="nav nav-pills flex-column flex-md-row gap-1">
@@ -176,15 +168,12 @@ const ProfilePage = () => {
                   onClick={() => setActiveTab(tab.value)}
                 >
                   <i className={`${tab.icon} me-2`} />
-
                   {tab.label}
                 </button>
               ))}
             </div>
           </div>
         </section>
-
-        {/* Tab content */}
 
         {activeTab === "me" && (
           <MeSection user={user} onSave={handleUpdateUser} />

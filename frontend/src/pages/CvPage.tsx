@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import ToastNotification from "../components/notifications/ToastNotification";
 import ValueField from "../components/fields/ValueField";
@@ -80,7 +81,6 @@ const isAttributeFilled = (attribute: CvAttribute): boolean => {
 
   if (attribute.attribute.type === AttributeType.Period) {
     const { start, end } = parsePeriod(attribute.value);
-
     return !!start || !!end;
   }
 
@@ -88,6 +88,7 @@ const isAttributeFilled = (attribute: CvAttribute): boolean => {
 };
 
 const CvPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -115,7 +116,7 @@ const CvPage = () => {
   const [isLiked, setIsLiked] = useState(false);
 
   const canEdit = user?.role !== UserRole.Recruiter;
-  const isRecruiter = user?.role == UserRole.Recruiter;
+  const isRecruiter = user?.role === UserRole.Recruiter;
 
   useEffect(() => {
     if (!id || !user) {
@@ -129,7 +130,7 @@ const CvPage = () => {
         const cvId = Number(id);
 
         if (Number.isNaN(cvId)) {
-          throw new Error("Invalid CV id.");
+          throw new Error(t("cvPage.errors.invalidId"));
         }
 
         const result = await getCvById(cvId, user.id);
@@ -137,7 +138,7 @@ const CvPage = () => {
         setCv(result);
       } catch (err: any) {
         setToast({
-          message: err.message ?? "Could not load this CV.",
+          message: err.message ?? t("cvPage.errors.loadFailed"),
           type: "danger",
         });
       } finally {
@@ -146,7 +147,7 @@ const CvPage = () => {
     };
 
     load();
-  }, [id, user?.id]);
+  }, [id, user?.id, t]);
 
   const startEditing = (attribute: CvAttribute) => {
     if (!canEdit) {
@@ -190,14 +191,6 @@ const CvPage = () => {
         ? JSON.stringify(draftPeriod)
         : draftValue;
 
-    /*
-     * IMPORTANT:
-     *
-     * attribute.id       = AttributeValue ID
-     * attribute.attributeId = Attribute definition ID
-     *
-     * The update API needs the AttributeValue ID.
-     */
     setSavingAttributeId(attribute.attributeId);
 
     try {
@@ -233,14 +226,14 @@ const CvPage = () => {
       });
 
       setToast({
-        message: "Attribute updated.",
+        message: t("cvPage.toast.attributeUpdated"),
         type: "success",
       });
 
       cancelEditing();
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not update this attribute.",
+        message: err.message ?? t("cvPage.errors.updateAttributeFailed"),
         type: "danger",
       });
     } finally {
@@ -260,7 +253,7 @@ const CvPage = () => {
       navigate("/");
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not delete this CV.",
+        message: err.message ?? t("cvPage.errors.deleteFailed"),
         type: "danger",
       });
 
@@ -285,12 +278,12 @@ const CvPage = () => {
       setCv(updated);
 
       setToast({
-        message: "CV published.",
+        message: t("cvPage.toast.published"),
         type: "success",
       });
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not publish this CV.",
+        message: err.message ?? t("cvPage.errors.publishFailed"),
         type: "danger",
       });
     } finally {
@@ -309,7 +302,7 @@ const CvPage = () => {
       setIsLiked(updated.isLikedByCurrentUser);
     } catch (error: any) {
       setToast({
-        message: error.message ?? "Could not perform action",
+        message: error.message ?? t("cvPage.errors.likeFailed"),
         type: "danger",
       });
     }
@@ -321,7 +314,7 @@ const CvPage = () => {
         <NavBar />
 
         <main className="container py-5 text-center text-muted">
-          Loading CV…
+          {t("cvPage.loading")}
         </main>
       </div>
     );
@@ -335,10 +328,10 @@ const CvPage = () => {
         <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
         <main className="container py-5 text-center">
-          <p className="text-danger mb-3">CV not found.</p>
+          <p className="text-danger mb-3">{t("cvPage.notFound")}</p>
 
           <Link to="/cvs" className="btn btn-outline-secondary">
-            Back to my CVs
+            {t("cvPage.backToMyCvs")}
           </Link>
         </main>
       </div>
@@ -374,7 +367,11 @@ const CvPage = () => {
                     : "text-bg-secondary"
               }`}
             >
-              {isDraft ? "Draft" : isPublished ? "Published" : "Other"}
+              {isDraft
+                ? t("cvPage.status.draft")
+                : isPublished
+                  ? t("cvPage.status.published")
+                  : t("cvPage.status.other")}
             </span>
           </div>
 
@@ -382,20 +379,26 @@ const CvPage = () => {
             {isRecruiter && (
               <button
                 type="button"
-                className={`btn px-4 ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
+                className={`btn px-4 ${
+                  isLiked ? "btn-primary" : "btn-outline-primary"
+                }`}
                 onClick={handleLike}
               >
                 <i
-                  className={`bi ${isLiked ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up"} me-2`}
-                ></i>
-                {isLiked ? "Liked" : "Like"}
+                  className={`bi ${
+                    isLiked ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up"
+                  } me-2`}
+                />
+
+                {isLiked ? t("cvPage.actions.liked") : t("cvPage.actions.like")}
               </button>
             )}
+
             <Link
               to={`/positions/${cv.positionId}`}
               className="btn btn-outline-secondary btn-sm px-3"
             >
-              View position
+              {t("cvPage.actions.viewPosition")}
             </Link>
 
             {canEdit && isDraft && (
@@ -404,13 +407,11 @@ const CvPage = () => {
                 className="btn btn-success btn-sm px-3"
                 onClick={handlePublish}
                 disabled={publishing || !allFilled}
-                title={
-                  !allFilled
-                    ? "Fill in every attribute before publishing"
-                    : undefined
-                }
+                title={!allFilled ? t("cvPage.publish.fillAll") : undefined}
               >
-                {publishing ? "Publishing…" : "Publish"}
+                {publishing
+                  ? t("cvPage.actions.publishing")
+                  : t("cvPage.actions.publish")}
               </button>
             )}
 
@@ -421,7 +422,7 @@ const CvPage = () => {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <i className="bi bi-trash me-1" />
-                Delete
+                {t("cvPage.actions.delete")}
               </button>
             )}
           </div>
@@ -430,8 +431,7 @@ const CvPage = () => {
         {/* Publish warning */}
         {canEdit && isDraft && !allFilled && (
           <div className="alert alert-warning py-2 px-3 small mb-4">
-            Fill in every highlighted field below before you can publish this CV
-            to recruiters.
+            {t("cvPage.publish.fillAll")}
           </div>
         )}
 
@@ -445,8 +445,10 @@ const CvPage = () => {
               </h1>
 
               <p className="text-muted mb-0">
-                {cv.likeCount ?? 0} like
-                {cv.likeCount === 1 ? "" : "s"}
+                {cv.likeCount ?? 0}{" "}
+                {cv.likeCount === 1
+                  ? t("cvPage.likes.one")
+                  : t("cvPage.likes.many")}
               </p>
             </header>
 
@@ -498,7 +500,9 @@ const CvPage = () => {
                                 disabled={isSaving}
                                 onClick={() => saveAttribute(attribute)}
                               >
-                                {isSaving ? "Saving…" : "Save"}
+                                {isSaving
+                                  ? t("cvPage.actions.saving")
+                                  : t("cvPage.actions.save")}
                               </button>
 
                               <button
@@ -507,7 +511,7 @@ const CvPage = () => {
                                 disabled={isSaving}
                                 onClick={cancelEditing}
                               >
-                                Cancel
+                                {t("cvPage.actions.cancel")}
                               </button>
                             </div>
                           </div>
@@ -541,7 +545,9 @@ const CvPage = () => {
                                       : "normal",
                                 }}
                               >
-                                {isEmpty ? "Not filled in" : shown}
+                                {isEmpty
+                                  ? t("cvPage.attribute.notFilled")
+                                  : shown}
                               </span>
                             )}
 
@@ -561,7 +567,7 @@ const CvPage = () => {
             {projects.length > 0 && (
               <section>
                 <h2 className="h6 text-uppercase text-muted fw-bold mb-3 pb-2 border-bottom">
-                  Relevant projects
+                  {t("cvPage.projects.title")}
                 </h2>
 
                 <div className="d-flex flex-column gap-4">
@@ -575,7 +581,7 @@ const CvPage = () => {
 
                           {project.endDate
                             ? ` – ${project.endDate}`
-                            : " – Present"}
+                            : ` – ${t("cvPage.projects.present")}`}
                         </div>
                       </div>
 
@@ -616,7 +622,7 @@ const CvPage = () => {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Delete this CV?</h5>
+                <h5 className="modal-title">{t("cvPage.deleteModal.title")}</h5>
 
                 <button
                   type="button"
@@ -628,9 +634,9 @@ const CvPage = () => {
 
               <div className="modal-body">
                 <p className="mb-0">
-                  This will permanently delete your CV for{" "}
-                  <strong>{cv.positionTitle ?? "this position"}</strong>. This
-                  action cannot be undone.
+                  {t("cvPage.deleteModal.description", {
+                    position: cv.positionTitle ?? t("cvPage.projects.title"),
+                  })}
                 </p>
               </div>
 
@@ -641,7 +647,7 @@ const CvPage = () => {
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={deleting}
                 >
-                  Cancel
+                  {t("cvPage.actions.cancel")}
                 </button>
 
                 <button
@@ -650,7 +656,9 @@ const CvPage = () => {
                   onClick={handleDeleteCv}
                   disabled={deleting}
                 >
-                  {deleting ? "Deleting…" : "Delete CV"}
+                  {deleting
+                    ? t("cvPage.actions.deleting")
+                    : t("cvPage.actions.deleteCv")}
                 </button>
               </div>
             </div>

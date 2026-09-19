@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/auth";
 import { UserRole } from "../enums/enums";
 import GoogleSignInButton from "../components/GoogleSignInButton";
@@ -9,9 +8,9 @@ import FacebookSignInButton from "../components/FacebookSignInButton";
 import ToastNotification from "../components/notifications/ToastNotification";
 
 const RegisterPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register, googleAuth, facebookAuth } = useAuth();
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +24,6 @@ const RegisterPage = () => {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setLoading(true);
 
     try {
@@ -37,14 +35,13 @@ const RegisterPage = () => {
         role,
       });
       setToast({
-        message: "Successfully completed registration",
+        message: t("registerPage.success.registration"),
         type: "success",
       });
-
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to create your account. Please try again.",
+        message: t("registerPage.errors.registration"),
         type: "danger",
       });
     } finally {
@@ -57,12 +54,14 @@ const RegisterPage = () => {
 
     try {
       await googleAuth(idToken, role);
-      setToast({ message: "Successfully registered", type: "success" });
-
+      setToast({
+        message: t("registerPage.success.social"),
+        type: "success",
+      });
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to sign in with Google. Please try again.",
+        message: t("registerPage.errors.google"),
         type: "danger",
       });
     } finally {
@@ -76,14 +75,13 @@ const RegisterPage = () => {
     try {
       await facebookAuth(accessToken, role);
       setToast({
-        message: "Successfully registered",
+        message: t("registerPage.success.social"),
         type: "success",
       });
-
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to sign in with Facebook. Please try again.",
+        message: t("registerPage.errors.facebook"),
         type: "danger",
       });
     } finally {
@@ -99,9 +97,9 @@ const RegisterPage = () => {
             <div className="card border-0 shadow-sm">
               <div className="card-body p-4 p-md-5">
                 <div className="text-center mb-4">
-                  <h1 className="h3 fw-bold mb-2">Create your account</h1>
+                  <h1 className="h3 fw-bold mb-2">{t("registerPage.title")}</h1>
                   <p className="text-muted mb-0">
-                    Join our recruitment platform
+                    {t("registerPage.description")}
                   </p>
                 </div>
 
@@ -110,14 +108,12 @@ const RegisterPage = () => {
                   onClose={() => setToast(null)}
                 />
 
-                {/* Role selection */}
                 <div className="mb-4">
                   <label className="form-label fw-semibold">
-                    I want to register as
+                    {t("registerPage.role.label")}
                   </label>
 
                   <div className="row g-3">
-                    {/* Candidate */}
                     <div className="col-6">
                       <button
                         type="button"
@@ -133,7 +129,9 @@ const RegisterPage = () => {
                             <i className="bi bi-person"></i>
                           </div>
 
-                          <div className="fw-semibold">Candidate</div>
+                          <div className="fw-semibold">
+                            {t("registerPage.role.candidate.title")}
+                          </div>
 
                           <small
                             className={
@@ -142,13 +140,12 @@ const RegisterPage = () => {
                                 : "text-muted"
                             }
                           >
-                            Find opportunities
+                            {t("registerPage.role.candidate.description")}
                           </small>
                         </div>
                       </button>
                     </div>
 
-                    {/* Recruiter */}
                     <div className="col-6">
                       <button
                         type="button"
@@ -164,7 +161,9 @@ const RegisterPage = () => {
                             <i className="bi bi-briefcase"></i>
                           </div>
 
-                          <div className="fw-semibold">Recruiter</div>
+                          <div className="fw-semibold">
+                            {t("registerPage.role.recruiter.title")}
+                          </div>
 
                           <small
                             className={
@@ -173,7 +172,7 @@ const RegisterPage = () => {
                                 : "text-muted"
                             }
                           >
-                            Find candidates
+                            {t("registerPage.role.recruiter.description")}
                           </small>
                         </div>
                       </button>
@@ -181,7 +180,6 @@ const RegisterPage = () => {
                   </div>
                 </div>
 
-                {/* Registration form */}
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-md-6 mb-3">
@@ -189,14 +187,14 @@ const RegisterPage = () => {
                         htmlFor="firstName"
                         className="form-label fw-semibold"
                       >
-                        First name
+                        {t("registerPage.firstName")}
                       </label>
 
                       <input
                         id="firstName"
                         type="text"
                         className="form-control"
-                        placeholder="John"
+                        placeholder={t("registerPage.firstNamePlaceholder")}
                         value={firstName}
                         onChange={(event) => setFirstName(event.target.value)}
                         autoComplete="given-name"
@@ -208,14 +206,14 @@ const RegisterPage = () => {
                         htmlFor="lastName"
                         className="form-label fw-semibold"
                       >
-                        Last name
+                        {t("registerPage.lastName")}
                       </label>
 
                       <input
                         id="lastName"
                         type="text"
                         className="form-control"
-                        placeholder="Doe"
+                        placeholder={t("registerPage.lastNamePlaceholder")}
                         value={lastName}
                         onChange={(event) => setLastName(event.target.value)}
                         autoComplete="family-name"
@@ -225,13 +223,14 @@ const RegisterPage = () => {
 
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label fw-semibold">
-                      Email address
+                      {t("registerPage.email")}
                     </label>
 
                     <input
                       id="email"
+                      type="email"
                       className="form-control"
-                      placeholder="you@example.com"
+                      placeholder={t("registerPage.emailPlaceholder")}
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       autoComplete="email"
@@ -243,21 +242,21 @@ const RegisterPage = () => {
                       htmlFor="password"
                       className="form-label fw-semibold"
                     >
-                      Password
+                      {t("registerPage.password")}
                     </label>
 
                     <input
                       id="password"
                       type="password"
                       className="form-control"
-                      placeholder="Create a password"
+                      placeholder={t("registerPage.passwordPlaceholder")}
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       autoComplete="new-password"
                     />
 
                     <div className="form-text">
-                      Password must be at least 8 characters.
+                      {t("registerPage.passwordHint")}
                     </div>
                   </div>
 
@@ -272,31 +271,28 @@ const RegisterPage = () => {
                           className="spinner-border spinner-border-sm me-2"
                           aria-hidden="true"
                         />
-                        Creating account...
+                        {t("registerPage.creatingAccount")}
                       </>
                     ) : (
-                      "Create account"
+                      t("registerPage.createAccount")
                     )}
                   </button>
                 </form>
 
-                {/* Divider */}
                 <div className="d-flex align-items-center my-4">
                   <hr className="flex-grow-1" />
-
-                  <span className="px-3 text-muted small">OR</span>
-
+                  <span className="px-3 text-muted small">
+                    {t("registerPage.or")}
+                  </span>
                   <hr className="flex-grow-1" />
                 </div>
 
                 <div className="my-3 d-flex flex-column gap-2">
-                  {/* Google registration */}
                   <GoogleSignInButton
                     onSuccess={handleGoogleSuccess}
                     onError={(message) => setToast({ message, type: "danger" })}
                   />
 
-                  {/* Facebook registration */}
                   <FacebookSignInButton
                     onSuccess={handleFacebookSuccess}
                     onError={(message) => setToast({ message, type: "danger" })}
@@ -304,20 +300,22 @@ const RegisterPage = () => {
                 </div>
 
                 <div className="text-center mt-4">
-                  <span className="text-muted">Already have an account? </span>
+                  <span className="text-muted">
+                    {t("registerPage.alreadyHaveAccount")}{" "}
+                  </span>
 
                   <Link
                     to="/login"
                     className="text-decoration-none fw-semibold"
                   >
-                    Sign in
+                    {t("registerPage.signIn")}
                   </Link>
                 </div>
               </div>
             </div>
 
             <p className="text-center text-muted small mt-4">
-              Find the right opportunities. Build your future.
+              {t("registerPage.footer")}
             </p>
           </div>
         </div>

@@ -347,5 +347,190 @@
       "projectTagsDescription": "Select technology tags used when filtering candidate projects."
     },
     "loadingAttributes": "Loading attributes..."
+  },
+  "cvPage": {
+    "loading": "Loading CV...",
+    "notFound": "CV not found.",
+    "backToMyCvs": "Back to my CVs",
+
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "other": "Other"
+    },
+
+    "actions": {
+      "like": "Like",
+      "liked": "Liked",
+      "viewPosition": "View position",
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "delete": "Delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "deleteCv": "Delete CV",
+      "deleting": "Deleting..."
+    },
+
+    "errors": {
+      "invalidId": "Invalid CV ID.",
+      "loadFailed": "Could not load this CV.",
+      "updateAttributeFailed": "Could not update this attribute.",
+      "deleteFailed": "Could not delete this CV.",
+      "publishFailed": "Could not publish this CV.",
+      "likeFailed": "Could not perform this action."
+    },
+
+    "toast": {
+      "attributeUpdated": "Attribute updated.",
+      "published": "CV published."
+    },
+
+    "publish": {
+      "fillAll": "Fill in every highlighted field below before you can publish this CV to recruiters."
+    },
+
+    "attribute": {
+      "notFilled": "Not filled in"
+    },
+
+    "likes": {
+      "one": "like",
+      "many": "likes"
+    },
+
+    "projects": {
+      "title": "Relevant projects",
+      "present": "Present"
+    },
+
+    "deleteModal": {
+      "title": "Delete this CV?",
+      "description": "This will permanently delete your CV for {{position}}. This action cannot be undone."
+    }
+  },
+  "editPositionPage": {
+    "backToPosition": "Back to position",
+    "title": "Edit Position",
+    "editing": "Editing \"{{title}}\"",
+    "description": "Update this position's details, access rules, and CV attributes.",
+    "loading": "Loading position...",
+    "notFound": "Position not found.",
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "errors": {
+      "loadFailed": "Could not load this position.",
+      "loadAttributesFailed": "Could not load attributes.",
+      "updateFailed": "Could not update this position."
+    }
+  },
+  "loginPage": {
+    "welcomeBack": "Welcome back",
+    "description": "Sign in to your recruitment account",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "or": "OR",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an account",
+    "footer": "Find the right opportunities. Build your future.",
+    "errors": {
+      "login": "Unable to login to your account. Please try again.",
+      "google": "Unable to login with Google account. Please try again.",
+      "facebook": "Unable to sign in with Facebook. Please try again."
+    },
+    "success": {
+      "facebook": "Successfully registered"
+    }
+  },
+  "registerPage": {
+    "title": "Create your account",
+    "description": "Join our recruitment platform",
+    "role": {
+      "label": "I want to register as",
+      "candidate": {
+        "title": "Candidate",
+        "description": "Find opportunities"
+      },
+      "recruiter": {
+        "title": "Recruiter",
+        "description": "Find candidates"
+      }
+    },
+    "firstName": "First name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Create a password",
+    "passwordHint": "Password must be at least 8 characters.",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account...",
+    "or": "OR",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "footer": "Find the right opportunities. Build your future.",
+    "success": {
+      "registration": "Successfully completed registration",
+      "social": "Successfully registered"
+    },
+    "errors": {
+      "registration": "Unable to create your account. Please try again.",
+      "google": "Unable to sign in with Google. Please try again.",
+      "facebook": "Unable to sign in with Facebook. Please try again."
+    }
+  },
+  "profilePage": {
+    "title": "My profile",
+    "description": "Manage your personal information, projects, and CVs.",
+    "profileImage": "Profile",
+    "locationNotProvided": "Location not provided",
+    "loginRequired": "Please log in to view your profile.",
+    "tabs": {
+      "personal": "Personal",
+      "additionalInfo": "Additional info",
+      "projects": "Projects",
+      "cvs": "CVs"
+    },
+    "success": {
+      "changesSaved": "Changes saved successfully",
+      "profileUpdated": "Profile updated successfully."
+    },
+    "errors": {
+      "updateFailed": "Could not update user profile."
+    }
+  },
+  "positionCvsPage": {
+    "breadcrumb": "breadcrumb",
+    "backToPositions": "Back to positions",
+    "backToPosition": "Back to position",
+    "loading": "Loading submitted CVs…",
+    "submittedCvs": "Submitted CVs",
+    "submittedCv": "submitted CV",
+    "candidatesSubmitted": "Candidates who submitted a CV for",
+    "noCvs": "No CVs submitted yet",
+    "noCvsDescription": "Candidates who submit a CV for this position will appear here.",
+    "cvNumber": "CV #{{id}}",
+    "notAvailable": "—",
+    "viewCv": "View CV",
+    "footer": "© 2026 Recruitment Platform",
+    "table": {
+      "candidate": "Candidate",
+      "cv": "CV",
+      "submitted": "Submitted",
+      "actions": "Actions"
+    },
+    "errors": {
+      "positionNotFound": "Position not found.",
+      "loadFailed": "Could not load submitted CVs.",
+      "noPermission": "You do not have permission to view submitted CVs."
+    }
   }
 }

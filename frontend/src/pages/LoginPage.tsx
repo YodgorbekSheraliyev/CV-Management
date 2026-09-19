@@ -1,11 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { useAuth } from "../hooks/auth";
 import ToastNotification from "../components/notifications/ToastNotification";
 import FacebookSignInButton from "../components/FacebookSignInButton";
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, googleAuth, facebookAuth } = useAuth();
   const [email, setEmail] = useState("");
@@ -22,11 +24,10 @@ const LoginPage = () => {
 
     try {
       await login({ email, password });
-
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to login your account. Please try again.",
+        message: t("loginPage.errors.login"),
         type: "danger",
       });
     } finally {
@@ -39,11 +40,10 @@ const LoginPage = () => {
 
     try {
       await googleAuth(idToken);
-
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to login with Google account. Please try again.",
+        message: t("loginPage.errors.google"),
         type: "danger",
       });
     } finally {
@@ -57,14 +57,13 @@ const LoginPage = () => {
     try {
       await facebookAuth(accessToken);
       setToast({
-        message: "Successfully registered",
+        message: t("loginPage.success.facebook"),
         type: "success",
       });
-
       navigate("/");
     } catch (err) {
       setToast({
-        message: "Unable to sign in with Facebook. Please try again.",
+        message: t("loginPage.errors.facebook"),
         type: "danger",
       });
     } finally {
@@ -80,10 +79,11 @@ const LoginPage = () => {
             <div className="card border-0 shadow-sm">
               <div className="card-body p-4 p-md-5">
                 <div className="text-center mb-4">
-                  <h1 className="h3 fw-bold mb-2">Welcome back</h1>
-
+                  <h1 className="h3 fw-bold mb-2">
+                    {t("loginPage.welcomeBack")}
+                  </h1>
                   <p className="text-muted mb-0">
-                    Sign in to your recruitment account
+                    {t("loginPage.description")}
                   </p>
                 </div>
 
@@ -95,14 +95,13 @@ const LoginPage = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label fw-semibold">
-                      Email address
+                      {t("loginPage.email")}
                     </label>
-
                     <input
                       id="email"
                       type="email"
                       className="form-control"
-                      placeholder="you@example.com"
+                      placeholder={t("loginPage.emailPlaceholder")}
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       required
@@ -114,27 +113,29 @@ const LoginPage = () => {
                       htmlFor="password"
                       className="form-label fw-semibold"
                     >
-                      Password
+                      {t("loginPage.password")}
                     </label>
                     <input
                       id="password"
                       type="password"
                       className="form-control"
-                      placeholder="Enter your password"
+                      placeholder={t("loginPage.passwordPlaceholder")}
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       required
                       autoComplete="current-password"
                     />
                   </div>
+
                   <div className="d-flex justify-content-end mb-4">
                     <Link
                       to="/forgot-password"
                       className="text-decoration-none"
                     >
-                      Forgot password?
+                      {t("loginPage.forgotPassword")}
                     </Link>
                   </div>
+
                   <button
                     type="submit"
                     className="btn btn-primary w-100"
@@ -146,19 +147,19 @@ const LoginPage = () => {
                           className="spinner-border spinner-border-sm me-2"
                           aria-hidden="true"
                         />
-                        Signing in...
+                        {t("loginPage.signingIn")}
                       </>
                     ) : (
-                      "Sign in"
+                      t("loginPage.signIn")
                     )}
                   </button>
                 </form>
 
                 <div className="d-flex align-items-center my-4">
                   <hr className="flex-grow-1" />
-
-                  <span className="px-3 text-muted small">OR</span>
-
+                  <span className="px-3 text-muted small">
+                    {t("loginPage.or")}
+                  </span>
                   <hr className="flex-grow-1" />
                 </div>
 
@@ -175,20 +176,21 @@ const LoginPage = () => {
                 </div>
 
                 <div className="text-center mt-4">
-                  <span className="text-muted">Don't have an account? </span>
-
+                  <span className="text-muted">
+                    {t("loginPage.noAccount")}{" "}
+                  </span>
                   <Link
                     to="/register"
                     className="text-decoration-none fw-semibold"
                   >
-                    Create an account
+                    {t("loginPage.createAccount")}
                   </Link>
                 </div>
               </div>
             </div>
 
             <p className="text-center text-muted small mt-4">
-              Find the right opportunities. Build your future.
+              {t("loginPage.footer")}
             </p>
           </div>
         </div>
