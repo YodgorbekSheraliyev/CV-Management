@@ -22,8 +22,10 @@ namespace backend.Dtos.Position
 
     public class CreateAccessRuleDto
     {
+        [Required(ErrorMessage = "AttributeIdRequired")]
         public int AttributeId { get; set; }
         public ComparisonType ComparisonType { get; set; }
+        [Required(ErrorMessage = "ValueRequired")]
         public string Value { get; set; }
     }
 }

@@ -1,16 +1,19 @@
 ﻿using backend.Dtos.Attribute;
 using backend.Dtos.Project;
 using backend.enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Dtos.Cv
 {
     public class CreateCvDto
     {
+        [Required(ErrorMessage = "PositionIdRequired")]
         public int PositionId { get; init; }
     }
 
     public class UpdateCvDto
     {
+        [Required(ErrorMessage = "IdRequired")]
         public int Id { get; init; }
         public List<int> AttributeIds { get; init; } = new();
         public List<int> ProjectIds { get; init; } = new();
@@ -18,13 +21,16 @@ namespace backend.Dtos.Cv
 
     public class UpdateCvAttributeValueDto
     {
+        [Required(ErrorMessage = "CvIdRequired")]
         public int CvId { get; init; }
+        [Required(ErrorMessage = "AttributeIdRequired")]
         public int AttributeId { get; init; }
         public string? Value { get; init; }
     }
 
     public class DeleteCvDto
     {
+        [Required(ErrorMessage = "IdRequired")]
         public int Id { get; init; }
     }
 
@@ -54,6 +60,7 @@ namespace backend.Dtos.Cv
 
     public class PublishCvDto
     {
+        [Required(ErrorMessage = "IdRequired")]
         public int Id { get; init; }
     }
 }

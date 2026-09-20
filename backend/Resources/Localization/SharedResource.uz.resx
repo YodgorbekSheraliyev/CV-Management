@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -194,5 +194,116 @@
   </data>
   <data name="PeriodEndBeforeStart" xml:space="preserve">
     <value>Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas.</value>
+  </data>
+  <data name="PositionIdRequired" xml:space="preserve">
+    <value>Lavozim identifikatori kiritilishi shart.</value>
+  </data>
+  <data name="CvIdRequired" xml:space="preserve">
+    <value>CV identifikatori kiritilishi shart.</value>
+  </data>
+  <data name="AttributeNotInCv" xml:space="preserve">
+    <value>Attribute ushbu CVga tegishli emas.</value>
+  </data>
+  <data name="CannotDeleteBuiltInAttribute" xml:space="preserve">
+    <value>O'rnatilgan attributlarni o'chirib bo'lmaydi.</value>
+  </data>
+  <data name="CannotRegisterAsAdministrator" xml:space="preserve">
+    <value>Administrator sifatida ro'yxatdan o'tib bo'lmaydi.</value>
+  </data>
+  <data name="CvAlreadyExistsForPosition" xml:space="preserve">
+    <value>Bu lavozim uchun CV allaqachon mavjud.</value>
+  </data>
+  <data name="CvHasEmptyAttributes" xml:space="preserve">
+    <value>CVda to'ldirilmagan attributlar mavjud.</value>
+  </data>
+  <data name="CvNotFound" xml:space="preserve">
+    <value>CV topilmadi.</value>
+  </data>
+  <data name="CvNotPublished" xml:space="preserve">
+    <value>Bu CV e'lon qilinmagan.</value>
+  </data>
+  <data name="FacebookAccessTokenRequired" xml:space="preserve">
+    <value>Facebook access tokeni kiritilishi shart.</value>
+  </data>
+  <data name="FacebookAuthenticationNotConfigured" xml:space="preserve">
+    <value>Facebook autentifikatsiyasi sozlanmagan.</value>
+  </data>
+  <data name="FacebookDidNotProvideEmailAddress" xml:space="preserve">
+    <value>Facebook email manzilini taqdim etmadi.</value>
+  </data>
+  <data name="FacebookExpiredOrInvalidToken" xml:space="preserve">
+    <value>Facebook access tokeni muddati tugagan yoki noto'g'ri.</value>
+  </data>
+  <data name="FacebookInvalidDebugResponse" xml:space="preserve">
+    <value>Facebook token uchun noto'g'ri javob qaytardi.</value>
+  </data>
+  <data name="FacebookRejectedAccessToken" xml:space="preserve">
+    <value>Facebook access tokenini rad etdi.</value>
+  </data>
+  <data name="FacebookWrongAppId" xml:space="preserve">
+    <value>Facebook tokeni boshqa ilovaga tegishli.</value>
+  </data>
+  <data name="GoogleAccountEmailNotProvided" xml:space="preserve">
+    <value>Google email manzilini taqdim etmadi.</value>
+  </data>
+  <data name="GoogleClientIdNotConfigured" xml:space="preserve">
+    <value>Google autentifikatsiyasi sozlanmagan.</value>
+  </data>
+  <data name="GoogleEmailNotVerified" xml:space="preserve">
+    <value>Google email manzili tasdiqlanmagan.</value>
+  </data>
+  <data name="GoogleIDTokenRequired" xml:space="preserve">
+    <value>Google ID tokeni kiritilishi shart.</value>
+  </data>
+  <data name="InvalidGoogleIDToken" xml:space="preserve">
+    <value>Google ID tokeni noto'g'ri.</value>
+  </data>
+  <data name="InvalidImageFormat" xml:space="preserve">
+    <value>Faqat JPG, JPEG va PNG rasmlar qo'llab-quvvatlanadi.</value>
+  </data>
+  <data name="NotYourCv" xml:space="preserve">
+    <value>Bu CV sizga tegishli emas.</value>
+  </data>
+  <data name="NotYourProject" xml:space="preserve">
+    <value>Bu loyiha sizga tegishli emas.</value>
+  </data>
+  <data name="PositionAccessDenied" xml:space="preserve">
+    <value>Bu lavozimga kirish huquqingiz yo'q.</value>
+  </data>
+  <data name="PositionNotFound" xml:space="preserve">
+    <value>Lavozim topilmadi.</value>
+  </data>
+  <data name="ProjectNotFound" xml:space="preserve">
+    <value>Loyiha topilmadi.</value>
+  </data>
+  <data name="TagNotFound" xml:space="preserve">
+    <value>Teg topilmadi.</value>
+  </data>
+  <data name="UnableToRetrieveFacebookAccountInformation" xml:space="preserve">
+    <value>Facebook akkaunti ma'lumotlarini olib bo'lmadi.</value>
+  </data>
+  <data name="PostAuthorNameRequired" xml:space="preserve">
+    <value>Post muallifining ismi kiritilishi shart.</value>
+  </data>
+  <data name="PostContentRequired" xml:space="preserve">
+    <value>Post mazmuni kiritilishi shart.</value>
+  </data>
+  <data name="TagNameRequired" xml:space="preserve">
+    <value>Teg nomi kiritilishi shart.</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Sarlavha kiritilishi shart.</value>
+  </data>
+  <data name="DescriptionRequired" xml:space="preserve">
+    <value>Tavsif kiritilishi shart.</value>
+  </data>
+  <data name="ProjectIdRequired" xml:space="preserve">
+    <value>Loyiha identifikatori kiritilishi shart.</value>
+  </data>
+  <data name="ProjectNameRequired" xml:space="preserve">
+    <value>Loyiha nomi kiritilishi shart.</value>
+  </data>
+  <data name="ProjectStartDateRequired" xml:space="preserve">
+    <value>Loyihaning boshlanish sanasi kiritilishi shart.</value>
   </data>
 </root>

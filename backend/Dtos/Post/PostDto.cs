@@ -1,4 +1,5 @@
 ﻿using backend.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Dtos.Post
 {
@@ -14,8 +15,11 @@ namespace backend.Dtos.Post
 
     public class CreatePostDto
     {
+        [Required(ErrorMessage = "PostAuthorNameRequired")]
         public string AuthorName { get; set; }
+        [Required(ErrorMessage = "PostContentRequired")]
         public string Content { get; set; }
+        [Required(ErrorMessage = "PositionIdRequired")]
         public int PositionId { get; set; }
     }
 
