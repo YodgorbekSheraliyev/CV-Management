@@ -133,7 +133,7 @@ const CvPage = () => {
           throw new Error(t("cvPage.errors.invalidId"));
         }
 
-        const result = await getCvById(cvId, user.id);
+        const result = await getCvById(cvId);
         setIsLiked(result.isLikedByCurrentUser);
         setCv(result);
       } catch (err: any) {
@@ -194,14 +194,11 @@ const CvPage = () => {
     setSavingAttributeId(attribute.attributeId);
 
     try {
-      await updateCvAttributeValue(
-        {
-          cvId: cv.id,
-          attributeValueId: attribute.id,
-          value: valueToSave,
-        },
-        user.id,
-      );
+      await updateCvAttributeValue({
+        cvId: cv.id,
+        attributeId: attribute.attributeId,
+        value: valueToSave,
+      });
 
       setCv((current) => {
         if (!current) {
@@ -249,7 +246,7 @@ const CvPage = () => {
     setDeleting(true);
 
     try {
-      await deleteCv(cv.id, user.id);
+      await deleteCv(cv.id);
       navigate("/");
     } catch (err: any) {
       setToast({
@@ -270,10 +267,7 @@ const CvPage = () => {
     setPublishing(true);
 
     try {
-      const updated = await publishCv({
-        id: cv.id,
-        userId: user.id,
-      });
+      const updated = await publishCv(cv.id);
 
       setCv(updated);
 
@@ -294,9 +288,7 @@ const CvPage = () => {
   const handleLike = async () => {
     if (!cv || !user) return;
     try {
-      const updated = isLiked
-        ? await unlikeCv(cv.id, user.id)
-        : await likeCv(cv.id, user.id);
+      const updated = isLiked ? await unlikeCv(cv.id) : await likeCv(cv.id);
 
       setCv(updated);
       setIsLiked(updated.isLikedByCurrentUser);

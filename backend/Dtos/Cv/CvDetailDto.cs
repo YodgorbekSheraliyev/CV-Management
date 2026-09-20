@@ -7,7 +7,6 @@ namespace backend.Dtos.Cv
     public class CreateCvDto
     {
         public int PositionId { get; init; }
-        public int UserId { get; init; }
     }
 
     public class UpdateCvDto
@@ -20,14 +19,13 @@ namespace backend.Dtos.Cv
     public class UpdateCvAttributeValueDto
     {
         public int CvId { get; init; }
-        public int AttributeValueId { get; init; }
+        public int AttributeId { get; init; }
         public string? Value { get; init; }
     }
 
     public class DeleteCvDto
     {
         public int Id { get; init; }
-        public int UserId { get; init; }
     }
 
     public class CvSummaryDto
@@ -57,6 +55,5 @@ namespace backend.Dtos.Cv
     public class PublishCvDto
     {
         public int Id { get; init; }
-        public int UserId { get; init; }
     }
 }

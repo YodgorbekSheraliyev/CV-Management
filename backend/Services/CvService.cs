@@ -76,42 +76,39 @@ namespace backend.Services
                 .ToListAsync();
         }
 
-        public async Task<CvDto> Create(CreateCvDto dto)
+        public async Task<CvDto> Create(CreateCvDto dto, int userId)
         {
             var position = await _db.Positions
-                .Include(p => p.Attributes)
-                .Include(p => p.PositionAccessRules)
-                    .ThenInclude(r => r.Attribute)
-                .Include(p => p.Tags)
-                .FirstOrDefaultAsync(p => p.Id == dto.PositionId);
+                .Where(p => p.Id == dto.PositionId)
+                .Select(p => new
+                {
+                    p.Id,
+                    AttributeIds = p.Attributes.Select(a => a.Id).ToList()
+                }).FirstOrDefaultAsync();
 
             if (position is null)
             {
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
 
-            if (await _db.CVs.AnyAsync(c => c.UserId == dto.UserId && c.PositionId == dto.PositionId))
+            if (await _db.CVs.AnyAsync(c =>c.UserId == userId && c.PositionId == dto.PositionId))
             {
                 throw new BadRequestException(_localizer["CvAlreadyExistsForPosition"]);
             }
 
-            var user = await _db.Users.Include(u => u.AttributeValues).FirstOrDefaultAsync(u => u.Id == dto.UserId);
-            if (user is null)
+            if (!await _db.Users.AnyAsync(u => u.Id == userId))
             {
                 throw new NotFoundException(_localizer["UserNotFound"]);
             }
 
-            var attributeIds = position.Attributes.Select(a => a.Id).ToList();
-            var userAttributeIds = user.AttributeValues.Select(av => av.AttributeId).ToHashSet();
-            attributeIds = attributeIds.Where(attributeId => userAttributeIds.Contains(attributeId)).ToList();
-            var projectIds = await GetMatchingProjectIds(dto.UserId, position);
+            var projectIds = await GetMatchingProjectIds(userId, dto.PositionId);
 
             var cv = new CV
             {
-                UserId = dto.UserId,
+                UserId = userId,
                 PositionId = position.Id,
-                Status = CVStatus.Published,
-                AttributeIds = attributeIds,
+                Status = CVStatus.Draft,
+                AttributeIds = position.AttributeIds,
                 ProjectIds = projectIds,
                 Likes = new List<User>(),
                 CreatedAt = DateTime.Now,
@@ -120,9 +117,9 @@ namespace backend.Services
 
             _db.CVs.Add(cv);
             await _db.SaveChangesAsync();
-            return await GetById(cv.Id, dto.UserId);
-        }
 
+            return await GetById(cv.Id, userId);
+        }
         public async Task<CvDto> GetById(int cvId, int userId)
         {
             var cv = await _db.CVs
@@ -226,21 +223,19 @@ namespace backend.Services
             {
                 throw new ForbiddenException(_localizer["NotYourCv"]);
             }
+            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeId);
 
-            if (!cv.AttributeIds.Contains(dto.AttributeValueId))
+            if (!cv.AttributeIds.Contains(attributeValue.AttributeId))
             {
                 throw new BadRequestException(_localizer["AttributeNotInCv"]);
             }
-
-            var attributeValue = await _db.AttributeValues
-                .FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeValueId);
 
             if (attributeValue is null)
             {
                 attributeValue = new AttributeValue
                 {
                     UserId = userId,
-                    AttributeId = dto.AttributeValueId,
+                    AttributeId = dto.AttributeId,
                     Value = dto.Value,
                 };
 
@@ -258,7 +253,7 @@ namespace backend.Services
             return await GetById(dto.CvId, userId);
         }
 
-        public async Task Delete(DeleteCvDto dto)
+        public async Task Delete(DeleteCvDto dto, int userId)
         {
             var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.Id);
             if (cv is null)
@@ -266,8 +261,8 @@ namespace backend.Services
                 throw new NotFoundException(_localizer["CvNotFound"]);
             }
 
-            var isAdmin = await _db.Users.AnyAsync(u => u.Id == dto.UserId && u.Role == UserRole.Administrator);
-            if (cv.UserId != dto.UserId && !isAdmin)
+            var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
+            if (cv.UserId != userId && !isAdmin)
             {
                 throw new ForbiddenException(_localizer["NotYourCv"]);
             }
@@ -276,7 +271,7 @@ namespace backend.Services
             await _db.SaveChangesAsync();
         }
 
-        public async Task<CvDto> Publish(PublishCvDto dto)
+        public async Task<CvDto> Publish(PublishCvDto dto, int userId)
         {
             var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.Id);
             if (cv is null)
@@ -284,8 +279,8 @@ namespace backend.Services
                 throw new NotFoundException(_localizer["CvNotFound"]);
             }
 
-            var isAdmin = await _db.Users.AnyAsync(u => u.Id == dto.UserId && u.Role == UserRole.Administrator);
-            if (cv.UserId != dto.UserId && !isAdmin)
+            var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
+            if (cv.UserId != userId && !isAdmin)
             {
                 throw new ForbiddenException(_localizer["NotYourCv"]);
             }
@@ -307,7 +302,7 @@ namespace backend.Services
 
             await _db.SaveChangesAsync();
 
-            return await GetById(dto.Id, dto.UserId);
+            return await GetById(dto.Id, userId);
         }
         private async Task<List<AttributeValue>> GetAttributeValues(int userId)
         {
@@ -340,26 +335,32 @@ namespace backend.Services
                 })
                 .ToList();
         }
-        private async Task<List<int>> GetMatchingProjectIds(int userId, Position position)
+        private async Task<List<int>> GetMatchingProjectIds(int userId, int positionId)
         {
-            var positionTagNames = (position.Tags ?? new List<Tag>()).Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            if (positionTagNames.Count == 0)
+            var position = await _db.Positions
+                .Where(p => p.Id == positionId)
+                .Select(p => new
+                {
+                    p.MaxProjects,
+                    TagNames = p.Tags
+                        .Select(t => t.Name)
+                        .ToList()
+                }).FirstOrDefaultAsync();
+            if (position is null || position.TagNames.Count == 0)
             {
                 return new List<int>();
             }
 
-            var projects = await _db.Projects
+            var positionTagNames = position.TagNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            return await _db.Projects
                 .AsNoTracking()
-                .Include(p => p.Tags)
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-
-            return projects
-                .Where(p => p.Tags.Any(t => positionTagNames.Contains(t.Name)))
+                .Where(p =>
+                    p.UserId == userId &&
+                    p.Tags.Any(t => positionTagNames.Contains(t.Name)))
                 .OrderByDescending(p => p.StartDate)
                 .Take(position.MaxProjects)
                 .Select(p => p.Id)
-                .ToList();
+                .ToListAsync();
         }
         private void EnsureViewable(CV cv, User user)
         {

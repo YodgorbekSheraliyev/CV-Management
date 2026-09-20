@@ -134,7 +134,7 @@ const PositionPage = () => {
       setLoading(true);
       setToast(null);
 
-      await createCv(positionId, user.id);
+      await createCv(positionId);
 
       setToast({
         message: t("positionPage.applySuccess"),

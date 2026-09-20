@@ -1,9 +1,11 @@
 ﻿using backend.Dtos;
 using backend.Dtos.Cv;
+using backend.Extensions;
+using backend.Localization;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.Extensions.Localization;
 
 namespace backend.Controllers
 {
@@ -13,10 +15,13 @@ namespace backend.Controllers
     public class CvsController : ControllerBase
     {
         private readonly CvService _cvService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
+        private int CurrentUserId => User.GetUserId(_localizer);
 
-        public CvsController(CvService cvService)
+        public CvsController(CvService cvService, IStringLocalizer<SharedResource> localizer)
         {
             _cvService = cvService;
+            _localizer = localizer;
         }
 
         [HttpGet("all")]
@@ -26,10 +31,10 @@ namespace backend.Controllers
             return Ok(CommonResponse<List<CvSummaryDto>>.Ok(result));
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetAllForUserId(int userId)
+        [HttpGet("user")]
+        public async Task<IActionResult> GetAllForCurrentUser()
         {
-            var result = await _cvService.GetAllForUserId(userId);
+            var result = await _cvService.GetAllForUserId(CurrentUserId);
             return Ok(CommonResponse<List<CvSummaryDto>>.Ok(result));
         }
 
@@ -37,36 +42,36 @@ namespace backend.Controllers
         [Authorize(Roles = "Candidate")]
         public async Task<IActionResult> Create(CreateCvDto dto)
         {
-            var result = await _cvService.Create(dto);
+            var result = await _cvService.Create(dto, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpGet("{cvId}/{userId}")]
-        public async Task<IActionResult> GetById(int cvId, int userId)
+        [HttpGet("{cvId}")]
+        public async Task<IActionResult> GetById(int cvId)
         {
-            var result = await _cvService.GetById(cvId, userId);
+            var result = await _cvService.GetById(cvId, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpPost("like/{cvId}/{userId}")]
-        public async Task<IActionResult> Like(int cvId, int userId)
+        [HttpPost("like/{cvId}")]
+        public async Task<IActionResult> Like(int cvId)
         {
-            var result = await _cvService.Like(cvId, userId);
+            var result = await _cvService.Like(cvId, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpDelete("unlike/{cvId}/{userId}")]
-        public async Task<IActionResult> Unlike(int cvId, int userId)
+        [HttpDelete("unlike/{cvId}")]
+        public async Task<IActionResult> Unlike(int cvId)
         {
-            var result = await _cvService.Unlike(cvId, userId);
+            var result = await _cvService.Unlike(cvId, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
-        [HttpPut("attribute-values/{userId}")]
+        [HttpPut("attribute-values")]
         [Authorize(Roles = "Candidate,Administrator")]
-        public async Task<IActionResult> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)
+        public async Task<IActionResult> UpdateAttributeValue(UpdateCvAttributeValueDto dto)
         {
-            var result = await _cvService.UpdateAttributeValue(dto, userId);
+            var result = await _cvService.UpdateAttributeValue(dto, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
@@ -74,14 +79,14 @@ namespace backend.Controllers
         [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> Publish(PublishCvDto dto)
         {
-            var result = await _cvService.Publish(dto);
+            var result = await _cvService.Publish(dto, CurrentUserId);
             return Ok(CommonResponse<CvDto>.Ok(result));
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteCvDto dto)
         {
-            await _cvService.Delete(dto);
+            await _cvService.Delete(dto, CurrentUserId);
             return NoContent();
         }
 

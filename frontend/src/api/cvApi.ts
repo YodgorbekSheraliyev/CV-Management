@@ -3,13 +3,8 @@ import api, { type CommonResponse } from "./axios";
 
 interface UpdateCvAttributeValueInput {
   cvId: number;
-  attributeValueId: number;
+  attributeId: number;
   value: string;
-}
-
-interface PublishCvInput {
-  id: number;
-  userId: number;
 }
 
 export const getAllCvs = async () => {
@@ -18,49 +13,43 @@ export const getAllCvs = async () => {
   return response.data;
 };
 
-export const getCvsByUserId = async (userId: number) => {
-  const { data: response } = await api.get<CommonResponse<CVSummary[]>>(
-    `/cvs/user/${userId}`,
-  );
+export const getCvsByCurrentUser = async () => {
+  const { data: response } =
+    await api.get<CommonResponse<CVSummary[]>>(`/cvs/user`);
   return response.data;
 };
 
-export const createCv = async (positionId: number, userId: number) => {
+export const createCv = async (positionId: number) => {
   const { data: response } = await api.post<CommonResponse<CV>>("/cvs", {
     positionId,
-    userId,
   });
   return response.data;
 };
 
-export const getCvById = async (id: number, userId: number) => {
-  const { data: response } = await api.get<CommonResponse<CV>>(
-    `/cvs/${id}/${userId}`,
-  );
+export const getCvById = async (id: number) => {
+  const { data: response } = await api.get<CommonResponse<CV>>(`/cvs/${id}`);
   return response.data;
 };
 
 export const updateCvAttributeValue = async (
   input: UpdateCvAttributeValueInput,
-  userId: number,
 ) => {
   const { data: response } = await api.put<CommonResponse<CV>>(
-    `/cvs/attribute-values/${userId}`,
+    `/cvs/attribute-values`,
     input,
   );
   return response.data;
 };
 
-export const publishCv = async ({ id, userId }: PublishCvInput) => {
+export const publishCv = async (id: number) => {
   const { data: response } = await api.put<CommonResponse<CV>>("/cvs/publish", {
     id,
-    userId,
   });
   return response.data;
 };
 
-export const deleteCv = async (id: number, userId: number) => {
-  await api.delete<void>("/cvs", { data: { id, userId } });
+export const deleteCv = async (id: number) => {
+  await api.delete<void>("/cvs", { data: { id } });
 };
 
 export const getCvsByPosition = async (positionId: number) => {
@@ -70,16 +59,16 @@ export const getCvsByPosition = async (positionId: number) => {
   return response.data;
 };
 
-export const likeCv = async (id: number, userId: number) => {
+export const likeCv = async (id: number) => {
   const { data: response } = await api.post<CommonResponse<CV>>(
-    `/cvs/like/${id}/${userId}`,
+    `/cvs/like/${id}`,
   );
   return response.data;
 };
 
-export const unlikeCv = async (id: number, userId: number) => {
+export const unlikeCv = async (id: number) => {
   const { data: response } = await api.delete<CommonResponse<CV>>(
-    `/cvs/unlike/${id}/${userId}`,
+    `/cvs/unlike/${id}`,
   );
   return response.data;
 };
