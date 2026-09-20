@@ -91,7 +91,7 @@ namespace backend.Services
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
 
-            if (await _db.CVs.AnyAsync(c =>c.UserId == userId && c.PositionId == dto.PositionId))
+            if (await _db.CVs.AnyAsync(c => c.UserId == userId && c.PositionId == dto.PositionId))
             {
                 throw new BadRequestException(_localizer["CvAlreadyExistsForPosition"]);
             }
@@ -223,12 +223,8 @@ namespace backend.Services
             {
                 throw new ForbiddenException(_localizer["NotYourCv"]);
             }
-            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeId);
 
-            if (!cv.AttributeIds.Contains(attributeValue.AttributeId))
-            {
-                throw new BadRequestException(_localizer["AttributeNotInCv"]);
-            }
+            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeId);
 
             if (attributeValue is null)
             {
@@ -328,6 +324,7 @@ namespace backend.Services
                             Type = attribute.AttributeType,
                             Description = attribute.Description,
                             IsBuiltIn = attribute.IsBuiltIn,
+                            Options = attribute.Options
                         },
                         Value = value,
                         IsEmpty = string.IsNullOrWhiteSpace(value),

@@ -39,9 +39,9 @@ const RegisterPage = () => {
         type: "success",
       });
       navigate("/");
-    } catch (err) {
+    } catch (err:any) {
       setToast({
-        message: t("registerPage.errors.registration"),
+        message: err.message,
         type: "danger",
       });
     } finally {
@@ -59,9 +59,9 @@ const RegisterPage = () => {
         type: "success",
       });
       navigate("/");
-    } catch (err) {
+    } catch (err:any) {
       setToast({
-        message: t("registerPage.errors.google"),
+        message: err.message,
         type: "danger",
       });
     } finally {
@@ -79,9 +79,9 @@ const RegisterPage = () => {
         type: "success",
       });
       navigate("/");
-    } catch (err) {
+    } catch (err:any) {
       setToast({
-        message: t("registerPage.errors.facebook"),
+        message: err.message,
         type: "danger",
       });
     } finally {

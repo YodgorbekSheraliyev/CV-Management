@@ -25,9 +25,9 @@ const LoginPage = () => {
     try {
       await login({ email, password });
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       setToast({
-        message: t("loginPage.errors.login"),
+        message: err.message,
         type: "danger",
       });
     } finally {
@@ -41,9 +41,9 @@ const LoginPage = () => {
     try {
       await googleAuth(idToken);
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       setToast({
-        message: t("loginPage.errors.google"),
+        message: err.message,
         type: "danger",
       });
     } finally {
@@ -61,9 +61,9 @@ const LoginPage = () => {
         type: "success",
       });
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       setToast({
-        message: t("loginPage.errors.facebook"),
+        message: err.message,
         type: "danger",
       });
     } finally {
