@@ -26,6 +26,7 @@ const ProfilePage = () => {
     message: string;
     type: "success" | "danger";
   } | null>(null);
+  const STATIC_PATH = import.meta.env.VITE_API_STATIC_API;
 
   const handleUpdateUser = async (data: UpdateUserData): Promise<void> => {
     if (!user) {
@@ -125,7 +126,7 @@ const ProfilePage = () => {
               >
                 {user.imageUrl ? (
                   <img
-                    src={user.imageUrl}
+                    src={`${STATIC_PATH}` + user.imageUrl}
                     alt={t("profilePage.profileImage")}
                     className="w-100 h-100 object-fit-cover"
                   />

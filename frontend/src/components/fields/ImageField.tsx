@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ImageIcon from "../icons/ImageIcon";
 import { uploadUserImage } from "../../api/attributeValueApi";
-// import { uploadUserImage } from "../../api/userApi";
 
 interface ImageFieldProps {
   value: string;
+  attributeId: number;
   onChange: (value: string) => void;
 }
 
-function ImageField({ value, onChange }: ImageFieldProps) {
+function ImageField({ value, onChange, attributeId }: ImageFieldProps) {
   const { t } = useTranslation();
   const [fileName, setFileName] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const STATIC_PATH = import.meta.env.VITE_API_STATIC_API
 
   useEffect(() => {
     setFileName("");
@@ -36,7 +37,7 @@ function ImageField({ value, onChange }: ImageFieldProps) {
     setUploading(true);
 
     try {
-      const imageUrl = await uploadUserImage(file);
+      const imageUrl = await uploadUserImage(file, attributeId);
 
       onChange(imageUrl);
     } catch {
@@ -105,7 +106,7 @@ function ImageField({ value, onChange }: ImageFieldProps) {
             style={{ minHeight: "160px" }}
           >
             <img
-              src={value}
+              src={`${STATIC_PATH}`+value}
               alt={t("imageField.selectedImage")}
               className="img-fluid rounded-2"
               style={{

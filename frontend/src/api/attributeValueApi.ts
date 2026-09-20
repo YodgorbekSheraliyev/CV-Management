@@ -35,11 +35,11 @@ export const deleteAttributeValue = async (
   });
 };
 
-export const uploadUserImage = async (image: File) => {
+export const uploadUserImage = async (image: File, attributeId: number) => {
   const formData = new FormData();
   formData.append("image", image);
   const { data: response } = await api.post<CommonResponse<string>>(
-    `/attributevalue/image`,
+    `/attributevalue/image/${attributeId}`,
     formData,
   );
   return response.data;

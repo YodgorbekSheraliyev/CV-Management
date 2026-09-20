@@ -182,7 +182,7 @@ namespace backend.Services
             return true;
         }
 
-        public async Task<string> UploadUserImage(int userId, IFormFile image)
+        public async Task<string> UploadUserImage(int userId, IFormFile image, int attributeId)
         {
             string extension = Path.GetExtension(image.FileName);
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -199,14 +199,15 @@ namespace backend.Services
             await using var stream = new FileStream(filePath, FileMode.Create);
             await image.CopyToAsync(stream);
             var imageAttribValue = await _db.AttributeValues
-                .FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == (int)BuiltInAttributes.ImageUrl);
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.AttributeId == attributeId);
             var prevImageUrl = imageAttribValue?.Value;
+
             if(imageAttribValue is null)
             {
                 imageAttribValue = new AttributeValue
                 {
                     UserId = userId,
-                    AttributeId = (int)BuiltInAttributes.ImageUrl,
+                    AttributeId = attributeId,
                     Value = uniqueFileName
                 };
                 await _db.AttributeValues.AddAsync(imageAttribValue);

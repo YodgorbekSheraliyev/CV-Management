@@ -54,7 +54,13 @@ function ValueField({
      * IMAGE
      */
     case AttributeType.Image:
-      return <ImageField value={value} onChange={onChange} />;
+      return (
+        <ImageField
+          value={value}
+          onChange={onChange}
+          attributeId={attribute.id}
+        />
+      );
 
     /*
      * NUMERIC

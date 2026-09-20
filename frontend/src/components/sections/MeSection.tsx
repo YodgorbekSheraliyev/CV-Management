@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 
 import type { User } from "../../models";
 import SectionHeader from "../SectionHeader";
+import ImageField from "../fields/ImageField";
 
 interface MeSectionProps {
   user: User;
-
   onSave: (data: {
     firstName: string;
     lastName: string;
     location: string;
+    imageUrl?: string;
   }) => Promise<void>;
 }
 
@@ -17,37 +18,37 @@ interface FormValues {
   firstName: string;
   lastName: string;
   location: string;
+  imageUrl?: string;
 }
 
-const MeSection = ({
-  user,
-  onSave,
-}: MeSectionProps) => {
-  const [isEditing, setIsEditing] =
-    useState(false);
+const IMAGE_ATTRIBUTE_ID = 4;
 
-  const [isSaving, setIsSaving] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
+const MeSection = ({ user, onSave }: MeSectionProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const [formValues, setFormValues] = useState<FormValues>({
-      firstName: user.firstName ?? "",
-      lastName: user.lastName ?? "",
-      location: user.location ?? "",
-    });
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    location: user.location ?? "",
+    imageUrl: user.imageUrl,
+  });
 
   useEffect(() => {
     setFormValues({
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       location: user.location ?? "",
+      imageUrl: user.imageUrl,
     });
   }, [user]);
 
   const handleChange = (field: keyof FormValues, value: string) => {
-    setFormValues((current) => ({...current, [field]: value}));
+    setFormValues((current) => ({
+      ...current,
+      [field]: value,
+    }));
   };
 
   const handleEdit = () => {
@@ -57,6 +58,7 @@ const MeSection = ({
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       location: user.location ?? "",
+      imageUrl: user.imageUrl,
     });
 
     setIsEditing(true);
@@ -69,6 +71,7 @@ const MeSection = ({
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       location: user.location ?? "",
+      imageUrl: user.imageUrl,
     });
 
     setIsEditing(false);
@@ -93,13 +96,12 @@ const MeSection = ({
         firstName: formValues.firstName.trim(),
         lastName: formValues.lastName.trim(),
         location: formValues.location.trim(),
+        imageUrl: formValues.imageUrl?.trim(),
       });
 
       setIsEditing(false);
     } catch {
-      setError(
-        "Could not save your information. Please try again.",
-      );
+      setError("Could not save your information. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -107,7 +109,6 @@ const MeSection = ({
 
   return (
     <section>
-
       <SectionHeader
         title="Personal information"
         description="Your basic personal details used across your profile and CVs."
@@ -116,10 +117,7 @@ const MeSection = ({
       />
 
       <div className="card border-0 shadow-sm">
-
         <div className="card-body p-4">
-
-          {/* Error */}
           {error && (
             <div className="alert alert-danger d-flex align-items-center gap-2">
               <i className="bi bi-exclamation-circle" />
@@ -128,14 +126,9 @@ const MeSection = ({
           )}
 
           <div className="row g-4">
-
             {/* First name */}
             <div className="col-12 col-md-6">
-
-              <label
-                htmlFor="firstName"
-                className="form-label fw-semibold"
-              >
+              <label htmlFor="firstName" className="form-label fw-semibold">
                 First name
               </label>
 
@@ -146,29 +139,20 @@ const MeSection = ({
                   className="form-control"
                   value={formValues.firstName}
                   onChange={(event) =>
-                    handleChange(
-                      "firstName",
-                      event.target.value,
-                    )
+                    handleChange("firstName", event.target.value)
                   }
                   disabled={isSaving}
                 />
               ) : (
                 <div className="profile-value">
-                  {user.firstName ||
-                    "Not provided"}
+                  {user.firstName || "Not provided"}
                 </div>
               )}
-
             </div>
 
             {/* Last name */}
             <div className="col-12 col-md-6">
-
-              <label
-                htmlFor="lastName"
-                className="form-label fw-semibold"
-              >
+              <label htmlFor="lastName" className="form-label fw-semibold">
                 Last name
               </label>
 
@@ -179,29 +163,20 @@ const MeSection = ({
                   className="form-control"
                   value={formValues.lastName}
                   onChange={(event) =>
-                    handleChange(
-                      "lastName",
-                      event.target.value,
-                    )
+                    handleChange("lastName", event.target.value)
                   }
                   disabled={isSaving}
                 />
               ) : (
                 <div className="profile-value">
-                  {user.lastName ||
-                    "Not provided"}
+                  {user.lastName || "Not provided"}
                 </div>
               )}
-
             </div>
 
             {/* Email */}
             <div className="col-12 col-md-6">
-
-              <label
-                htmlFor="email"
-                className="form-label fw-semibold"
-              >
+              <label htmlFor="email" className="form-label fw-semibold">
                 Email
               </label>
 
@@ -214,19 +189,12 @@ const MeSection = ({
                 readOnly
               />
 
-              <div className="form-text">
-                Email cannot be changed here.
-              </div>
-
+              <div className="form-text">Email cannot be changed here.</div>
             </div>
 
             {/* Location */}
             <div className="col-12 col-md-6">
-
-              <label
-                htmlFor="location"
-                className="form-label fw-semibold"
-              >
+              <label htmlFor="location" className="form-label fw-semibold">
                 Location
               </label>
 
@@ -238,27 +206,34 @@ const MeSection = ({
                   placeholder="For example: Tashkent, Uzbekistan"
                   value={formValues.location}
                   onChange={(event) =>
-                    handleChange(
-                      "location",
-                      event.target.value,
-                    )
+                    handleChange("location", event.target.value)
                   }
                   disabled={isSaving}
                 />
               ) : (
                 <div className="profile-value">
-                  {user.location ||
-                    "Not provided"}
+                  {user.location || "Not provided"}
                 </div>
               )}
-
             </div>
+
+            {/* Profile image */}
+            {isEditing && (
+              <div className="col-12">
+                <label className="form-label fw-semibold">Profile image</label>
+
+                <ImageField
+                  value={formValues.imageUrl ?? ""}
+                  attributeId={IMAGE_ATTRIBUTE_ID}
+                  onChange={(value) => handleChange("imageUrl", value)}
+                />
+              </div>
+            )}
           </div>
 
           {/* Actions */}
           {isEditing && (
             <div className="border-top mt-4 pt-4 d-flex flex-column flex-sm-row justify-content-end gap-2">
-
               <button
                 type="button"
                 className="btn btn-outline-secondary"
@@ -280,7 +255,6 @@ const MeSection = ({
                       className="spinner-border spinner-border-sm me-2"
                       aria-hidden="true"
                     />
-
                     Saving...
                   </>
                 ) : (
@@ -290,10 +264,8 @@ const MeSection = ({
                   </>
                 )}
               </button>
-
             </div>
           )}
-
         </div>
       </div>
     </section>
