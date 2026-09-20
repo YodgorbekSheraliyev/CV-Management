@@ -34,7 +34,7 @@ const ProfilePage = () => {
     }
 
     try {
-      const updatedUser = await updateUser(user.id, data);
+      const updatedUser = await updateUser(data);
       setToast({
         message: t("profilePage.success.changesSaved"),
         type: "success",

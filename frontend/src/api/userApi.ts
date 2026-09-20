@@ -14,9 +14,9 @@ export const getUser = async (userId: number): Promise<User> => {
   return response.data;
 };
 
-export const updateUser = async (userId: number, updateUser: UpdateUser) => {
+export const updateUser = async (updateUser: UpdateUser) => {
   const { data: response } = await api.put<CommonResponse<User>>(
-    `/user/${userId}`,
+    `/user`,
     updateUser,
   );
   return response.data;
