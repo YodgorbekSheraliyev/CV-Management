@@ -1,6 +1,7 @@
 ﻿using backend.Dtos;
 using backend.Dtos.Position;
 using backend.Exceptions;
+using backend.Extensions;
 using backend.Localization;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,10 +16,13 @@ namespace backend.Controllers
     public class PositionsController : ControllerBase
     {
         private readonly PositionService _positionService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
+        private int CurrentUserId => User.GetUserId(_localizer);
 
-        public PositionsController(PositionService positionService)
+        public PositionsController(PositionService positionService, IStringLocalizer<SharedResource> localizer)
         {
             _positionService = positionService;
+            _localizer = localizer;
         }
 
         [HttpGet("all")]
@@ -28,27 +32,27 @@ namespace backend.Controllers
             return Ok(CommonResponse<List<PositionSummaryDto>>.Ok(result));
         }
 
-        [HttpGet("{positionId:int}/{userId:int}")]
+        [HttpGet("{positionId:int}")]
         [Authorize(Roles = "Recruiter,Administrator,Candidate")]
-        public async Task<IActionResult> GetById(int positionId, int userId)
+        public async Task<IActionResult> GetById(int positionId)
         {
-            var result = await _positionService.GetById(positionId, userId);
+            var result = await _positionService.GetById(positionId, CurrentUserId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 
         [Authorize(Roles = "Recruiter,Administrator")]
-        [HttpPost("{userId:int}")]
-        public async Task<IActionResult> Create(CreatePositionDto dto, int userId)
+        [HttpPost]
+        public async Task<IActionResult> Create(CreatePositionDto dto)
         {
-            var result = await _positionService.Create(dto, userId);
-            return CreatedAtAction(nameof(GetById), new { PositionId = result.Id, UserId = userId }, CommonResponse<PositionDto>.Ok(result));
+            var result = await _positionService.Create(dto, CurrentUserId);
+            return CreatedAtAction(nameof(GetById), new { PositionId = result.Id, UserId = CurrentUserId }, CommonResponse<PositionDto>.Ok(result));
         }
 
         [Authorize(Roles = "Recruiter,Administrator")]
-        [HttpPut("{userId:int}")]
-        public async Task<IActionResult> Update(UpdatePositionDto dto, int userId)
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdatePositionDto dto)
         {
-            var result = await _positionService.Update(dto, userId);
+            var result = await _positionService.Update(dto, CurrentUserId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 
@@ -60,10 +64,10 @@ namespace backend.Controllers
             return NoContent();
         }
         [Authorize(Roles = "Recruiter,Administrator")]
-        [HttpPost("{positionId}/duplicate/{userId}")]
-        public async Task<IActionResult> Duplicate(int positionId, int userId)
+        [HttpPost("{positionId}/duplicate")]
+        public async Task<IActionResult> Duplicate(int positionId)
         {
-            var result = await _positionService.Duplicate(positionId, userId);
+            var result = await _positionService.Duplicate(positionId, CurrentUserId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 

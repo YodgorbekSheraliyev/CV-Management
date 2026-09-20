@@ -58,7 +58,7 @@ const PositionPage = () => {
     setLoading(true);
 
     try {
-      const res = await getPositionById(positionId, user!.id);
+      const res = await getPositionById(positionId);
       setPosition(res);
     } catch (error: any) {
       setToast({
@@ -109,7 +109,7 @@ const PositionPage = () => {
     setDuplicating(true);
 
     try {
-      const duplicatedPosition = await duplicatePosition(position.id, user.id);
+      const duplicatedPosition = await duplicatePosition(position.id);
 
       setToast({
         message: t("positionPage.positionDuplicated"),

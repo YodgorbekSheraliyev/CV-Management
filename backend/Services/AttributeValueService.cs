@@ -141,8 +141,6 @@ namespace backend.Services
                     {
                         throw new InvalidDataException(_localizer["PeriodEndBeforeStart"]);
                     }
-
-
                     valueToStore = JsonSerializer.Serialize(new { start = updateAttributeValueDto.Value, end = updateAttributeValueDto.PeriodEnd });
                 }
 

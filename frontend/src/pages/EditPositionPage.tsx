@@ -62,7 +62,7 @@ const EditPositionPage = () => {
 
     setLoadingPosition(true);
     try {
-      const position = await getPositionById(Number(id), user.id);
+      const position = await getPositionById(Number(id));
       setInitialValues(toFormValues(position));
       setPositionTitle(position.title);
     } catch (error: any) {
@@ -100,7 +100,7 @@ const EditPositionPage = () => {
     setSaving(true);
 
     try {
-      await updatePosition(valuesToUpdate, user.id);
+      await updatePosition(valuesToUpdate);
 
       navigate(`/positions/${id}`);
     } catch (error: any) {

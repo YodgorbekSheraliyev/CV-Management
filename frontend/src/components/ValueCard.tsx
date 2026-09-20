@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { AttributeType } from "../enums/enums";
 import type { AttributeValue, User } from "../models";
 
-import {
-  createAttributeValue,
-  updateAttributeValue,
-} from "../api/attributeValueApi";
+import { updateAttributeValue } from "../api/attributeValueApi";
 
 import AttributeIcon from "./icons/AttributeIcon";
 import ValueField from "./fields/ValueField";
@@ -19,7 +16,6 @@ interface ValueCardProps {
   onDelete: (attributeValue: AttributeValue) => void;
 }
 
-
 export default function ValueCard({
   attributeValue,
   user,
@@ -27,7 +23,9 @@ export default function ValueCard({
 }: ValueCardProps) {
   const initialValue = attributeValue.value;
   const [value, setValue] = useState(initialValue ?? "");
-  const [period, setPeriod] = useState<PeriodValue>(() => parsePeriod(initialValue));
+  const [period, setPeriod] = useState<PeriodValue>(() =>
+    parsePeriod(initialValue),
+  );
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,11 +62,7 @@ export default function ValueCard({
               value,
             };
 
-      if (attributeValue.id >= 0) {
-        await updateAttributeValue(attrib);
-      } else {
-        await createAttributeValue(attrib);
-      }
+      await updateAttributeValue(attrib);
 
       setEditing(false);
     } catch (err) {

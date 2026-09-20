@@ -35,11 +35,11 @@ namespace backend.Services
                 }).OrderBy(p => p.CreatedAt).ToListAsync();
         }
 
-        public async Task<PostDto> Create(CreatePostDto createPostDto)
+        public async Task<PostDto> Create(CreatePostDto createPostDto, int authorId)
         {
             var post = new Post
             {
-                AuthorId = createPostDto.AuthorId,
+                AuthorId = authorId,
                 AuthorName = createPostDto.AuthorName,
                 Content = createPostDto.Content,
                 PositionId = createPostDto.PositionId,

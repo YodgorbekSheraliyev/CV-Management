@@ -50,7 +50,7 @@ const CreatePositionPage = () => {
     setToast(null);
     setSaving(true);
     try {
-      await createPosition(values, user!.id);
+      await createPosition(values);
       navigate("/positions");
     } catch (err) {
       setToast({

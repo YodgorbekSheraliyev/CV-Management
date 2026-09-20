@@ -34,7 +34,7 @@ const PositionCvsPage = () => {
 
     try {
       const [positionResult, cvsResult] = await Promise.all([
-        getPositionById(positionId, user.id),
+        getPositionById(positionId),
         getPositionCvs(positionId),
       ]);
 

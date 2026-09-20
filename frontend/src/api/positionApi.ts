@@ -7,27 +7,24 @@ export const getPositions = async () => {
   return response.data;
 };
 
-export const getPositionById = async (positionId: number, userId: number) => {
+export const getPositionById = async (positionId: number) => {
   const { data: response } = await api.get<CommonResponse<Position>>(
-    `/positions/${positionId}/${userId}`,
+    `/positions/${positionId}`,
   );
   return response.data;
 };
 
-export const createPosition = async (
-  position: Omit<Position, "id">,
-  userId: number,
-) => {
+export const createPosition = async (position: Omit<Position, "id">) => {
   const { data: response } = await api.post<CommonResponse<Position>>(
-    `/positions/${userId}`,
+    `/positions`,
     position,
   );
   return response.data;
 };
 
-export const updatePosition = async (position: Position, userId: number) => {
+export const updatePosition = async (position: Position) => {
   const { data: response } = await api.put<CommonResponse<Position>>(
-    `/positions/${userId}`,
+    `/positions`,
     position,
   );
   return response.data;
@@ -37,15 +34,16 @@ export const deletePosition = async (position: Pick<Position, "id">) => {
   await api.delete<void>("/positions", { data: position });
 };
 
-export const duplicatePosition = async (positionId: number, userId: number) => {
+export const duplicatePosition = async (positionId: number) => {
   const { data: response } = await api.post<CommonResponse<Position>>(
-    `/positions/${positionId}/duplicate/${userId}`,
+    `/positions/${positionId}/duplicate`,
   );
   return response.data;
 };
 
 export const getPositionCvs = async (positionId: number) => {
-  const { data: response } =
-    await api.get<CommonResponse<CVSummary[]>>(`/positions/${positionId}/cvs`);
+  const { data: response } = await api.get<CommonResponse<CVSummary[]>>(
+    `/positions/${positionId}/cvs`,
+  );
   return response.data;
 };

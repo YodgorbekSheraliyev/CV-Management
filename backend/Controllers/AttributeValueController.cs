@@ -22,7 +22,7 @@ namespace backend.Controllers
             _attributeValueService = attributeValueService;
             _localizer = localizer;
         }
-        public int CurrentUserId => User.GetUserId(_localizer);
+        private int CurrentUserId => User.GetUserId(_localizer);
 
         [HttpGet]
         public async Task<IActionResult> GetAllForUserId()
