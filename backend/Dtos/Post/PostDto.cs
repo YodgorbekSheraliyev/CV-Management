@@ -22,5 +22,16 @@ namespace backend.Dtos.Post
         [Required(ErrorMessage = "PositionIdRequired")]
         public int PositionId { get; set; }
     }
+    public class UpdatePostDto : CreatePostDto
+    {
+        [Required(ErrorMessage = "IdRequired")]
+        public int Id { get; set; }
+    }
+
+    public class DeletePostDto
+    {
+        [Required(ErrorMessage = "IdRequired")]
+        public int Id { get; set; }
+    }
 
 }

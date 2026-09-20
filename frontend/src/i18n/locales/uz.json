@@ -197,6 +197,8 @@
     "duplicatePositionError": "Vakansiyani nusxalab bo'lmadi.",
     "applySuccess": "CV muvaffaqiyatli yaratildi.",
     "applyFailed": "Ushbu vakansiyaga ariza topshirib bo'lmadi.",
+    "postUpdateFailed": "Bu postni yangilab bo'lmadi.",
+    "postDeleteFailed": "Bu postni o'chirib bo'lmadi.",
 
     "accessRequirements": "Kirish talablari",
     "publicAccessDescription": "Bu vakansiya ochiq — ushbu qoidalar faqat ma'lumot uchun ko'rsatilgan.",

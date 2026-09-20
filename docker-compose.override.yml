@@ -38,6 +38,7 @@ services:
     environment:
       - VITE_API_URL=http://${SERVER_IP}:9080/api
       - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - VITE_API_STATIC_API=http://${SERVER_IP}:9080/uploads
     ports:
       - "5174:5173"
     depends_on:

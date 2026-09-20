@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SectionHeader from "../SectionHeader";
 import type { Project } from "../../models";
@@ -13,12 +13,27 @@ const ProjectsSection = () => {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Project | "new" | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Project | null>(null);
+  const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
     loadProjects();
   }, []);
+
+  useEffect(() => {
+    if (openMenu === null) return;
+
+    function closeMenu(event: MouseEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setOpenMenu(null);
+      }
+    }
+
+    document.addEventListener("mousedown", closeMenu);
+    return () => document.removeEventListener("mousedown", closeMenu);
+  }, [openMenu]);
 
   async function loadProjects() {
     setLoading(true);
@@ -136,23 +151,46 @@ const ProjectsSection = () => {
                     )}
                   </div>
 
-                  <div className="d-flex flex-md-column align-items-start gap-2 flex-shrink-0">
+                  <div ref={menuRef} className="dropdown flex-shrink-0">
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline-secondary"
-                      onClick={() => setEditing(project)}
+                      className="btn btn-sm btn-light border"
+                      aria-label={`${project.name} actions`}
+                      aria-expanded={openMenu === project.id}
+                      onClick={() =>
+                        setOpenMenu((current) =>
+                          current === project.id ? null : project.id,
+                        )
+                      }
                     >
-                      <i className="bi bi-pencil me-1" />
-                      {t("common.edit")}
+                      <i className="bi bi-three-dots-vertical" />
                     </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => setConfirmDelete(project)}
-                    >
-                      <i className="bi bi-trash me-1" />
-                      {t("common.delete")}
-                    </button>
+                    {openMenu === project.id && (
+                      <div className="dropdown-menu dropdown-menu-end show">
+                        <button
+                          type="button"
+                          className="dropdown-item"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            setEditing(project);
+                          }}
+                        >
+                          <i className="bi bi-pencil me-2" />
+                          {t("common.edit")}
+                        </button>
+                        <button
+                          type="button"
+                          className="dropdown-item text-danger"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            setConfirmDelete(project);
+                          }}
+                        >
+                          <i className="bi bi-trash me-2" />
+                          {t("common.delete")}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

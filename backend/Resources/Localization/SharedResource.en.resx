@@ -288,6 +288,12 @@
   <data name="PostContentRequired" xml:space="preserve">
     <value>Post content is required.</value>
   </data>
+  <data name="PostNotFound" xml:space="preserve">
+    <value>Post not found.</value>
+  </data>
+  <data name="NotYourPost" xml:space="preserve">
+    <value>This post does not belong to you.</value>
+  </data>
   <data name="TagNameRequired" xml:space="preserve">
     <value>Tag name is required.</value>
   </data>

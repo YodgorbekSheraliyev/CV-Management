@@ -197,6 +197,8 @@
     "duplicatePositionError": "Could not duplicate this position.",
     "applySuccess": "CV created successfully.",
     "applyFailed": "Could not apply to this position.",
+    "postUpdateFailed": "Could not update this post.",
+    "postDeleteFailed": "Could not delete this post.",
 
     "accessRequirements": "Access requirements",
     "publicAccessDescription": "This position is public — these rules are shown for reference only.",

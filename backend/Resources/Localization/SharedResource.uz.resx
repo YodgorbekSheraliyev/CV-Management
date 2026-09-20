@@ -288,6 +288,12 @@
   <data name="PostContentRequired" xml:space="preserve">
     <value>Post mazmuni kiritilishi shart.</value>
   </data>
+  <data name="PostNotFound" xml:space="preserve">
+    <value>Post topilmadi.</value>
+  </data>
+  <data name="NotYourPost" xml:space="preserve">
+    <value>Bu post sizga tegishli emas.</value>
+  </data>
   <data name="TagNameRequired" xml:space="preserve">
     <value>Teg nomi kiritilishi shart.</value>
   </data>

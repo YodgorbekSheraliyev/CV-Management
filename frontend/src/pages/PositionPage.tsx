@@ -12,7 +12,12 @@ import {
 import { createCv } from "../api/cvApi";
 import ToastNotification from "../components/notifications/ToastNotification";
 import { useTranslation } from "react-i18next";
-import { createPost, getAllPosts } from "../api/postApi";
+import {
+  createPost,
+  deletePost,
+  getAllPosts,
+  updatePost,
+} from "../api/postApi";
 
 const OPERATOR_SYMBOLS: Partial<Record<ComparisonType, string>> = {
   [ComparisonType.Equal]: "=",
@@ -40,6 +45,10 @@ const PositionPage = () => {
   const [duplicating, setDuplicating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<number | null>(null);
+  const [editingPostContent, setEditingPostContent] = useState("");
+  const [savingPost, setSavingPost] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [visiblePosts, setVisiblePosts] = useState(DISCUSSION_PAGE_SIZE);
   const [toast, setToast] = useState<{
@@ -166,6 +175,62 @@ const PositionPage = () => {
     } finally {
       setPost("");
       setPosting(false);
+    }
+  };
+
+  const startEditingPost = (postToEdit: Post) => {
+    setEditingPostId(postToEdit.id);
+    setEditingPostContent(postToEdit.content);
+  };
+
+  const cancelEditingPost = () => {
+    setEditingPostId(null);
+    setEditingPostContent("");
+  };
+
+  const savePost = async (postToUpdate: Post) => {
+    if (!editingPostContent.trim() || savingPost) return;
+
+    setSavingPost(true);
+    try {
+      const updatedPost = await updatePost({
+        ...postToUpdate,
+        content: editingPostContent.trim(),
+      });
+
+      setPosts(
+        (current) =>
+          current?.map((item) =>
+            item.id === updatedPost.id ? updatedPost : item,
+          ) ?? null,
+      );
+      cancelEditingPost();
+    } catch (error: any) {
+      setToast({
+        message: error.message ?? t("positionPage.postUpdateFailed"),
+        type: "danger",
+      });
+    } finally {
+      setSavingPost(false);
+    }
+  };
+
+  const removePost = async (postId: number) => {
+    if (deletingPostId !== null) return;
+
+    setDeletingPostId(postId);
+    try {
+      await deletePost(postId);
+      setPosts(
+        (current) => current?.filter((item) => item.id !== postId) ?? null,
+      );
+    } catch (error: any) {
+      setToast({
+        message: error.message ?? t("positionPage.postDeleteFailed"),
+        type: "danger",
+      });
+    } finally {
+      setDeletingPostId(null);
     }
   };
 
@@ -393,7 +458,9 @@ const PositionPage = () => {
                             </td>
                             <td>
                               <span className="badge text-bg-light border">
-                                {t(`attributeManagement.types.${AttributeType[rule.attribute.type]}`)}
+                                {t(
+                                  `attributeManagement.types.${AttributeType[rule.attribute.type]}`,
+                                )}
                               </span>
                             </td>
                             <td>
@@ -451,7 +518,9 @@ const PositionPage = () => {
 
                             <td>
                               <span className="badge text-bg-light border">
-                                {t(`attributeManagement.types.${AttributeType[attribute.type]}`)}
+                                {t(
+                                  `attributeManagement.types.${AttributeType[attribute.type]}`,
+                                )}
                               </span>
                             </td>
                           </tr>
@@ -557,18 +626,96 @@ const PositionPage = () => {
                                 {post.authorName}
                               </span>
 
-                              <span className="text-muted small text-end">
-                                {new Date(post?.createdAt).toLocaleString(
-                                  "en-GB",
-                                  {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  },
+                              <div className="d-flex align-items-center gap-2">
+                                <span className="text-muted small text-end">
+                                  {new Date(post?.createdAt).toLocaleString(
+                                    "en-GB",
+                                    {
+                                      day: "numeric",
+                                      month: "short",
+                                      year: "numeric",
+                                    },
+                                  )}
+                                </span>
+
+                                {user?.id === post.authorId && (
+                                  <div className="d-flex gap-1">
+                                    <button
+                                      type="button"
+                                      className="btn btn-sm btn-link text-secondary p-0"
+                                      onClick={() => startEditingPost(post)}
+                                      disabled={
+                                        savingPost || deletingPostId !== null
+                                      }
+                                      aria-label={t("common.edit")}
+                                    >
+                                      <i className="bi bi-pencil" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="btn btn-sm btn-link text-danger p-0"
+                                      onClick={() => removePost(post.id)}
+                                      disabled={
+                                        savingPost || deletingPostId !== null
+                                      }
+                                      aria-label={t("common.delete")}
+                                    >
+                                      {deletingPostId === post.id ? (
+                                        <span
+                                          className="spinner-border spinner-border-sm"
+                                          aria-hidden="true"
+                                        />
+                                      ) : (
+                                        <i className="bi bi-trash" />
+                                      )}
+                                    </button>
+                                  </div>
                                 )}
-                              </span>
+                              </div>
                             </div>
-                            <p className="text-muted mb-0">{post.content}</p>
+                            {editingPostId === post.id ? (
+                              <div>
+                                <textarea
+                                  className="form-control mb-2"
+                                  rows={3}
+                                  value={editingPostContent}
+                                  onChange={(event) =>
+                                    setEditingPostContent(event.target.value)
+                                  }
+                                  disabled={savingPost}
+                                  autoFocus
+                                />
+                                <div className="d-flex gap-2 justify-content-end">
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-secondary"
+                                    onClick={cancelEditingPost}
+                                    disabled={savingPost}
+                                  >
+                                    {t("common.cancel")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-primary"
+                                    onClick={() => savePost(post)}
+                                    disabled={
+                                      !editingPostContent.trim() || savingPost
+                                    }
+                                  >
+                                    {savingPost ? (
+                                      <span
+                                        className="spinner-border spinner-border-sm"
+                                        aria-hidden="true"
+                                      />
+                                    ) : (
+                                      t("common.save")
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-muted mb-0">{post.content}</p>
+                            )}
                           </div>
                         </div>
                       </div>

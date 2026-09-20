@@ -37,5 +37,19 @@ namespace backend.Controllers
             var post = await _postService.Create(createPostDto, CurrentUserId);
             return Ok(CommonResponse<PostDto>.Ok(post));
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdatePostDto updatePostDto)
+        {
+            var post = await _postService.Update(updatePostDto, CurrentUserId);
+            return Ok(CommonResponse<PostDto>.Ok(post));
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(DeletePostDto deletePostDto)
+        {
+            await _postService.Delete(deletePostDto, CurrentUserId);
+            return NoContent();
+        }
     }
 }
