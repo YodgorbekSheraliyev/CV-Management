@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Project, User } from "../models";
 import { createProject, updateProject } from "../api/projectApi";
 
@@ -15,6 +16,7 @@ function ProjectFormModal({
   onClose,
   onSaved,
 }: ProjectFormModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState(initial?.name ?? "");
   const [startDate, setStartDate] = useState(
     initial?.startDate?.slice(0, 10) ?? "",
@@ -32,7 +34,7 @@ function ProjectFormModal({
     setError(null);
 
     if (!name.trim() || !startDate) {
-      setError("Name and start date are required.");
+      setError(t("projectForm.nameAndStartRequired"));
       return;
     }
 
@@ -85,19 +87,19 @@ function ProjectFormModal({
           <form onSubmit={handleSubmit}>
             <div className="modal-header px-4 py-3">
               <h2 className="h5 fw-bold mb-0">
-                {initial ? "Edit project" : "Add project"}
+                {initial ? t("projectForm.editTitle") : t("projectForm.addTitle")}
               </h2>
               <button
                 type="button"
                 className="btn-close"
-                aria-label="Close"
+                aria-label={t("common.close")}
                 onClick={onClose}
               />
             </div>
 
             <div className="modal-body px-4">
               <div className="mb-3">
-                <label className="form-label small fw-semibold">Name</label>
+                <label className="form-label small fw-semibold">{t("projectForm.name")}</label>
                 <input
                   className="form-control"
                   value={name}
@@ -109,7 +111,7 @@ function ProjectFormModal({
               <div className="row g-2 mb-3">
                 <div className="col-6">
                   <label className="form-label small fw-semibold">
-                    Start date
+                    {t("projectForm.startDate")}
                   </label>
                   <input
                     type="date"
@@ -120,7 +122,7 @@ function ProjectFormModal({
                 </div>
                 <div className="col-6">
                   <label className="form-label small fw-semibold">
-                    End date
+                    {t("projectForm.endDate")}
                   </label>
                   <input
                     type="date"
@@ -133,7 +135,7 @@ function ProjectFormModal({
 
               <div className="mb-3">
                 <label className="form-label small fw-semibold">
-                  Description
+                    {t("projectForm.description")}
                 </label>
                 <textarea
                   className="form-control"
@@ -145,15 +147,15 @@ function ProjectFormModal({
 
               <div className="mb-2">
                 <label className="form-label small fw-semibold">
-                  Technology tags
+                    {t("projectForm.technologyTags")}
                 </label>
                 <input
                   className="form-control"
                   value={tagsInput}
                   onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="React, TypeScript, PostgreSQL"
+                  placeholder={t("projectForm.tagsPlaceholder")}
                 />
-                <div className="form-text">Comma-separated.</div>
+                <div className="form-text">{t("projectForm.commaSeparated")}</div>
               </div>
 
               {error && (
@@ -173,14 +175,14 @@ function ProjectFormModal({
                 onClick={onClose}
                 disabled={saving}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
                 disabled={saving}
               >
-                {saving ? "Saving…" : "Save"}
+                {saving ? t("projectForm.saving") : t("common.save")}
               </button>
             </div>
           </form>

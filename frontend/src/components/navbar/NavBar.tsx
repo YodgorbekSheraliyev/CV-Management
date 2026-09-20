@@ -25,7 +25,7 @@ const NavBar = () => {
           data-bs-target="#mainNavbar"
           aria-controls="mainNavbar"
           aria-expanded="false"
-          aria-label="Toggle navigation"
+          aria-label={t("common.toggleNavigation")}
         >
           <span className="navbar-toggler-icon" />
         </button>

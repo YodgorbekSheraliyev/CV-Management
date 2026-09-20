@@ -13,7 +13,59 @@
     "cancel": "Bekor qilish",
     "delete": "O'chirish",
     "edit": "Tahrirlash",
-    "loading": "Yuklanmoqda..."
+    "loading": "Yuklanmoqda...",
+    "home": "Bosh sahifa",
+    "positions": "Vakansiyalar",
+    "profile": "Profil",
+    "back": "Orqaga",
+    "close": "Yopish",
+    "attribute": "Atribut",
+    "operator": "Operator",
+    "value": "Qiymat",
+    "remove": "O'chirish",
+    "removeAccessRule": "Kirish qoidasini o'chirish",
+    "dismiss": "Yopish",
+    "toggleNavigation": "Navigatsiyani almashtirish",
+    "breadcrumb": "yo'nalishlar satri",
+    "serverUnavailable": "Server mavjud emas. Iltimos, ulanishni tekshiring yoki keyinroq qayta urinib ko'ring."
+  },
+  "ruleValue": {
+    "numericPlaceholder": "masalan, 7.0",
+    "checked": "Belgilangan",
+    "notChecked": "Belgilanmagan",
+    "select": "Tanlang...",
+    "periodValue": "Davr qiymati"
+  },
+  "attributeSelector": {
+    "search": "Atributlarni qidirish...",
+    "noMatching": "Mos atributlar topilmadi."
+  },
+  "markdownField": {
+    "supportsMarkdown": "Markdown formatlash qo'llab-quvvatlanadi."
+  },
+  "valueField": {
+    "enterValue": "Qiymat kiriting...",
+    "shortText": "Qisqa matn qiymatini kiriting.",
+    "numericValue": "Son qiymatini kiriting.",
+    "startDate": "Boshlanish sanasi",
+    "endDate": "Tugash sanasi",
+    "ongoingPeriod": "Davom etayotgan davr uchun tugash sanasini bo'sh qoldiring.",
+    "selectValue": "Qiymatni tanlang...",
+    "yes": "Ha",
+    "no": "Yo'q"
+  },
+  "projectForm": {
+    "editTitle": "Loyihani tahrirlash",
+    "addTitle": "Loyiha qo'shish",
+    "name": "Nom",
+    "startDate": "Boshlanish sanasi",
+    "endDate": "Tugash sanasi",
+    "description": "Tavsif",
+    "technologyTags": "Texnologiya teglari",
+    "tagsPlaceholder": "React, TypeScript, PostgreSQL",
+    "commaSeparated": "Vergul bilan ajrating.",
+    "nameAndStartRequired": "Nom va boshlanish sanasi kiritilishi shart.",
+    "saving": "Saqlanmoqda..."
   },
   "mainPage": {
     "recruitmentPlatform": "Ishga joylashish platformasi",
@@ -70,6 +122,10 @@
     "duplicate": "Nusxalash",
     "duplicating": "Nusxalanmoqda…",
     "delete": "O'chirish",
+    "positionDuplicated": "Vakansiya muvaffaqiyatli nusxalandi.",
+    "duplicatePositionError": "Vakansiyani nusxalab bo'lmadi.",
+    "applySuccess": "CV muvaffaqiyatli yaratildi.",
+    "applyFailed": "Ushbu vakansiyaga ariza topshirib bo'lmadi.",
 
     "accessRequirements": "Kirish talablari",
     "publicAccessDescription": "Bu vakansiya ochiq — ushbu qoidalar faqat ma'lumot uchun ko'rsatilgan.",
@@ -111,7 +167,6 @@
 
     "positionInformation": "Vakansiya ma'lumotlari",
     "visibility": "Ko'rinish",
-    "submittedCvs": "Yuborilgan CV lar",
     "maxProjectsInCv": "CV dagi maksimal loyihalar",
 
     "submittedCvsTitle": "Yuborilgan CV lar",
@@ -229,6 +284,77 @@
       "cancel": "Bekor qilish",
       "saving": "Saqlanmoqda...",
       "create": "Atribut yaratish",
+    "attributePicker": {
+      "addAttribute": "Atribut qo'shish",
+      "description": "Kutubxonadan atribut tanlang.",
+      "search": "Atributlarni qidirish...",
+      "all": "Barchasi",
+      "recentlyUsed": "Yaqinda ishlatilgan",
+      "matching": "Mos atributlar",
+      "allAttributes": "Barcha atributlar",
+      "noAttributes": "Atributlar topilmadi",
+      "tryAnother": "Boshqa qidiruv yoki kategoriyani sinab ko'ring."
+    },
+    "cvsSection": {
+      "title": "CVlar",
+      "description": "Sizga mos lavozimlar uchun yaratilgan CVlaringiz.",
+      "browsePositions": "Vakansiyalarni ko'rish",
+      "loadFailed": "CVlaringizni yuklab bo'lmadi.",
+      "published": "E'lon qilingan",
+      "draft": "Qoralama",
+      "loading": "CVlaringiz yuklanmoqda...",
+      "status": "Holat",
+      "likes": "Yoqtirishlar",
+      "cv": "CV",
+      "untitledPosition": "Nomsiz lavozim",
+      "open": "Ochish",
+      "positionSpecificTitle": "CVlar lavozimga xos",
+      "positionSpecificDescription": "Har bir lavozim uchun ko'pi bilan bitta CVga ega bo'lishingiz mumkin. Yangi CVlarni siz uchun ochiq lavozimlardan yarating.",
+      "noCvs": "Hali CVlar mavjud emas",
+      "noCvsDescription": "Mavjud lavozimlarni ko'ring va sizga mos lavozim uchun CV yarating."
+    },
+    "infoSection": {
+      "title": "Ma'lumot",
+      "description": "Atributlar kutubxonasidan qo'shimcha ma'lumotlar.",
+      "addAttribute": "Atribut qo'shish",
+      "loadAttributesFailed": "Atributlarni yuklab bo'lmadi.",
+      "loadValuesFailed": "Atribut qiymatlarini yuklab bo'lmadi.",
+      "alreadyAdded": "\"{{name}}\" allaqachon qo'shilgan.",
+      "alreadyAdding": "\"{{name}}\" allaqachon qo'shilmoqda.",
+      "deleteFailed": "Atributni o'chirib bo'lmadi.",
+      "noInfo": "Hali qo'shimcha ma'lumot yo'q",
+      "noInfoDescription": "Profilingizni boyitish uchun ko'nikmalar, havolalar yoki sanalar kabi atributlarni qo'shing."
+    },
+    "meSection": {
+      "title": "Shaxsiy ma'lumotlar",
+      "description": "Profilingiz va CVlaringizda ishlatiladigan asosiy shaxsiy ma'lumotlar.",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "email": "Email",
+      "emailReadOnly": "Emailni bu yerda o'zgartirib bo'lmaydi.",
+      "location": "Manzil",
+      "locationPlaceholder": "Masalan: Toshkent, O'zbekiston",
+      "profileImage": "Profil rasmi",
+      "notProvided": "Kiritilmagan",
+      "firstNameRequired": "Ism kiritilishi shart.",
+      "lastNameRequired": "Familiya kiritilishi shart.",
+      "saveFailed": "Ma'lumotlaringizni saqlab bo'lmadi. Qayta urinib ko'ring.",
+      "saving": "Saqlanmoqda...",
+      "saveChanges": "O'zgarishlarni saqlash"
+    },
+    "projectsSection": {
+      "title": "Loyihalar",
+      "description": "Tajribangiz va bajargan ishlaringizni namoyish eting.",
+      "addProject": "Loyiha qo'shish",
+      "loadFailed": "Loyihalaringizni yuklab bo'lmadi.",
+      "deleteFailed": "Loyihani o'chirib bo'lmadi.",
+      "loading": "Loyihalaringiz yuklanmoqda...",
+      "emptyTitle": "Loyiha portfelingizni yarating",
+      "emptyDescription": "Rekruterlar tajribangizni yaxshiroq tushunishi uchun loyihalar qo'shing.",
+      "deleteTitle": "Ushbu loyiha o'chirilsinmi?",
+      "deleteDescription": "\"{{name}}\" profilingizdan butunlay o'chiriladi. Bu amalni bekor qilib bo'lmaydi.",
+      "deleting": "O'chirilmoqda..."
+    },
       "saveChanges": "O‘zgarishlarni saqlash"
     },
 
@@ -534,6 +660,9 @@
     }
   },
   "imageField": {
+    "invalidType": "Iltimos, rasm faylini tanlang.",
+    "uploadFailed": "Rasmni yuklab bo'lmadi.",
+    "uploading": "Yuklanmoqda...",
     "selected": "Tanlangan",
     "preview": "Ko‘rib chiqish",
     "remove": "O‘chirish",

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "../SectionHeader";
 import AttributePickerModal from "../AttributePickerModal";
 // import AttributeRow from "../AttributeRow";
@@ -17,6 +18,7 @@ interface InfoSectionProps {
 }
 
 const InfoSection = ({ user }: InfoSectionProps) => {
+  const { t } = useTranslation();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [attributeValues, setAttributeValues] = useState<AttributeValue[]>([]);
   const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
@@ -32,7 +34,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       setAttributes(res.filter((x) => x.isBuiltIn !== true));
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not load attributes.",
+        message: err.message ?? t("infoSection.loadAttributesFailed"),
         type: "danger",
       });
     }
@@ -44,7 +46,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       setAttributeValues(res.filter((x) => !x.attribute.isBuiltIn));
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not load attribute values.",
+        message: err.message ?? t("infoSection.loadValuesFailed"),
         type: "danger",
       });
     }
@@ -57,7 +59,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
 
     if (alreadyExists) {
       setToast({
-        message: `"${attribute.name}" has already been added.`,
+        message: t("infoSection.alreadyAdded", { name: attribute.name }),
         type: "danger",
       });
       return;
@@ -69,7 +71,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
 
     if (alreadySelected) {
       setToast({
-        message: `"${attribute.name}" is already being added.`,
+        message: t("infoSection.alreadyAdding", { name: attribute.name }),
         type: "danger",
       });
       return;
@@ -96,7 +98,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       await loadAttributeValues();
     } catch (err: any) {
       setToast({
-        message: err.message ?? "Could not delete attribute.",
+        message: err.message ?? t("infoSection.deleteFailed"),
         type: "danger",
       });
     }
@@ -114,9 +116,9 @@ const InfoSection = ({ user }: InfoSectionProps) => {
   return (
     <section>
       <SectionHeader
-        title="Info"
-        description="Additional information from the Attribute Library."
-        buttonText="Add attribute"
+        title={t("infoSection.title")}
+        description={t("infoSection.description")}
+        buttonText={t("infoSection.addAttribute")}
         onClick={() => setIsAttributeModalOpen(true)}
       />
 
@@ -124,10 +126,9 @@ const InfoSection = ({ user }: InfoSectionProps) => {
         {attributeValues.length === 0 ? (
           <div className="card-body text-center py-5">
             <i className="bi bi-collection fs-2 text-muted d-block mb-2" />
-            <p className="fw-semibold mb-1">No additional info yet</p>
+            <p className="fw-semibold mb-1">{t("infoSection.noInfo")}</p>
             <p className="text-muted small mb-3">
-              Add attributes like skills, links, or dates to enrich your
-              profile.
+              {t("infoSection.noInfoDescription")}
             </p>
             <button
               type="button"
@@ -135,7 +136,7 @@ const InfoSection = ({ user }: InfoSectionProps) => {
               onClick={() => setIsAttributeModalOpen(true)}
             >
               <i className="bi bi-plus-lg me-1" />
-              Add attribute
+              {t("infoSection.addAttribute")}
             </button>
           </div>
         ) : (

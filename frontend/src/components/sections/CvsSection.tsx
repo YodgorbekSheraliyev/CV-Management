@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import SectionHeader from "../SectionHeader";
 
@@ -8,6 +9,7 @@ import { CVStatus } from "../../enums/enums";
 import { getCvsByCurrentUser } from "../../api/cvApi";
 
 const CvsSection = () => {
+  const { t } = useTranslation();
   const [cvs, setCvs] = useState<CVSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,7 @@ const CvsSection = () => {
       const result = await getCvsByCurrentUser();
       setCvs(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't load your CVs.");
+      setError(err instanceof Error ? err.message : t("cvsSection.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -32,18 +34,18 @@ const CvsSection = () => {
 
   const getStatusBadge = (status: CVStatus) => {
     if (status === CVStatus.Published) {
-      return <span className="badge text-bg-success">Published</span>;
+      return <span className="badge text-bg-success">{t("cvsSection.published")}</span>;
     }
 
-    return <span className="badge text-bg-warning">Draft</span>;
+    return <span className="badge text-bg-warning">{t("cvsSection.draft")}</span>;
   };
 
   return (
     <section>
       <SectionHeader
-        title="CVs"
-        description="Your CVs created for positions you are eligible for."
-        buttonText="Browse positions"
+        title={t("cvsSection.title")}
+        description={t("cvsSection.description")}
+        buttonText={t("cvsSection.browsePositions")}
         onClick={() => {
           window.location.href = "/positions";
         }}
@@ -64,7 +66,7 @@ const CvsSection = () => {
               aria-hidden="true"
             />
 
-            <div className="text-muted small">Loading your CVs…</div>
+            <div className="text-muted small">{t("cvsSection.loading")}</div>
           </div>
         </div>
       ) : cvs.length === 0 ? (
@@ -75,13 +77,13 @@ const CvsSection = () => {
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
                 <tr>
-                  <th className="px-4 py-3">Position</th>
+                  <th className="px-4 py-3">{t("common.positions")}</th>
 
-                  <th className="py-3">Status</th>
+                  <th className="py-3">{t("cvsSection.status")}</th>
 
-                  <th className="py-3">Likes</th>
+                  <th className="py-3">{t("cvsSection.likes")}</th>
 
-                  <th className="py-3">CV</th>
+                  <th className="py-3">{t("cvsSection.cv")}</th>
                 </tr>
               </thead>
 
@@ -106,7 +108,7 @@ const CvsSection = () => {
 
                           <div>
                             <div className="fw-semibold text-dark">
-                              {cv.positionTitle ?? "Untitled position"}
+                              {cv.positionTitle ?? t("cvsSection.untitledPosition")}
                             </div>
 
                             <div className="small text-muted">CV #{cv.id}</div>
@@ -126,7 +128,7 @@ const CvsSection = () => {
                         to={`/cvs/${cv.id}`}
                         className="text-decoration-none fw-semibold"
                       >
-                        Open →
+                        {t("cvsSection.open")} →
                       </Link>
                     </td>
                   </tr>
@@ -142,11 +144,10 @@ const CvsSection = () => {
           <span className="fs-5">ℹ</span>
 
           <div>
-            <div className="fw-semibold mb-1">CVs are position-specific</div>
+            <div className="fw-semibold mb-1">{t("cvsSection.positionSpecificTitle")}</div>
 
             <div className="small text-muted">
-              You can have at most one CV for each position. Create new CVs from
-              positions that are accessible to you.
+              {t("cvsSection.positionSpecificDescription")}
             </div>
           </div>
         </div>
@@ -156,6 +157,7 @@ const CvsSection = () => {
 };
 
 const EmptyCvs = () => {
+  const { t } = useTranslation();
   return (
     <div className="card border-0 shadow-sm">
       <div className="card-body text-center py-5">
@@ -169,15 +171,14 @@ const EmptyCvs = () => {
           <span className="fw-bold fs-5">CV</span>
         </div>
 
-        <h3 className="h6 fw-bold">No CVs yet</h3>
+        <h3 className="h6 fw-bold">{t("cvsSection.noCvs")}</h3>
 
         <p className="text-muted small mb-3">
-          Browse available positions and create a tailored CV for a position
-          you're eligible for.
+          {t("cvsSection.noCvsDescription")}
         </p>
 
         <Link to="/positions" className="btn btn-primary">
-          Browse positions
+          {t("cvsSection.browsePositions")}
         </Link>
       </div>
     </div>

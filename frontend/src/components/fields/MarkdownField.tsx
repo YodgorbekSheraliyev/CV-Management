@@ -12,6 +12,7 @@ import {
 } from "@mdxeditor/editor";
 
 import "@mdxeditor/editor/style.css";
+import { useTranslation } from "react-i18next";
 
 interface MarkdownFieldProps {
   value: string;
@@ -19,6 +20,8 @@ interface MarkdownFieldProps {
 }
 
 function MarkdownField({ value, onChange }: MarkdownFieldProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="value-field">
       <MDXEditor
@@ -47,7 +50,7 @@ function MarkdownField({ value, onChange }: MarkdownFieldProps) {
         contentEditableClassName="markdown-editor"
       />
 
-      <div className="form-text">Supports Markdown formatting.</div>
+      <div className="form-text">{t("markdownField.supportsMarkdown")}</div>
     </div>
   );
 }

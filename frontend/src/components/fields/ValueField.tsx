@@ -3,6 +3,7 @@ import type { Attribute } from "../../models";
 import CalendarIcon from "../icons/CalendarIcon";
 import ImageField from "./ImageField";
 import MarkdownField from "./MarkdownField";
+import { useTranslation } from "react-i18next";
 
 export interface PeriodValue {
   start: string;
@@ -24,6 +25,8 @@ function ValueField({
   period,
   onPeriodChange,
 }: ValueFieldProps) {
+  const { t } = useTranslation();
+
   switch (attribute.type) {
     /*
      * STRING
@@ -36,11 +39,11 @@ function ValueField({
             className="form-control form-control-lg"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Enter a value..."
+            placeholder={t("valueField.enterValue")}
             autoFocus
           />
 
-          <div className="form-text">Enter a short text value.</div>
+          <div className="form-text">{t("valueField.shortText")}</div>
         </div>
       );
 
@@ -82,7 +85,7 @@ function ValueField({
             />
           </div>
 
-          <div className="form-text">Enter a numeric value.</div>
+          <div className="form-text">{t("valueField.numericValue")}</div>
         </div>
       );
 
@@ -117,7 +120,7 @@ function ValueField({
           <div className="row g-2 align-items-end">
             <div className="col-12 col-sm-5">
               <label className="form-label small fw-semibold text-muted mb-1">
-                Start date
+                {t("valueField.startDate")}
               </label>
               <input
                 type="date"
@@ -136,7 +139,7 @@ function ValueField({
 
             <div className="col-12 col-sm-5">
               <label className="form-label small fw-semibold text-muted mb-1">
-                End date
+                {t("valueField.endDate")}
               </label>
               <input
                 type="date"
@@ -151,7 +154,7 @@ function ValueField({
           </div>
 
           <div className="form-text mt-2">
-            Leave the end date empty for an ongoing period.
+            {t("valueField.ongoingPeriod")}
           </div>
         </div>
       );
@@ -174,7 +177,7 @@ function ValueField({
             />
 
             <label className="form-check-label" htmlFor="boolean-value">
-              {checked ? "Yes" : "No"}
+              {checked ? t("valueField.yes") : t("valueField.no")}
             </label>
           </div>
 
@@ -196,7 +199,7 @@ function ValueField({
             onChange={(e) => onChange(e.target.value)}
             autoFocus
           >
-            <option value="">Select a value...</option>
+            <option value="">{t("valueField.selectValue")}</option>
 
             {attribute.options.map((option) => (
               <option key={option} value={option}>

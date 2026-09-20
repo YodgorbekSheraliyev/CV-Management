@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Attribute } from "../models";
 import { AttributeCategory } from "../enums/enums";
-import { ATTRIBUTE_TYPE_LABELS, CATEGORY_LABELS } from "../constants";
+import { AttributeType } from "../enums/enums";
 
 interface AttributePickerModalProps {
   attributes: Attribute[];
@@ -16,6 +17,7 @@ export default function AttributePickerModal({
   onSelect,
   onClose,
 }: AttributePickerModalProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<AttributeCategory | "all"
   >("all");
@@ -78,18 +80,18 @@ export default function AttributePickerModal({
           <div className="modal-header px-4 py-3">
             <div>
               <h2 className="h5 fw-bold mb-1">
-                Add attribute
+                {t("attributePicker.addAttribute")}
               </h2>
 
               <p className="text-muted small mb-0">
-                Choose an attribute from the library.
+                {t("attributePicker.description")}
               </p>
             </div>
 
             <button
               type="button"
               className="btn-close"
-              aria-label="Close"
+              aria-label={t("common.close")}
               onClick={onClose}
             />
           </div>
@@ -104,7 +106,7 @@ export default function AttributePickerModal({
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search attributes..."
+                placeholder={t("attributePicker.search")}
                 value={search}
                 onChange={(event) =>
                   setSearch(event.target.value)
@@ -126,7 +128,7 @@ export default function AttributePickerModal({
                 }`}
                 onClick={() => setCategory("all")}
               >
-                All
+                {t("attributePicker.all")}
               </button>
 
               {categories.map((item) => (
@@ -140,7 +142,7 @@ export default function AttributePickerModal({
                   }`}
                   onClick={() => setCategory(item)}
                 >
-                  {CATEGORY_LABELS[item]}
+                  {t(`attributeManagement.categories.${AttributeCategory[item]}`)}
                 </button>
               ))}
             </div>
@@ -159,7 +161,7 @@ export default function AttributePickerModal({
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <h3 className="small fw-bold mb-0">
-                    Recently used
+                    {t("attributePicker.recentlyUsed")}
                   </h3>
 
                   <span className="text-muted small">
@@ -185,11 +187,7 @@ export default function AttributePickerModal({
                         </div>
 
                         <div className="text-muted small mt-1">
-                          {
-                            CATEGORY_LABELS[
-                              attribute.category
-                            ]
-                          }
+                          {t(`attributeManagement.categories.${AttributeCategory[attribute.category]}`)}
                         </div>
                       </button>
                     </div>
@@ -202,8 +200,8 @@ export default function AttributePickerModal({
             <div>
               <h3 className="small fw-bold mb-2">
                 {search || category !== "all"
-                  ? "Matching attributes"
-                  : "All attributes"}
+                  ? t("attributePicker.matching")
+                  : t("attributePicker.allAttributes")}
               </h3>
 
               {filteredAttributes.length === 0 ? (
@@ -211,11 +209,11 @@ export default function AttributePickerModal({
                   <div className="fs-2 mb-2">⌕</div>
 
                   <p className="fw-semibold mb-1">
-                    No attributes found
+                    {t("attributePicker.noAttributes")}
                   </p>
 
                   <p className="text-muted small mb-0">
-                    Try another search or category.
+                    {t("attributePicker.tryAnother")}
                   </p>
                 </div>
               ) : (
@@ -234,9 +232,7 @@ export default function AttributePickerModal({
                           </div>
 
                           <div className="text-muted small mt-1">
-                            {CATEGORY_LABELS[
-                              attribute.category
-                            ]}
+                            {t(`attributeManagement.categories.${AttributeCategory[attribute.category]}`)}
                           </div>
 
                           {attribute?.description && (
@@ -247,11 +243,7 @@ export default function AttributePickerModal({
                         </div>
 
                         <span className="badge bg-light text-dark">
-                          {
-                            ATTRIBUTE_TYPE_LABELS[
-                              attribute.type
-                            ]
-                          }
+                          {t(`attributeManagement.types.${AttributeType[attribute.type]}`)}
                         </span>
                       </div>
                     </button>
@@ -268,7 +260,7 @@ export default function AttributePickerModal({
               className="btn btn-light"
               onClick={onClose}
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           </div>
         </div>

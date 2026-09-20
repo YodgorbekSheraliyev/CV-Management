@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { User } from "../../models";
 import SectionHeader from "../SectionHeader";
@@ -24,6 +25,7 @@ interface FormValues {
 const IMAGE_ATTRIBUTE_ID = 4;
 
 const MeSection = ({ user, onSave }: MeSectionProps) => {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -79,12 +81,12 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
 
   const handleSave = async () => {
     if (!formValues.firstName.trim()) {
-      setError("First name is required.");
+      setError(t("meSection.firstNameRequired"));
       return;
     }
 
     if (!formValues.lastName.trim()) {
-      setError("Last name is required.");
+      setError(t("meSection.lastNameRequired"));
       return;
     }
 
@@ -101,7 +103,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
 
       setIsEditing(false);
     } catch {
-      setError("Could not save your information. Please try again.");
+      setError(t("meSection.saveFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -110,9 +112,9 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
   return (
     <section>
       <SectionHeader
-        title="Personal information"
-        description="Your basic personal details used across your profile and CVs."
-        buttonText={isEditing ? undefined : "Edit"}
+        title={t("meSection.title")}
+        description={t("meSection.description")}
+        buttonText={isEditing ? undefined : t("common.edit")}
         onClick={isEditing ? undefined : handleEdit}
       />
 
@@ -129,7 +131,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
             {/* First name */}
             <div className="col-12 col-md-6">
               <label htmlFor="firstName" className="form-label fw-semibold">
-                First name
+                {t("meSection.firstName")}
               </label>
 
               {isEditing ? (
@@ -145,7 +147,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                 />
               ) : (
                 <div className="profile-value">
-                  {user.firstName || "Not provided"}
+                  {user.firstName || t("meSection.notProvided")}
                 </div>
               )}
             </div>
@@ -153,7 +155,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
             {/* Last name */}
             <div className="col-12 col-md-6">
               <label htmlFor="lastName" className="form-label fw-semibold">
-                Last name
+                {t("meSection.lastName")}
               </label>
 
               {isEditing ? (
@@ -169,7 +171,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                 />
               ) : (
                 <div className="profile-value">
-                  {user.lastName || "Not provided"}
+                  {user.lastName || t("meSection.notProvided")}
                 </div>
               )}
             </div>
@@ -177,7 +179,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
             {/* Email */}
             <div className="col-12 col-md-6">
               <label htmlFor="email" className="form-label fw-semibold">
-                Email
+                {t("meSection.email")}
               </label>
 
               <input
@@ -189,13 +191,13 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                 readOnly
               />
 
-              <div className="form-text">Email cannot be changed here.</div>
+              <div className="form-text">{t("meSection.emailReadOnly")}</div>
             </div>
 
             {/* Location */}
             <div className="col-12 col-md-6">
               <label htmlFor="location" className="form-label fw-semibold">
-                Location
+                {t("meSection.location")}
               </label>
 
               {isEditing ? (
@@ -203,7 +205,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                   id="location"
                   type="text"
                   className="form-control"
-                  placeholder="For example: Tashkent, Uzbekistan"
+                  placeholder={t("meSection.locationPlaceholder")}
                   value={formValues.location}
                   onChange={(event) =>
                     handleChange("location", event.target.value)
@@ -212,7 +214,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                 />
               ) : (
                 <div className="profile-value">
-                  {user.location || "Not provided"}
+                  {user.location || t("meSection.notProvided")}
                 </div>
               )}
             </div>
@@ -220,7 +222,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
             {/* Profile image */}
             {isEditing && (
               <div className="col-12">
-                <label className="form-label fw-semibold">Profile image</label>
+                <label className="form-label fw-semibold">{t("meSection.profileImage")}</label>
 
                 <ImageField
                   value={formValues.imageUrl ?? ""}
@@ -240,7 +242,7 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                 onClick={handleCancel}
                 disabled={isSaving}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
 
               <button
@@ -255,12 +257,12 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
                       className="spinner-border spinner-border-sm me-2"
                       aria-hidden="true"
                     />
-                    Saving...
+                    {t("meSection.saving")}
                   </>
                 ) : (
                   <>
                     <i className="bi bi-check-lg me-2" />
-                    Save changes
+                    {t("meSection.saveChanges")}
                   </>
                 )}
               </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "../SectionHeader";
 import type { Project } from "../../models";
 import { deleteProject, getUserProjects } from "../../api/projectApi";
@@ -6,6 +7,7 @@ import { useAuth } from "../../hooks/auth";
 import ProjectFormModal from "../ProjectFormModal";
 
 const ProjectsSection = () => {
+  const { t } = useTranslation();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ const ProjectsSection = () => {
       const res = await getUserProjects(user!.id);
       setProjects(res);
     } catch (err: any) {
-      setError(err.message ?? "Couldn't load your projects.");
+      setError(err.message ?? t("projectsSection.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ const ProjectsSection = () => {
       setProjects((prev) => prev.filter((p) => p.id !== confirmDelete.id));
       setConfirmDelete(null);
     } catch (err: any) {
-      setError(err.message ?? "Could not delete project.");
+      setError(err.message ?? t("projectsSection.deleteFailed"));
     } finally {
       setDeleting(false);
     }
@@ -51,9 +53,9 @@ const ProjectsSection = () => {
   return (
     <section>
       <SectionHeader
-        title="Projects"
-        description="Showcase your experience and the work you've done."
-        buttonText="Add project"
+        title={t("projectsSection.title")}
+        description={t("projectsSection.description")}
+        buttonText={t("projectsSection.addProject")}
         onClick={() => setEditing("new")}
       />
 
@@ -67,7 +69,7 @@ const ProjectsSection = () => {
           <button
             type="button"
             className="btn-close"
-            aria-label="Dismiss"
+            aria-label={t("common.dismiss")}
             onClick={() => setError(null)}
           />
         </div>
@@ -81,15 +83,15 @@ const ProjectsSection = () => {
                 className="spinner-border spinner-border-sm mb-2"
                 aria-hidden="true"
               />
-              Loading your projects…
+              {t("projectsSection.loading")}
             </div>
           </div>
         ) : projects.length === 0 ? (
           <div className="card-body text-center py-5">
             <i className="bi bi-kanban fs-2 text-muted d-block mb-2" />
-            <h3 className="h6 fw-bold mb-1">Build your project portfolio</h3>
+            <h3 className="h6 fw-bold mb-1">{t("projectsSection.emptyTitle")}</h3>
             <p className="text-muted small mb-3">
-              Add projects to help recruiters understand your experience.
+              {t("projectsSection.emptyDescription")}
             </p>
             <button
               type="button"
@@ -97,7 +99,7 @@ const ProjectsSection = () => {
               onClick={() => setEditing("new")}
             >
               <i className="bi bi-plus-lg me-1" />
-              Add project
+              {t("projectsSection.addProject")}
             </button>
           </div>
         ) : (
@@ -110,7 +112,7 @@ const ProjectsSection = () => {
                       <h3 className="h6 fw-bold mb-0">{project.name}</h3>
                       <span className="badge text-bg-light border text-muted fw-normal">
                         <i className="bi bi-calendar3 me-1" />
-                        {formatRange(project.startDate, project.endDate)}
+                        {formatRange(project.startDate, project.endDate ?? undefined)}
                       </span>
                     </div>
 
@@ -141,7 +143,7 @@ const ProjectsSection = () => {
                       onClick={() => setEditing(project)}
                     >
                       <i className="bi bi-pencil me-1" />
-                      Edit
+                      {t("common.edit")}
                     </button>
                     <button
                       type="button"
@@ -149,7 +151,7 @@ const ProjectsSection = () => {
                       onClick={() => setConfirmDelete(project)}
                     >
                       <i className="bi bi-trash me-1" />
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </div>
@@ -188,10 +190,9 @@ const ProjectsSection = () => {
                 <div className="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle p-3 mb-3">
                   <i className="bi bi-trash fs-4" />
                 </div>
-                <h3 className="h6 fw-bold mb-2">Delete this project?</h3>
+                <h3 className="h6 fw-bold mb-2">{t("projectsSection.deleteTitle")}</h3>
                 <p className="text-muted small mb-0">
-                  "{confirmDelete.name}" will be permanently removed from your
-                  profile. This can't be undone.
+                  {t("projectsSection.deleteDescription", { name: confirmDelete.name })}
                 </p>
               </div>
               <div className="modal-footer border-0 p-3 pt-0 justify-content-center gap-2">
@@ -201,7 +202,7 @@ const ProjectsSection = () => {
                   onClick={() => setConfirmDelete(null)}
                   disabled={deleting}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="button"
@@ -215,10 +216,10 @@ const ProjectsSection = () => {
                         className="spinner-border spinner-border-sm me-2"
                         aria-hidden="true"
                       />
-                      Deleting…
+                      {t("projectsSection.deleting")}
                     </>
                   ) : (
-                    "Delete"
+                    t("common.delete")
                   )}
                 </button>
               </div>

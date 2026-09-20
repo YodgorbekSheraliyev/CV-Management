@@ -1,5 +1,6 @@
 import { AttributeType } from "../enums/enums";
 import type { Attribute } from "../models";
+import { useTranslation } from "react-i18next";
 
 interface RuleValueInputProps {
   attribute: Attribute;
@@ -12,6 +13,7 @@ const RuleValueInput = ({
   value,
   onChange,
 }: RuleValueInputProps) => {
+  const { t } = useTranslation();
   switch (attribute.type) {
     case AttributeType.Numeric:
       return (
@@ -21,7 +23,7 @@ const RuleValueInput = ({
           step="any"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="e.g. 7.0"
+          placeholder={t("ruleValue.numericPlaceholder")}
         />
       );
 
@@ -42,8 +44,8 @@ const RuleValueInput = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >
-          <option value="true">Checked</option>
-          <option value="false">Not checked</option>
+          <option value="true">{t("ruleValue.checked")}</option>
+          <option value="false">{t("ruleValue.notChecked")}</option>
         </select>
       );
 
@@ -55,7 +57,7 @@ const RuleValueInput = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
           >
-            <option value="">Select...</option>
+            <option value="">{t("ruleValue.select")}</option>
             {attribute.options.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -70,7 +72,7 @@ const RuleValueInput = ({
           className="form-control"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Value"
+          placeholder={t("common.value")}
         />
       );
 
@@ -81,7 +83,7 @@ const RuleValueInput = ({
           className="form-control"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Period value"
+          placeholder={t("ruleValue.periodValue")}
         />
       );
 
@@ -92,7 +94,7 @@ const RuleValueInput = ({
           className="form-control"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Value"
+          placeholder={t("common.value")}
         />
       );
   }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getAttributeTypeName } from "../utils";
 import type { Attribute } from "../models";
 
@@ -13,6 +14,7 @@ const AttributeSelector = ({
   selectedIds,
   onToggle,
 }: AttributeSelectorProps) => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   const filteredAttributes = attributes.filter((attribute) =>
@@ -26,7 +28,7 @@ const AttributeSelector = ({
         <input
           type="search"
           className="form-control"
-          placeholder="Search attributes..."
+          placeholder={t("attributeSelector.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -38,7 +40,7 @@ const AttributeSelector = ({
       >
         {filteredAttributes.length === 0 ? (
           <div className="text-center text-muted py-4">
-            No matching attributes.
+            {t("attributeSelector.noMatching")}
           </div>
         ) : (
           <div className="list-group list-group-flush">

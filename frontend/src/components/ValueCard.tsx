@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { AttributeType } from "../enums/enums";
 import type { AttributeValue, User } from "../models";
@@ -21,6 +22,7 @@ export default function ValueCard({
   user,
   onDelete,
 }: ValueCardProps) {
+  const { t } = useTranslation();
   const initialValue = attributeValue.value;
   const [value, setValue] = useState(initialValue ?? "");
   const [period, setPeriod] = useState<PeriodValue>(() =>
@@ -179,7 +181,7 @@ export default function ValueCard({
             border: "1px solid #e9ecef",
           }}
         >
-          <div className="small fw-semibold text-muted mb-2">Value</div>
+          <div className="small fw-semibold text-muted mb-2">{t("common.value")}</div>
 
           <div className="flex-grow-1">
             <ValueField

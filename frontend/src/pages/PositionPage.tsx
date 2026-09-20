@@ -9,7 +9,6 @@ import {
   deletePosition,
   duplicatePosition,
 } from "../api/positionApi";
-import { ATTRIBUTE_TYPE_LABELS } from "../constants";
 import { createCv } from "../api/cvApi";
 import ToastNotification from "../components/notifications/ToastNotification";
 import { useTranslation } from "react-i18next";
@@ -247,7 +246,7 @@ const PositionPage = () => {
       <ToastNotification toast={toast} onClose={() => setToast(null)} />
 
       <main className="container py-4 py-md-5">
-        <nav aria-label="breadcrumb" className="mb-4">
+        <nav aria-label={t("common.breadcrumb")} className="mb-4">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
               <Link to="/" className="text-decoration-none">
@@ -394,11 +393,7 @@ const PositionPage = () => {
                             </td>
                             <td>
                               <span className="badge text-bg-light border">
-                                {
-                                  ATTRIBUTE_TYPE_LABELS[
-                                    rule.attribute.type as AttributeType
-                                  ]
-                                }
+                                {t(`attributeManagement.types.${AttributeType[rule.attribute.type]}`)}
                               </span>
                             </td>
                             <td>
@@ -456,7 +451,7 @@ const PositionPage = () => {
 
                             <td>
                               <span className="badge text-bg-light border">
-                                {ATTRIBUTE_TYPE_LABELS[attribute.type]}
+                                {t(`attributeManagement.types.${AttributeType[attribute.type]}`)}
                               </span>
                             </td>
                           </tr>

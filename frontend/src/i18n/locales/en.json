@@ -13,7 +13,59 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "home": "Home",
+    "positions": "Positions",
+    "profile": "Profile",
+    "back": "Back",
+    "close": "Close",
+    "attribute": "Attribute",
+    "operator": "Operator",
+    "value": "Value",
+    "remove": "Remove",
+    "removeAccessRule": "Remove access rule",
+    "dismiss": "Dismiss",
+    "toggleNavigation": "Toggle navigation",
+    "breadcrumb": "breadcrumb",
+    "serverUnavailable": "The server is unavailable. Please check your connection or try again later."
+  },
+  "ruleValue": {
+    "numericPlaceholder": "e.g. 7.0",
+    "checked": "Checked",
+    "notChecked": "Not checked",
+    "select": "Select...",
+    "periodValue": "Period value"
+  },
+  "attributeSelector": {
+    "search": "Search attributes...",
+    "noMatching": "No matching attributes."
+  },
+  "markdownField": {
+    "supportsMarkdown": "Supports Markdown formatting."
+  },
+  "valueField": {
+    "enterValue": "Enter a value...",
+    "shortText": "Enter a short text value.",
+    "numericValue": "Enter a numeric value.",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "ongoingPeriod": "Leave the end date empty for an ongoing period.",
+    "selectValue": "Select a value...",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "projectForm": {
+    "editTitle": "Edit project",
+    "addTitle": "Add project",
+    "name": "Name",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "description": "Description",
+    "technologyTags": "Technology tags",
+    "tagsPlaceholder": "React, TypeScript, PostgreSQL",
+    "commaSeparated": "Comma-separated.",
+    "nameAndStartRequired": "Name and start date are required.",
+    "saving": "Saving..."
   },
   "mainPage": {
     "recruitmentPlatform": "Recruitment Platform",
@@ -70,6 +122,10 @@
     "duplicate": "Duplicate",
     "duplicating": "Duplicating…",
     "delete": "Delete",
+    "positionDuplicated": "Position duplicated successfully.",
+    "duplicatePositionError": "Could not duplicate this position.",
+    "applySuccess": "CV created successfully.",
+    "applyFailed": "Could not apply to this position.",
 
     "accessRequirements": "Access requirements",
     "publicAccessDescription": "This position is public — these rules are shown for reference only.",
@@ -111,7 +167,6 @@
 
     "positionInformation": "Position information",
     "visibility": "Visibility",
-    "submittedCvs": "Submitted CVs",
     "maxProjectsInCv": "Max projects in CV",
 
     "submittedCvsTitle": "Submitted CVs",
@@ -229,6 +284,77 @@
       "cancel": "Cancel",
       "saving": "Saving...",
       "create": "Create Attribute",
+    "attributePicker": {
+      "addAttribute": "Add attribute",
+      "description": "Choose an attribute from the library.",
+      "search": "Search attributes...",
+      "all": "All",
+      "recentlyUsed": "Recently used",
+      "matching": "Matching attributes",
+      "allAttributes": "All attributes",
+      "noAttributes": "No attributes found",
+      "tryAnother": "Try another search or category."
+    },
+    "cvsSection": {
+      "title": "CVs",
+      "description": "Your CVs created for positions you are eligible for.",
+      "browsePositions": "Browse positions",
+      "loadFailed": "Couldn't load your CVs.",
+      "published": "Published",
+      "draft": "Draft",
+      "loading": "Loading your CVs...",
+      "status": "Status",
+      "likes": "Likes",
+      "cv": "CV",
+      "untitledPosition": "Untitled position",
+      "open": "Open",
+      "positionSpecificTitle": "CVs are position-specific",
+      "positionSpecificDescription": "You can have at most one CV for each position. Create new CVs from positions that are accessible to you.",
+      "noCvs": "No CVs yet",
+      "noCvsDescription": "Browse available positions and create a tailored CV for a position you're eligible for."
+    },
+    "infoSection": {
+      "title": "Info",
+      "description": "Additional information from the Attribute Library.",
+      "addAttribute": "Add attribute",
+      "loadAttributesFailed": "Could not load attributes.",
+      "loadValuesFailed": "Could not load attribute values.",
+      "alreadyAdded": "\"{{name}}\" has already been added.",
+      "alreadyAdding": "\"{{name}}\" is already being added.",
+      "deleteFailed": "Could not delete attribute.",
+      "noInfo": "No additional info yet",
+      "noInfoDescription": "Add attributes like skills, links, or dates to enrich your profile."
+    },
+    "meSection": {
+      "title": "Personal information",
+      "description": "Your basic personal details used across your profile and CVs.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "emailReadOnly": "Email cannot be changed here.",
+      "location": "Location",
+      "locationPlaceholder": "For example: Tashkent, Uzbekistan",
+      "profileImage": "Profile image",
+      "notProvided": "Not provided",
+      "firstNameRequired": "First name is required.",
+      "lastNameRequired": "Last name is required.",
+      "saveFailed": "Could not save your information. Please try again.",
+      "saving": "Saving...",
+      "saveChanges": "Save changes"
+    },
+    "projectsSection": {
+      "title": "Projects",
+      "description": "Showcase your experience and the work you've done.",
+      "addProject": "Add project",
+      "loadFailed": "Couldn't load your projects.",
+      "deleteFailed": "Could not delete project.",
+      "loading": "Loading your projects...",
+      "emptyTitle": "Build your project portfolio",
+      "emptyDescription": "Add projects to help recruiters understand your experience.",
+      "deleteTitle": "Delete this project?",
+      "deleteDescription": "\"{{name}}\" will be permanently removed from your profile. This can't be undone.",
+      "deleting": "Deleting..."
+    },
       "saveChanges": "Save Changes"
     },
 
@@ -534,6 +660,9 @@
     }
   },
   "imageField": {
+    "invalidType": "Please select an image file.",
+    "uploadFailed": "Could not upload the image.",
+    "uploading": "Uploading...",
     "selected": "Selected",
     "preview": "Preview",
     "remove": "Remove",

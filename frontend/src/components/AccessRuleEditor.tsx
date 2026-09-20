@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { Attribute } from "../models";
 import {
   getComparisonOperators,
@@ -26,6 +27,7 @@ const AccessRuleEditor = ({
   onChange,
   onRemove,
 }: AccessRuleEditorProps) => {
+  const { t } = useTranslation();
   const availableAttributes = attributes.filter(
     (item) =>
       item.id === rule.attributeId || !existingAttributeIds.includes(item.id),
@@ -57,7 +59,7 @@ const AccessRuleEditor = ({
     <div className="border rounded-3 p-3">
       <div className="row g-2 align-items-end">
         <div className="col-12 col-md-4">
-          <label className="form-label small fw-semibold">Attribute</label>
+          <label className="form-label small fw-semibold">{t("common.attribute")}</label>
           <select
             className="form-select"
             value={rule.attributeId}
@@ -72,7 +74,7 @@ const AccessRuleEditor = ({
         </div>
 
         <div className="col-12 col-md-3">
-          <label className="form-label small fw-semibold">Operator</label>
+          <label className="form-label small fw-semibold">{t("common.operator")}</label>
           <select
             className="form-select"
             value={rule.comparisonType}
@@ -91,7 +93,7 @@ const AccessRuleEditor = ({
         </div>
 
         <div className="col-12 col-md">
-          <label className="form-label small fw-semibold">Value</label>
+          <label className="form-label small fw-semibold">{t("common.value")}</label>
           <RuleValueInput
             attribute={attribute}
             value={rule.value}
@@ -104,9 +106,9 @@ const AccessRuleEditor = ({
             type="button"
             className="btn btn-outline-danger"
             onClick={onRemove}
-            aria-label="Remove access rule"
+            aria-label={t("common.removeAccessRule")}
           >
-            Remove
+            {t("common.remove")}
           </button>
         </div>
       </div>
