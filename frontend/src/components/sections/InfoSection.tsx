@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SectionHeader from "../SectionHeader";
 import AttributePickerModal from "../AttributePickerModal";
-// import AttributeRow from "../AttributeRow";
 import ToastNotification from "../notifications/ToastNotification";
 import type { Attribute, AttributeValue, User } from "../../models";
 import { getAttributes } from "../../api/attributeApi";

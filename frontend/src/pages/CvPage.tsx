@@ -92,6 +92,7 @@ const CvPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const STATIC_PATH = import.meta.env.VITE_API_STATIC_API;
 
   const [cv, setCv] = useState<CV | null>(null);
   const [loading, setLoading] = useState(true);
@@ -518,7 +519,7 @@ const CvPage = () => {
                             {attribute.attribute.type === AttributeType.Image &&
                             !isEmpty ? (
                               <img
-                                src={attribute.value}
+                                src={STATIC_PATH + attribute.value}
                                 alt={attribute.attribute.name}
                                 style={{
                                   maxWidth: 120,
