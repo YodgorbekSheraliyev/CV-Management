@@ -70,6 +70,14 @@ const TagSelector = ({
   const normalizedSearch = search.trim().toLowerCase();
 
   const filteredTags = tags.filter((tag) => {
+    const selected = nameMode
+      ? selectedTagNames.includes(tag.name)
+      : selectedTagIds.includes(tag.id);
+
+    if (selected) {
+      return false;
+    }
+
     if (!normalizedSearch) {
       return true;
     }

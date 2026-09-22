@@ -58,7 +58,7 @@ namespace backend.Data
                     Id = 4,
                     Name = "ImageUrl",
                     Category = AttributeCategory.PersonalInformation,
-                    AttributeType = AttributeType.String,
+                    AttributeType = AttributeType.Image,
                     Description = "",
                     IsBuiltIn = true
                 });

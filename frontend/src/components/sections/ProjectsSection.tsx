@@ -118,7 +118,7 @@ const ProjectsSection = () => {
             </button>
           </div>
         ) : (
-          <div className="list-group list-group-flush">
+          <div ref={menuRef} className="list-group list-group-flush">
             {projects.map((project) => (
               <div className="list-group-item p-3 p-md-4" key={project.id}>
                 <div className="d-flex flex-column flex-md-row justify-content-between gap-3">
@@ -151,7 +151,7 @@ const ProjectsSection = () => {
                     )}
                   </div>
 
-                  <div ref={menuRef} className="dropdown flex-shrink-0">
+                  <div className="dropdown flex-shrink-0">
                     <button
                       type="button"
                       className="btn btn-sm btn-light border"

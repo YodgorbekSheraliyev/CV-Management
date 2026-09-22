@@ -13,6 +13,7 @@ interface MeSectionProps {
     location: string;
     imageUrl?: string;
   }) => Promise<void>;
+  readOnly?: boolean;
 }
 
 interface FormValues {
@@ -24,7 +25,7 @@ interface FormValues {
 
 const IMAGE_ATTRIBUTE_ID = 4;
 
-const MeSection = ({ user, onSave }: MeSectionProps) => {
+const MeSection = ({ user, onSave, readOnly = false }: MeSectionProps) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -114,8 +115,8 @@ const MeSection = ({ user, onSave }: MeSectionProps) => {
       <SectionHeader
         title={t("meSection.title")}
         description={t("meSection.description")}
-        buttonText={isEditing ? undefined : t("common.edit")}
-        onClick={isEditing ? undefined : handleEdit}
+        buttonText={readOnly || isEditing ? undefined : t("common.edit")}
+        onClick={readOnly || isEditing ? undefined : handleEdit}
       />
 
       <div className="card border-0 shadow-sm">

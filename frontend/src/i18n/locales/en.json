@@ -643,7 +643,12 @@
       "profileUpdated": "Profile updated successfully."
     },
     "errors": {
-      "updateFailed": "Could not update user profile."
+      "updateFailed": "Could not update user profile.",
+      "userNotFound": "User profile not found."
+    },
+    "readOnly": {
+      "backToApplications": "Back to applications",
+      "noPermission": "You do not have permission to view this profile."
     }
   },
   "positionCvsPage": {

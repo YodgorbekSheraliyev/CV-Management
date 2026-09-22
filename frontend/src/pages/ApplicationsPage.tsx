@@ -205,7 +205,11 @@ const ApplicationsPage = () => {
                         />
                       </td>
 
-                      <td>{application.candidateName}</td>
+                      <td>
+                        <Link to={`/users/${application.candidateId}`}>
+                          {application.candidateName}
+                        </Link>
+                      </td>
 
                       <td>
                         <Link to={`/positions/${application.positionId}`}>

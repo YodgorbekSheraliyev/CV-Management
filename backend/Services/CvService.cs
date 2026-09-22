@@ -1,4 +1,5 @@
-﻿using backend.Data;
+﻿using System.Text.Json;
+using backend.Data;
 using backend.Dtos.Cv;
 using backend.Dtos.Project;
 using backend.enums;
@@ -30,6 +31,15 @@ namespace backend.Services
                 .Select(cv => new CvSummaryDto
                 {
                     Id = cv.Id,
+                    CandidateId = cv.UserId,
+                    CandidateName = cv.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.FirstName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault() + " " + cv.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.LastName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault(),
+                    CandidateEmail = cv.User.Email,
                     PositionId = cv.PositionId,
                     PositionTitle = cv.Position != null ? cv.Position.Title : string.Empty,
                     LikeCount = cv.Likes.Count,
@@ -48,6 +58,15 @@ namespace backend.Services
                 .Select(x => new CvSummaryDto
                 {
                     Id = x.Id,
+                    CandidateId = x.UserId,
+                    CandidateName = x.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.FirstName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault() + " " + x.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.LastName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault(),
+                    CandidateEmail = x.User.Email,
                     PositionId = x.PositionId,
                     LikeCount = x.Likes.Count,
                     PositionTitle = x.Position.Title,
@@ -67,6 +86,15 @@ namespace backend.Services
                 .Select(x => new CvSummaryDto
                 {
                     Id = x.Id,
+                    CandidateId = x.UserId,
+                    CandidateName = x.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.FirstName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault() + " " + x.User.AttributeValues
+                        .Where(value => value.AttributeId == (int)BuiltInAttributes.LastName)
+                        .Select(value => value.Value)
+                        .FirstOrDefault(),
+                    CandidateEmail = x.User.Email,
                     PositionId = x.PositionId,
                     LikeCount = x.Likes.Count,
                     PositionTitle = x.Position.Title,
@@ -314,16 +342,19 @@ namespace backend.Services
             }
 
             var attributeValues = await GetAttributeValues(cv.UserId);
-            var hasEmptyAttribute = cv.AttributeIds.Any(attributeId =>
-            {
-                var value = attributeValues.FirstOrDefault(v => v.AttributeId == attributeId)?.Value;
-                return string.IsNullOrWhiteSpace(value);
-            });
+            var attributes = await _db.Attributes
+                .AsNoTracking()
+                .Where(attribute => cv.AttributeIds.Contains(attribute.Id))
+                .ToListAsync();
 
-            if (hasEmptyAttribute)
-            {
-                throw new BadRequestException(_localizer["CvHasEmptyAttributes"]);
-            }
+            cv.AttributeIds = attributes
+                .Where(attribute =>
+                {
+                    var value = attributeValues.FirstOrDefault(v => v.AttributeId == attribute.Id)?.Value;
+                    return HasValue(attribute.AttributeType, value);
+                })
+                .Select(attribute => attribute.Id)
+                .ToList();
 
             cv.Status = CVStatus.Published;
             cv.UpdatedAt = DateTime.UtcNow;
@@ -346,6 +377,35 @@ namespace backend.Services
                 .AsNoTracking()
                 .Where(v => v.UserId == userId)
                 .ToListAsync();
+        }
+
+        private static bool HasValue(AttributeType attributeType, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            if (attributeType != AttributeType.Period)
+            {
+                return true;
+            }
+
+            try
+            {
+                var period = JsonSerializer.Deserialize<PeriodValue>(
+                    value,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                return !string.IsNullOrWhiteSpace(period?.Start) ||
+                       !string.IsNullOrWhiteSpace(period?.End);
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
         }
         private static List<CvAttributeDto> BuildAttributes(List<Models.Attribute> attributes, List<AttributeValue> values)
         {
@@ -409,6 +469,11 @@ namespace backend.Services
             {
                 throw new ForbiddenException(_localizer["CvNotPublished"]);
             }
+        }
+        private sealed class PeriodValue
+        {
+            public string? Start { get; set; }
+            public string? End { get; set; }
         }
     }
 }

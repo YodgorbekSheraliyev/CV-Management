@@ -5,7 +5,7 @@ import NavBar from "../components/navbar/NavBar";
 import { getPositionById, getPositionCvs } from "../api/positionApi";
 import { useAuth } from "../hooks/auth";
 import { UserRole } from "../enums/enums";
-import type { CVSummary, Position, User } from "../models";
+import type { CVSummary, Position } from "../models";
 
 const PositionCvsPage = () => {
   const { t } = useTranslation();
@@ -222,7 +222,7 @@ const PositionCvsPage = () => {
 
                   <tbody>
                     {cvs.map((cv) => (
-                      <CvRow key={cv.id} user={user} cv={cv} />
+                      <CvRow key={cv.id} cv={cv} />
                     ))}
                   </tbody>
                 </table>
@@ -263,13 +263,10 @@ const PositionCvsPage = () => {
 
 interface CvRowProps {
   cv: CVSummary;
-  user: User;
 }
 
-const CvRow = ({ cv, user }: CvRowProps) => {
+const CvRow = ({ cv }: CvRowProps) => {
   const { t } = useTranslation();
-
-  const candidateName = `${user?.firstName} ${user.lastName}`;
   const submittedAt = cv.createdAt;
 
   return (
@@ -283,13 +280,19 @@ const CvRow = ({ cv, user }: CvRowProps) => {
               height: 42,
             }}
           >
-            {getInitials(candidateName)}
+            {getInitials(cv.candidateName)}
           </div>
 
           <div>
-            <div className="fw-semibold">{candidateName}</div>
-
-            {user.email && <div className="text-muted small">{user.email}</div>}
+            <Link
+              to={`/users/${cv.candidateId}`}
+              className="fw-semibold text-decoration-none"
+            >
+              {cv.candidateName || t("positionCvsPage.notAvailable")}
+            </Link>
+            {cv.candidateEmail && (
+              <div className="text-muted small">{cv.candidateEmail}</div>
+            )}
           </div>
         </div>
       </td>

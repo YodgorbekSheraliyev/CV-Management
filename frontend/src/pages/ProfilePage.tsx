@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
@@ -7,6 +9,7 @@ import InfoSection from "../components/sections/InfoSection";
 import ProjectsSection from "../components/sections/ProjectsSection";
 import CvsSection from "../components/sections/CvsSection";
 import { updateUser } from "../api/userApi";
+import { getUser } from "../api/userApi";
 import { UserRole } from "../enums/enums";
 import ToastNotification from "../components/notifications/ToastNotification";
 
@@ -20,16 +23,40 @@ interface UpdateUserData {
 
 const ProfilePage = () => {
   const { t } = useTranslation();
-  const { user, setUser } = useAuth();
+  const { user: currentUser, setUser } = useAuth();
+  const { id } = useParams();
+  const [profileUser, setProfileUser] = useState<typeof currentUser>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("me");
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "danger";
   } | null>(null);
   const STATIC_PATH = import.meta.env.VITE_API_STATIC_API;
+  const isReadOnly = Boolean(id);
+
+  useEffect(() => {
+    if (!id) {
+      setProfileUser(null);
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        setProfileError(null);
+        setProfileUser(await getUser(Number(id)));
+      } catch (err: any) {
+        setProfileError(err.message ?? t("profilePage.errors.userNotFound"));
+      }
+    };
+
+    loadProfile();
+  }, [id, t]);
+
+  const user = isReadOnly ? profileUser : currentUser;
 
   const handleUpdateUser = async (data: UpdateUserData): Promise<void> => {
-    if (!user) {
+    if (!currentUser || isReadOnly) {
       return;
     }
 
@@ -52,7 +79,35 @@ const ProfilePage = () => {
     }
   };
 
+  if (isReadOnly && currentUser?.role !== UserRole.Recruiter && currentUser?.role !== UserRole.Administrator) {
+    return (
+      <div className="min-vh-100 bg-light">
+        <NavBar />
+        <main className="container py-5">
+          <div className="alert alert-danger">{t("profilePage.readOnly.noPermission")}</div>
+          <Link to="/applications" className="btn btn-outline-secondary">
+            {t("profilePage.readOnly.backToApplications")}
+          </Link>
+        </main>
+      </div>
+    );
+  }
+
   if (!user) {
+    if (profileError) {
+      return (
+        <div className="min-vh-100 bg-light">
+          <NavBar />
+          <main className="container py-5">
+            <div className="alert alert-danger mb-3">{profileError}</div>
+            <Link to="/applications" className="btn btn-outline-secondary">
+              {t("profilePage.readOnly.backToApplications")}
+            </Link>
+          </main>
+        </div>
+      );
+    }
+
     return (
       <div className="min-vh-100 bg-light">
         <NavBar />
@@ -87,7 +142,7 @@ const ProfilePage = () => {
     },
   ];
 
-  if (user.role != UserRole.Recruiter) {
+  if (!isReadOnly && user.role != UserRole.Recruiter) {
     tabs.push(
       {
         value: "projects",
@@ -177,14 +232,14 @@ const ProfilePage = () => {
         </section>
 
         {activeTab === "me" && (
-          <MeSection user={user} onSave={handleUpdateUser} />
+          <MeSection user={user} onSave={handleUpdateUser} readOnly={isReadOnly} />
         )}
 
-        {activeTab === "info" && <InfoSection user={user} />}
+        {!isReadOnly && activeTab === "info" && <InfoSection user={user} />}
 
-        {activeTab === "projects" && <ProjectsSection />}
+        {!isReadOnly && activeTab === "projects" && <ProjectsSection />}
 
-        {activeTab === "cvs" && <CvsSection />}
+        {!isReadOnly && activeTab === "cvs" && <CvsSection />}
       </main>
     </div>
   );

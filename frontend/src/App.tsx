@@ -20,6 +20,7 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<RequireAuth />}>
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/users/:id" element={<ProfilePage />} />
         <Route path="/positions" element={<PositionsPage />} />
         <Route path="/positions/new" element={<CreatePositionPage />} />
         <Route path="/positions/:id" element={<PositionPage />} />

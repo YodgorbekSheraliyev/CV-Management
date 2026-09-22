@@ -51,6 +51,9 @@ export interface CvAttribute {
 
 export interface CVSummary {
   id: number;
+  candidateId: number;
+  candidateName: string;
+  candidateEmail?: string | null;
   positionId: number;
   positionTitle: string;
   likeCount: number;

@@ -325,8 +325,6 @@ const CvPage = () => {
 
   const sections = groupAttributes(attributes);
 
-  const allFilled = attributes.every(isAttributeFilled);
-
   const isDraft = cv.status === CVStatus.Draft;
   const isPublished = cv.status === CVStatus.Published;
 
@@ -388,8 +386,7 @@ const CvPage = () => {
                 type="button"
                 className="btn btn-success btn-sm px-3"
                 onClick={handlePublish}
-                disabled={publishing || !allFilled}
-                title={!allFilled ? t("cvPage.publish.fillAll") : undefined}
+                disabled={publishing}
               >
                 {publishing
                   ? t("cvPage.actions.publishing")
@@ -409,13 +406,6 @@ const CvPage = () => {
             )}
           </div>
         </div>
-
-        {/* Publish warning */}
-        {canEdit && isDraft && !allFilled && (
-          <div className="alert alert-warning py-2 px-3 small mb-4">
-            {t("cvPage.publish.fillAll")}
-          </div>
-        )}
 
         {/* CV */}
         <div className="card border-0 shadow-sm">
