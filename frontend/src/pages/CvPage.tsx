@@ -87,6 +87,12 @@ const isAttributeFilled = (attribute: CvAttribute): boolean => {
   return attribute.value.trim() !== "";
 };
 
+const formatProjectDate = (date: string): string =>
+  new Date(date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+  });
+
 const CvPage = () => {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -119,34 +125,33 @@ const CvPage = () => {
   const canEdit = user?.role !== UserRole.Recruiter;
   const isRecruiter = user?.role === UserRole.Recruiter;
 
-  useEffect(() => {
+  const load = async () => {
     if (!id || !user) {
       return;
     }
+    setLoading(true);
 
-    const load = async () => {
-      setLoading(true);
+    try {
+      const cvId = Number(id);
 
-      try {
-        const cvId = Number(id);
-
-        if (Number.isNaN(cvId)) {
-          throw new Error(t("cvPage.errors.invalidId"));
-        }
-
-        const result = await getCvById(cvId);
-        setIsLiked(result.isLikedByCurrentUser);
-        setCv(result);
-      } catch (err: any) {
-        setToast({
-          message: err.message ?? t("cvPage.errors.loadFailed"),
-          type: "danger",
-        });
-      } finally {
-        setLoading(false);
+      if (Number.isNaN(cvId)) {
+        throw new Error(t("cvPage.errors.invalidId"));
       }
-    };
 
+      const result = await getCvById(cvId);
+      setIsLiked(result.isLikedByCurrentUser);
+      setCv(result);
+    } catch (err: any) {
+      setToast({
+        message: err.message ?? t("cvPage.errors.loadFailed"),
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     load();
   }, [id, user?.id, t]);
 
@@ -210,6 +215,7 @@ const CvPage = () => {
       });
 
       cancelEditing();
+      load();
     } catch (err: any) {
       setToast({
         message: err.message ?? t("cvPage.errors.updateAttributeFailed"),
@@ -257,6 +263,7 @@ const CvPage = () => {
         message: t("cvPage.toast.published"),
         type: "success",
       });
+      load();
     } catch (err: any) {
       setToast({
         message: err.message ?? t("cvPage.errors.publishFailed"),
@@ -274,6 +281,7 @@ const CvPage = () => {
 
       setCv(updated);
       setIsLiked(updated.isLikedByCurrentUser);
+      load()
     } catch (error: any) {
       setToast({
         message: error.message ?? t("cvPage.errors.likeFailed"),
@@ -551,11 +559,11 @@ const CvPage = () => {
                         <div className="fw-bold">{project.name}</div>
 
                         <div className="text-muted small">
-                          {project.startDate}
-
+                          {formatProjectDate(project.startDate)}
+                          {" — "}
                           {project.endDate
-                            ? ` – ${project.endDate}`
-                            : ` – ${t("cvPage.projects.present")}`}
+                            ? formatProjectDate(project.endDate)
+                            : t("cvPage.projects.present")}
                         </div>
                       </div>
 
