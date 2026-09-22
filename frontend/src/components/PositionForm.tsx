@@ -16,6 +16,7 @@ export interface AccessRule {
 
 export interface PositionFormValues {
   id: number;
+  version: number;
   title: string;
   description: string;
   attributeIds: number[];
@@ -39,6 +40,7 @@ interface PositionFormProps {
 
 const EMPTY_FORM: PositionFormValues = {
   id: -Date.now(),
+  version: 0,
   title: "",
   description: "",
   attributeIds: [],

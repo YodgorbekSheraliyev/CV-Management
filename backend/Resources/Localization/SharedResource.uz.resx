@@ -222,6 +222,9 @@
   <data name="CvNotPublished" xml:space="preserve">
     <value>Bu CV e'lon qilinmagan.</value>
   </data>
+  <data name="CvVersionNotMatch" xml:space="preserve">
+    <value>Bu CV boshqa foydalanuvchi tomonidan o'zgartirilgan. Qayta yuklab, yana urinib ko'ring.</value>
+  </data>
   <data name="FacebookAccessTokenRequired" xml:space="preserve">
     <value>Facebook access tokeni kiritilishi shart.</value>
   </data>
@@ -273,6 +276,9 @@
   <data name="PositionNotFound" xml:space="preserve">
     <value>Lavozim topilmadi.</value>
   </data>
+  <data name="PositionVersionNotMatch" xml:space="preserve">
+    <value>Bu lavozim boshqa foydalanuvchi tomonidan o'zgartirilgan. Qayta yuklab, yana urinib ko'ring.</value>
+  </data>
   <data name="ProjectNotFound" xml:space="preserve">
     <value>Loyiha topilmadi.</value>
   </data>
@@ -311,5 +317,11 @@
   </data>
   <data name="ProjectStartDateRequired" xml:space="preserve">
     <value>Loyihaning boshlanish sanasi kiritilishi shart.</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>Foydalanuvchi identifikatori topilmadi.</value>
+  </data>
+  <data name="VersionRequired" xml:space="preserve">
+    <value>Versiya kiritilishi shart.</value>
   </data>
 </root>

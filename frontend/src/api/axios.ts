@@ -35,7 +35,12 @@ api.interceptors.response.use(
     if (!error.response) {
       throw new Error(i18n.t("common.serverUnavailable"));
     }
-    throw new Error(error.response?.data.error);
+
+    const requestError = new Error(error.response.data.error) as Error & {
+      status?: number;
+    };
+    requestError.status = error.response.status;
+    throw requestError;
   },
 );
 

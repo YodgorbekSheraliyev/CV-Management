@@ -3,6 +3,7 @@ import api, { type CommonResponse } from "./axios";
 
 interface UpdateCvAttributeValueInput {
   cvId: number;
+  version: number;
   attributeId: number;
   value: string;
 }
@@ -41,15 +42,16 @@ export const updateCvAttributeValue = async (
   return response.data;
 };
 
-export const publishCv = async (id: number) => {
+export const publishCv = async (id: number, version: number) => {
   const { data: response } = await api.put<CommonResponse<CV>>("/cvs/publish", {
     id,
+    version,
   });
   return response.data;
 };
 
-export const deleteCv = async (id: number) => {
-  await api.delete<void>("/cvs", { data: { id } });
+export const deleteCv = async (id: number, version: number) => {
+  await api.delete<void>("/cvs", { data: { id, version } });
 };
 
 export const getCvsByPosition = async (positionId: number) => {

@@ -222,6 +222,9 @@
   <data name="CvNotPublished" xml:space="preserve">
     <value>This CV has not been published.</value>
   </data>
+  <data name="CvVersionNotMatch" xml:space="preserve">
+    <value>This CV was changed by someone else. Reload it and try again.</value>
+  </data>
   <data name="FacebookAccessTokenRequired" xml:space="preserve">
     <value>Facebook access token is required.</value>
   </data>
@@ -273,6 +276,9 @@
   <data name="PositionNotFound" xml:space="preserve">
     <value>Position not found.</value>
   </data>
+  <data name="PositionVersionNotMatch" xml:space="preserve">
+    <value>This position was changed by someone else. Reload it and try again.</value>
+  </data>
   <data name="ProjectNotFound" xml:space="preserve">
     <value>Project not found.</value>
   </data>
@@ -311,5 +317,11 @@
   </data>
   <data name="ProjectStartDateRequired" xml:space="preserve">
     <value>Project start date is required.</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>User id was not found.</value>
+  </data>
+  <data name="VersionRequired" xml:space="preserve">
+    <value>Version is required.</value>
   </data>
 </root>

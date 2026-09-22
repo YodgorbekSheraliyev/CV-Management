@@ -6,7 +6,6 @@ import ToastNotification from "../components/notifications/ToastNotification";
 import { createPosition } from "../api/positionApi";
 import { getAttributes } from "../api/attributeApi";
 import type { Attribute } from "../models";
-import { useAuth } from "../hooks/auth";
 import PositionForm, {
   type PositionFormValues,
 } from "../components/PositionForm";
@@ -14,7 +13,6 @@ import PositionForm, {
 const CreatePositionPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user } = useAuth();
 
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loadingAttributes, setLoadingAttributes] = useState(true);

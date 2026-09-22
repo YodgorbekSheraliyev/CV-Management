@@ -66,7 +66,8 @@ namespace backend.Services
                         IsBuiltIn = a.IsBuiltIn
                     }).ToList(),
                     PositionAccessRules = p.PositionAccessRules,
-                    CVsCount = p.CVs.Count
+                    CVsCount = p.CVs.Count,
+                    Version = p.Version
                 })
                 .FirstOrDefaultAsync();
 
@@ -107,7 +108,8 @@ namespace backend.Services
                     Value = r.Value
                 }).ToList(),
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                Version = 1
             };
 
             _db.Positions.Add(position);
@@ -127,6 +129,10 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
+            if(position.Version != dto.Version)
+            {
+                throw new ConflictException(_localizer["PositionVersionNotMatch"]);
+            }
 
             var attributes = await _db.Attributes
                 .Where(a => dto.AttributeIds.Contains(a.Id))
@@ -143,14 +149,26 @@ namespace backend.Services
             position.MaxProjects = dto.MaxProjects;
 
             position.PositionAccessRules.Clear();
-            position.PositionAccessRules = dto.AccessRules.Select(r => new PositionAccessRule
+            foreach(var rule in dto.AccessRules)
             {
-                AttributeId = r.AttributeId,
-                ComparisonType = r.ComparisonType,
-                Value = r.Value
-            }).ToList();
+                position.PositionAccessRules.Add(new PositionAccessRule
+                {
+                    AttributeId = rule.AttributeId,
+                    ComparisonType = rule.ComparisonType,
+                    Value = rule.Value
+                });
+            }
+            position.Version++;
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["PositionVersionNotMatch"]);
+            }
+
             return await GetById(dto.Id, userId);
         }
         public async Task Delete(DeletePositionDto dto)

@@ -71,7 +71,7 @@ namespace backend.Services
                     LikeCount = x.Likes.Count,
                     PositionTitle = x.Position.Title,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt
+                    CreatedAt = x.CreatedAt,
                 })
                 .ToListAsync();
         }
@@ -112,7 +112,8 @@ namespace backend.Services
                 ProjectIds = projectIds,
                 Likes = new List<User>(),
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                Version = 1
             };
 
             _db.CVs.Add(cv);
@@ -160,6 +161,7 @@ namespace backend.Services
                 Attributes = BuildAttributes(attributes, attributeValues),
                 CreatedAt = cv.CreatedAt,
                 IsLikedByCurrentUser = cv.Likes.Any(l => l.Id == userId),
+                Version = cv.Version,
                 Projects = projects.Select(project => new ProjectDto
                 {
                     Id = project.Id,
@@ -212,10 +214,15 @@ namespace backend.Services
         }
         public async Task<CvDto> UpdateAttributeValue(UpdateCvAttributeValueDto dto, int userId)
         {
-            var cv = await _db.CVs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == dto.CvId);
+            var cv = await _db.CVs.FirstOrDefaultAsync(c => c.Id == dto.CvId);
             if (cv is null)
             {
                 throw new NotFoundException(_localizer["CvNotFound"]);
+            }
+
+            if (cv.Version != dto.Version)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
             }
 
             var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
@@ -243,8 +250,16 @@ namespace backend.Services
             }
 
             cv.UpdatedAt = DateTime.UtcNow;
+            cv.Version++;
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
+            }
 
             return await GetById(dto.CvId, userId);
         }
@@ -257,6 +272,11 @@ namespace backend.Services
                 throw new NotFoundException(_localizer["CvNotFound"]);
             }
 
+            if (cv.Version != dto.Version)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
+            }
+
             var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
             if (cv.UserId != userId && !isAdmin)
             {
@@ -264,7 +284,14 @@ namespace backend.Services
             }
 
             _db.CVs.Remove(cv);
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
+            }
         }
 
         public async Task<CvDto> Publish(PublishCvDto dto, int userId)
@@ -273,6 +300,11 @@ namespace backend.Services
             if (cv is null)
             {
                 throw new NotFoundException(_localizer["CvNotFound"]);
+            }
+
+            if (cv.Version != dto.Version)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
             }
 
             var isAdmin = await _db.Users.AnyAsync(u => u.Id == userId && u.Role == UserRole.Administrator);
@@ -295,8 +327,16 @@ namespace backend.Services
 
             cv.Status = CVStatus.Published;
             cv.UpdatedAt = DateTime.UtcNow;
+            cv.Version++;
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["CvVersionNotMatch"]);
+            }
 
             return await GetById(dto.Id, userId);
         }

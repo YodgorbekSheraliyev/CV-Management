@@ -63,9 +63,20 @@
     "description": "Description",
     "technologyTags": "Technology tags",
     "tagsPlaceholder": "React, TypeScript, PostgreSQL",
-    "commaSeparated": "Comma-separated.",
     "nameAndStartRequired": "Name and start date are required.",
+    "saveFailed": "Could not save the project.",
+    "tagsLoadFailed": "Could not load tags.",
     "saving": "Saving..."
+  },
+  "tagSelector": {
+    "select": "Select tags...",
+    "add": "Add tag...",
+    "tags": "Tags",
+    "available": "Available tags",
+    "noTags": "No tags found",
+    "creating": "Creating...",
+    "create": "Create \"{{name}}\"",
+    "remove": "Remove {{name}}"
   },
   "attributePicker": {
     "addAttribute": "Add attribute",

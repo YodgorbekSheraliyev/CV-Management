@@ -23,6 +23,8 @@ namespace backend.Dtos.Cv
     {
         [Required(ErrorMessage = "CvIdRequired")]
         public int CvId { get; init; }
+        [Required(ErrorMessage = "VersionRequired")]
+        public int Version { get; init; }
         [Required(ErrorMessage = "AttributeIdRequired")]
         public int AttributeId { get; init; }
         public string? Value { get; init; }
@@ -32,6 +34,8 @@ namespace backend.Dtos.Cv
     {
         [Required(ErrorMessage = "IdRequired")]
         public int Id { get; init; }
+        [Required(ErrorMessage = "VersionRequired")]
+        public int Version { get; init; }
     }
 
     public class CvSummaryDto
@@ -49,6 +53,7 @@ namespace backend.Dtos.Cv
         public List<CvAttributeDto> Attributes { get; init; } = new();
         public List<ProjectDto> Projects { get; init; } = new();
         public bool IsLikedByCurrentUser { get; init; }
+        public int Version { get; init; }
     }
     public class CvAttributeDto
     {
@@ -62,5 +67,7 @@ namespace backend.Dtos.Cv
     {
         [Required(ErrorMessage = "IdRequired")]
         public int Id { get; init; }
+        [Required(ErrorMessage = "VersionRequired")]
+        public int Version { get; init; }
     }
 }

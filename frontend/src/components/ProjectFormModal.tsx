@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Project, User } from "../models";
 import { createProject, updateProject } from "../api/projectApi";
+import TagSelector from "./TagSelector";
+import ToastNotification from "./notifications/ToastNotification";
 
 interface ProjectFormModalProps {
   initial?: Project;
@@ -23,18 +25,20 @@ function ProjectFormModal({
   );
   const [endDate, setEndDate] = useState(initial?.endDate?.slice(0, 10) ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [tagsInput, setTagsInput] = useState(
-    initial?.tags.map((t) => t).join(", ") ?? "",
-  );
-  const [error, setError] = useState<string | null>(null);
+  const [tags, setTags] = useState(initial?.tags ?? []);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "danger";
+  } | null>(null);
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
     if (!name.trim() || !startDate) {
-      setError(t("projectForm.nameAndStartRequired"));
+      setToast({
+        message: t("projectForm.nameAndStartRequired"),
+        type: "danger",
+      });
       return;
     }
 
@@ -47,10 +51,7 @@ function ProjectFormModal({
         startDate,
         endDate: endDate || null,
         description,
-        tags: tagsInput
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
+        tags,
       };
 
       if (initial) {
@@ -61,7 +62,10 @@ function ProjectFormModal({
 
       onSaved();
     } catch (err: any) {
-      setError(err.message);
+      setToast({
+        message: err.message ?? t("projectForm.saveFailed"),
+        type: "danger",
+      });
     } finally {
       setSaving(false);
     }
@@ -82,7 +86,7 @@ function ProjectFormModal({
       >
         <div
           className="modal-content border-0 shadow"
-          style={{ borderRadius: "18px", overflow: "hidden" }}
+          style={{ borderRadius: "18px" }}
         >
           <form onSubmit={handleSubmit}>
             <div className="modal-header px-4 py-3">
@@ -149,23 +153,17 @@ function ProjectFormModal({
                 <label className="form-label small fw-semibold">
                     {t("projectForm.technologyTags")}
                 </label>
-                <input
-                  className="form-control"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder={t("projectForm.tagsPlaceholder")}
+                <TagSelector
+                  selectedTagNames={tags}
+                  onNamesChange={setTags}
+                  onError={(message) =>
+                    setToast({
+                      message: message || t("projectForm.tagsLoadFailed"),
+                      type: "danger",
+                    })
+                  }
                 />
-                <div className="form-text">{t("projectForm.commaSeparated")}</div>
               </div>
-
-              {error && (
-                <div
-                  className="alert alert-danger py-2 small mb-0"
-                  role="alert"
-                >
-                  {error}
-                </div>
-              )}
             </div>
 
             <div className="modal-footer px-4">
@@ -188,6 +186,7 @@ function ProjectFormModal({
           </form>
         </div>
       </div>
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }

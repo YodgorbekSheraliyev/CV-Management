@@ -39,6 +39,7 @@ export interface CV extends CVSummary {
   attributes: CvAttribute[];
   projects: Project[];
   isLikedByCurrentUser: boolean;
+  version: number;
 }
 
 export interface CvAttribute {
@@ -76,6 +77,7 @@ export interface Position {
   isPublic: boolean;
   maxProjects?: number;
   hasUserApplied: boolean;
+  version: number;
 }
 
 export interface PositionSummary {

@@ -67,7 +67,8 @@ namespace backend.Data
             modelBuilder.Entity<CV>(entity =>
             {
                 entity.HasKey(x => x.Id);
-                
+                entity.Property(x => x.Version).IsConcurrencyToken();
+
                 entity.HasOne(x => x.User)
                 .WithMany(u => u.CVs)
                 .HasForeignKey(x => x.UserId)
@@ -99,6 +100,7 @@ namespace backend.Data
             {
                 entity.HasMany(x => x.Tags).WithMany(x => x.Positions);
                 entity.HasMany(x => x.Attributes).WithMany(x => x.Positions);
+                entity.Property(x => x.Version).IsConcurrencyToken();
             });
 
             modelBuilder.Entity<Project>(entity =>

@@ -14,6 +14,7 @@ import { useAuth } from "../hooks/auth";
 function toFormValues(position: Position): PositionFormValues {
   return {
     id: position.id,
+    version: position.version,
     title: position.title,
     description: position.description,
     attributeIds: position.attributes.map((a) => a.id),
@@ -54,8 +55,10 @@ const EditPositionPage = () => {
   }, []);
 
   useEffect(() => {
+    setInitialValues(undefined);
+    setPositionTitle("");
     loadPosition();
-  }, [id]);
+  }, [id, user?.id]);
 
   const loadPosition = async () => {
     if (!id || !user) return;
@@ -100,10 +103,15 @@ const EditPositionPage = () => {
     setSaving(true);
 
     try {
-      await updatePosition(valuesToUpdate);
-
+      const updatedPosition = await updatePosition(valuesToUpdate);
+      setInitialValues(toFormValues(updatedPosition));
+      setPositionTitle(updatedPosition.title);
       navigate(`/positions/${id}`);
     } catch (error: any) {
+      if (error?.status === 409) {
+        await loadPosition();
+      }
+
       setToast({
         message: error.message ?? t("editPositionPage.errors.updateFailed"),
         type: "danger",

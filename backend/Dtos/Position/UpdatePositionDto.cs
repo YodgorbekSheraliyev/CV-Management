@@ -7,5 +7,7 @@ namespace backend.Dtos.Position
     {
         [Required(ErrorMessage = "IdRequired")]
         public int Id { get; set; }
+        [Required(ErrorMessage ="VersionRequired")]
+        public int Version { get; set; }
     }
 }

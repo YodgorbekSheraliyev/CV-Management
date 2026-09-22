@@ -10,6 +10,7 @@
         public List<Tag>? Tags { get; set; }
         public List<CV>? CVs { get; set; }
         public int MaxProjects { get; set; }
+        public int Version { get; set; } = 1;
         
     }
 }

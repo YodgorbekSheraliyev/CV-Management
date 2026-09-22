@@ -16,6 +16,7 @@ namespace backend.Dtos.Position
         public bool IsPublic { get; set; } = true;
         public int MaxProjects { get; set; }
         public bool HasUserApplied { get; set; } = false;
+        public int Version { get; set; }
     }
     public class PositionSummaryDto
     {

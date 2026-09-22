@@ -14,7 +14,13 @@ export const getPositionById = async (positionId: number) => {
   return response.data;
 };
 
-export const createPosition = async (position: Omit<Position, "id">) => {
+export const createPosition = async (
+  position: Pick<Position, "title" | "description" | "maxProjects"> & {
+    attributeIds: number[];
+    accessRules: unknown[];
+    tagIds: number[];
+  },
+) => {
   const { data: response } = await api.post<CommonResponse<Position>>(
     `/positions`,
     position,
@@ -22,7 +28,13 @@ export const createPosition = async (position: Omit<Position, "id">) => {
   return response.data;
 };
 
-export const updatePosition = async (position: Position) => {
+export const updatePosition = async (
+  position: Pick<Position, "id" | "version" | "title" | "description" | "maxProjects"> & {
+    attributeIds: number[];
+    accessRules: unknown[];
+    tagIds: number[];
+  },
+) => {
   const { data: response } = await api.put<CommonResponse<Position>>(
     `/positions`,
     position,

@@ -195,33 +195,14 @@ const CvPage = () => {
     setSavingAttributeId(attribute.attributeId);
 
     try {
-      await updateCvAttributeValue({
+      const updated = await updateCvAttributeValue({
         cvId: cv.id,
+        version: cv.version,
         attributeId: attribute.attributeId,
         value: valueToSave,
       });
 
-      setCv((current) => {
-        if (!current) {
-          return current;
-        }
-
-        return {
-          ...current,
-          attributes: current.attributes.map((item) =>
-            item.attributeId === attribute.attributeId
-              ? {
-                  ...item,
-                  value: valueToSave,
-                  isEmpty: !isAttributeFilled({
-                    ...item,
-                    value: valueToSave,
-                  }),
-                }
-              : item,
-          ),
-        };
-      });
+      setCv(updated);
 
       setToast({
         message: t("cvPage.toast.attributeUpdated"),
@@ -247,7 +228,7 @@ const CvPage = () => {
     setDeleting(true);
 
     try {
-      await deleteCv(cv.id);
+      await deleteCv(cv.id, cv.version);
       navigate("/");
     } catch (err: any) {
       setToast({
@@ -268,7 +249,7 @@ const CvPage = () => {
     setPublishing(true);
 
     try {
-      const updated = await publishCv(cv.id);
+      const updated = await publishCv(cv.id, cv.version);
 
       setCv(updated);
 

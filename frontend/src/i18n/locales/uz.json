@@ -63,9 +63,20 @@
     "description": "Tavsif",
     "technologyTags": "Texnologiya teglari",
     "tagsPlaceholder": "React, TypeScript, PostgreSQL",
-    "commaSeparated": "Vergul bilan ajrating.",
     "nameAndStartRequired": "Nom va boshlanish sanasi kiritilishi shart.",
+    "saveFailed": "Loyihani saqlab bo'lmadi.",
+    "tagsLoadFailed": "Teglarni yuklab bo'lmadi.",
     "saving": "Saqlanmoqda..."
+  },
+  "tagSelector": {
+    "select": "Teglarni tanlang...",
+    "add": "Teg qo'shish...",
+    "tags": "Teglar",
+    "available": "Mavjud teglar",
+    "noTags": "Teglar topilmadi",
+    "creating": "Yaratilmoqda...",
+    "create": "\"{{name}}\" yaratish",
+    "remove": "{{name}} tegini olib tashlash"
   },
   "attributePicker": {
     "addAttribute": "Atribut qo'shish",

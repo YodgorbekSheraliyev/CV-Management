@@ -1,15 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Plus, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { Tag } from "../models";
 import { getAllTags as getTags, createTag } from "../api/tagApi";
 
 interface TagSelectorProps {
-  selectedTagIds: number[];
-  onChange: (tagIds: number[]) => void;
+  selectedTagIds?: number[];
+  onChange?: (tagIds: number[]) => void;
+  selectedTagNames?: string[];
+  onNamesChange?: (tagNames: string[]) => void;
+  onError?: (message: string) => void;
 }
 
-const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
+const TagSelector = ({
+  selectedTagIds = [],
+  onChange,
+  selectedTagNames,
+  onNamesChange,
+  onError,
+}: TagSelectorProps) => {
+  const { t } = useTranslation();
+  const nameMode = selectedTagNames !== undefined && onNamesChange !== undefined;
   const [tags, setTags] = useState<Tag[]>([]);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -28,7 +40,7 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
       const result = await getTags();
       setTags(result);
     } catch (error: any) {
-      console.error(error.message);
+      onError?.(error.message);
     } finally {
       setLoading(false);
     }
@@ -52,7 +64,7 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   }, []);
 
   const selectedTagObjects = tags.filter((tag) =>
-    selectedTagIds.includes(tag.id),
+    nameMode ? selectedTagNames.includes(tag.name) : selectedTagIds.includes(tag.id),
   );
 
   const normalizedSearch = search.trim().toLowerCase();
@@ -70,15 +82,29 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   );
 
   const toggleTag = (tag: Tag) => {
+    if (nameMode) {
+      if (selectedTagNames.includes(tag.name)) {
+        onNamesChange(selectedTagNames.filter((name) => name !== tag.name));
+      } else {
+        onNamesChange([...selectedTagNames, tag.name]);
+      }
+      return;
+    }
+
     if (selectedTagIds.includes(tag.id)) {
-      onChange(selectedTagIds.filter((id) => id !== tag.id));
+      onChange?.(selectedTagIds.filter((id) => id !== tag.id));
     } else {
-      onChange([...selectedTagIds, tag.id]);
+      onChange?.([...selectedTagIds, tag.id]);
     }
   };
 
-  const removeTag = (tagId: number) => {
-    onChange(selectedTagIds.filter((id) => id !== tagId));
+  const removeTag = (tag: Tag) => {
+    if (nameMode) {
+      onNamesChange(selectedTagNames.filter((name) => name !== tag.name));
+      return;
+    }
+
+    onChange?.(selectedTagIds.filter((id) => id !== tag.id));
   };
 
   const handleCreate = async () => {
@@ -95,12 +121,16 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
 
       setTags((current) => [...current, newTag]);
 
-      onChange([...selectedTagIds, newTag.id]);
+      if (nameMode) {
+        onNamesChange([...selectedTagNames, newTag.name]);
+      } else {
+        onChange?.([...selectedTagIds, newTag.id]);
+      }
 
       setSearch("");
       setOpen(false);
     } catch (error: any) {
-      console.error(error.message);
+      onError?.(error.message);
     } finally {
       setCreating(false);
     }
@@ -127,8 +157,22 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
       return;
     }
 
-    if (event.key === "Backspace" && !search && selectedTagIds.length > 0) {
-      removeTag(selectedTagIds[selectedTagIds.length - 1]);
+    const selectedCount = nameMode
+      ? selectedTagNames.length
+      : selectedTagIds.length;
+
+    if (event.key === "Backspace" && !search && selectedCount > 0) {
+        if (nameMode) {
+        const lastTag = tags.find(
+          (tag) => tag.name === selectedTagNames[selectedTagNames.length - 1],
+        );
+        if (lastTag) removeTag(lastTag);
+        } else {
+        const lastTag = tags.find(
+          (tag) => tag.id === selectedTagIds[selectedTagIds.length - 1],
+        );
+        if (lastTag) removeTag(lastTag);
+        }
     }
 
     if (event.key === "Escape") {
@@ -169,10 +213,10 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
             <button
               type="button"
               className="btn btn-sm p-0 border-0 d-flex align-items-center text-secondary"
-              aria-label={`Remove ${tag.name}`}
+              aria-label={t("tagSelector.remove", { name: tag.name })}
               onClick={(event) => {
                 event.stopPropagation();
-                removeTag(tag.id);
+                removeTag(tag);
               }}
             >
               <X size={14} />
@@ -187,7 +231,9 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
           value={search}
           disabled={loading}
           placeholder={
-            selectedTagIds.length === 0 ? "Select tags..." : "Add tag..."
+            (nameMode ? selectedTagNames.length : selectedTagIds.length) === 0
+              ? t("tagSelector.select")
+              : t("tagSelector.add")
           }
           className="border-0 shadow-none flex-grow-1"
           style={{
@@ -215,7 +261,7 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
           {/* Search result header */}
           <div className="px-3 py-2 border-bottom">
             <small className="text-muted">
-              {normalizedSearch ? "Tags" : "Available tags"}
+              {normalizedSearch ? t("tagSelector.tags") : t("tagSelector.available")}
             </small>
           </div>
 
@@ -229,7 +275,9 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
           >
             {filteredTags.length > 0 ? (
               filteredTags.map((tag) => {
-                const selected = selectedTagIds.includes(tag.id);
+                const selected = nameMode
+                  ? selectedTagNames.includes(tag.name)
+                  : selectedTagIds.includes(tag.id);
 
                 return (
                   <button
@@ -256,7 +304,7 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               })
             ) : (
               <div className="px-3 py-3 text-muted text-center">
-                No tags found
+                {t("tagSelector.noTags")}
               </div>
             )}
           </div>
@@ -273,7 +321,9 @@ const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               <Plus size={17} />
 
               <span>
-                {creating ? "Creating..." : `Create "${search.trim()}"`}
+                {creating
+                  ? t("tagSelector.creating")
+                  : t("tagSelector.create", { name: search.trim() })}
               </span>
             </button>
           )}
