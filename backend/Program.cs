@@ -18,7 +18,18 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Database"));
 });
 
-builder.Services.AddCors();
+const string CorsPolicy = "MY_CORS_POLICY";
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CorsPolicy, builder =>
+    {
+        builder.WithOrigins(allowedOrigins)
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -95,16 +106,14 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ApplicationService>();
 
 var app = builder.Build();
-app.UseCors(builder => builder
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+app.UseCors(CorsPolicy);
 app.UseRequestLocalization();
 
 using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
     await dataContext.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(dataContext);
 }
 
 app.UseStaticFiles();

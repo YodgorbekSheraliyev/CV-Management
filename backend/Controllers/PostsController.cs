@@ -12,7 +12,6 @@ namespace backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly PostService _postService;
@@ -39,6 +38,7 @@ namespace backend.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> Update(UpdatePostDto updatePostDto)
         {
             var post = await _postService.Update(updatePostDto, CurrentUserId);
@@ -46,6 +46,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> Delete(DeletePostDto deletePostDto)
         {
             await _postService.Delete(deletePostDto, CurrentUserId);
