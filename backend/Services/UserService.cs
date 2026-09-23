@@ -55,7 +55,8 @@ namespace backend.Services
                 ImageUrl = imageUrl,
                 Location = location,
                 Role = user.Role.ToString(),
-                Email = user.Email
+                Email = user.Email,
+                Version = user.Version
             };
 
             return userDto;
@@ -67,6 +68,11 @@ namespace backend.Services
             if (user is null)
             {
                 throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+
+            if (user.Version != updateUserDto.Version)
+            {
+                throw new ConflictException(_localizer["UserVersionNotMatch"]);
             }
 
             var attributeValues = await _db.AttributeValues
@@ -96,7 +102,7 @@ namespace backend.Services
 
             if (updateUserDto.LastName is not null)
             {
-                var lastName = attributeValues.FirstOrDefault(x =>x.AttributeId == (int)BuiltInAttributes.LastName);
+                var lastName = attributeValues.FirstOrDefault(x => x.AttributeId == (int)BuiltInAttributes.LastName);
                 if (lastName is null)
                 {
                     lastName = new AttributeValue
@@ -134,8 +140,96 @@ namespace backend.Services
                 }
             }
 
-            await _db.SaveChangesAsync();
+            user.Version++;
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["UserVersionNotMatch"]);
+            }
             return await GetUserById(userId);
         }
+
+        public async Task<List<AdminUserDto>> GetAllForAdmin()
+        {
+            return await _db.Users.AsNoTracking()
+                .OrderBy(user => user.Email)
+                .Select(user => new AdminUserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Role = user.Role.ToString(),
+                    IsBlocked = user.IsBlocked,
+                    Version = user.Version
+                })
+                .ToListAsync();
+        }
+
+        public async Task<AdminUserDto> UpdateRole(UpdateUserRoleDto dto)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(item => item.Id == dto.UserId);
+            if (user is null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+
+            if (user.Version != dto.Version)
+            {
+                throw new ConflictException(_localizer["UserVersionNotMatch"]);
+            }
+            user.Role = dto.Role;
+            user.Version++;
+            await SaveAdminChange(user);
+            return ToAdminDto(user);
+        }
+
+        public async Task<AdminUserDto> UpdateBlocked(UpdateUserBlockDto dto)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(item => item.Id == dto.UserId);
+            if (user is null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+
+            if (user.Version != dto.Version) throw new ConflictException(_localizer["UserVersionNotMatch"]);
+            user.IsBlocked = dto.IsBlocked;
+            user.Version++;
+            await SaveAdminChange(user);
+            return ToAdminDto(user);
+        }
+
+        public async Task DeleteUser(int userId)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(item => item.Id == userId);
+            if (user is null)
+            {
+                throw new NotFoundException(_localizer["UserNotFound"]);
+            }
+            _db.Users.Remove(user);
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task SaveAdminChange(User user)
+        {
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(_localizer["UserVersionNotMatch"]);
+            }
+        }
+
+        private static AdminUserDto ToAdminDto(User user) => new()
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = user.Role.ToString(),
+            IsBlocked = user.IsBlocked,
+            Version = user.Version
+        };
     }
 }

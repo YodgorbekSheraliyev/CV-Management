@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import NavBar from "../components/navbar/NavBar";
 import type { PositionSummary } from "../models";
@@ -20,36 +20,50 @@ const PositionsPage = () => {
   const [search, setSearch] = useState("");
   const [access, setAccess] = useState("All positions");
   const [sort, setSort] = useState("Most CVs");
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const latestRequest = useRef(0);
 
   useEffect(() => {
-    loadPositions();
-  }, []);
+    const timer = window.setTimeout(() => {
+      void loadPositions(search, page);
+    }, 250);
 
-  const loadPositions = async () => {
+    return () => {
+      window.clearTimeout(timer);
+      latestRequest.current += 1;
+    };
+  }, [search, page]);
+
+  const loadPositions = async (query = "", requestedPage = 1) => {
+    const requestId = ++latestRequest.current;
+
     try {
-      const res = await getPositions();
-      setPositions(res);
+      if (requestId !== latestRequest.current) return;
+      const res = await getPositions(query, requestedPage, pageSize);
+
+      setPositions(res.items);
+      setTotalCount(res.totalCount);
     } catch (error: any) {
+      if (requestId !== latestRequest.current) return;
+
       setError(error.message ?? t("positionsPage.loadError"));
     } finally {
-      setLoading(false);
+      if (requestId === latestRequest.current) {
+        setLoading(false);
+      }
     }
   };
 
   const filteredPositions = useMemo(() => {
     const filtered = positions.filter((position) => {
-      const query = search.toLowerCase();
-      const matchesSearch =
-        query === "" ||
-        position.title.toLowerCase().includes(query) ||
-        (position.tags ?? []).some((tag) => tag.toLowerCase().includes(query));
-
       const matchesAccess =
         access === "All positions" ||
         (access === "Public" && position.isPublic) ||
         (access === "Restricted" && !position.isPublic);
 
-      return matchesSearch && matchesAccess;
+      return matchesAccess;
     });
 
     switch (sort) {
@@ -62,7 +76,9 @@ const PositionsPage = () => {
       default:
         return filtered;
     }
-  }, [positions, search, access, sort]);
+  }, [positions, access, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
     <div className="min-vh-100 bg-light">
@@ -106,14 +122,19 @@ const PositionsPage = () => {
                   {t("positionsPage.searchPositions")}
                 </label>
                 <div className="input-group">
-                  <span className="input-group-text bg-white">🔎</span>
+                  <span className="input-group-text bg-white">
+                    <i className="bi bi-search" />
+                  </span>
                   <input
                     id="position-search"
                     type="search"
                     className="form-control"
                     placeholder={t("positionsPage.searchPlaceholder")}
                     value={search}
-                    onChange={(event) => setSearch(event.target.value)}
+                    onChange={(event) => {
+                      setPage(1);
+                      setSearch(event.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -129,7 +150,10 @@ const PositionsPage = () => {
                   id="access"
                   className="form-select"
                   value={access}
-                  onChange={(event) => setAccess(event.target.value)}
+                  onChange={(event) => {
+                    setPage(1);
+                    setAccess(event.target.value);
+                  }}
                 >
                   <option value="All positions">
                     {t("positionsPage.allPositions")}
@@ -200,7 +224,7 @@ const PositionsPage = () => {
                   {filteredPositions.length}
                 </strong>{" "}
                 {t("positionsPage.of")}{" "}
-                <strong className="text-dark">{positions.length}</strong>{" "}
+                <strong className="text-dark">{totalCount}</strong>{" "}
                 {t("positionsPage.positions")}
               </div>
             </div>
@@ -296,7 +320,16 @@ const PositionsPage = () => {
                 </table>
               </div>
 
-              {filteredPositions.length === 0 && <EmptyState />}
+              {filteredPositions.length === 0 && (
+                <EmptyState
+                  onClearFilters={() => {
+                    setPage(1);
+                    setSearch("");
+                    setAccess("All positions");
+                    setSort("Most CVs");
+                  }}
+                />
+              )}
             </div>
 
             {/* Mobile cards */}
@@ -357,9 +390,45 @@ const PositionsPage = () => {
                   </Link>
                 ))}
 
-                {filteredPositions.length === 0 && <EmptyState />}
+                {filteredPositions.length === 0 && (
+                  <EmptyState
+                    onClearFilters={() => {
+                      setPage(1);
+                      setSearch("");
+                      setAccess("All positions");
+                      setSort("Most CVs");
+                    }}
+                  />
+                )}
               </div>
             </div>
+
+            {totalPages > 1 && (
+              <nav
+                className="d-flex justify-content-center align-items-center gap-3 mt-4"
+                aria-label={t("positionsPage.pagination")}
+              >
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  disabled={page === 1}
+                  onClick={() => setPage((current) => current - 1)}
+                >
+                  {t("positionsPage.previous")}
+                </button>
+                <span className="small text-muted">
+                  {t("positionsPage.pageOf", { page, totalPages })}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((current) => current + 1)}
+                >
+                  {t("positionsPage.next")}
+                </button>
+              </nav>
+            )}
           </>
         )}
 
@@ -404,11 +473,13 @@ const PositionsPage = () => {
   );
 };
 
-const EmptyState = () => {
+const EmptyState = ({ onClearFilters }: { onClearFilters: () => void }) => {
   const { t } = useTranslation();
   return (
     <div className="text-center py-5 px-4">
-      <div className="fs-1 mb-3">🔎</div>
+      <div className="fs-1 mb-3">
+        <i className="bi bi-search" />
+      </div>
 
       <h2 className="h5 fw-bold">{t("positionsPage.noPositionsFound")}</h2>
 
@@ -416,7 +487,10 @@ const EmptyState = () => {
         {t("positionsPage.changeSearchOrFilters")}
       </p>
 
-      <button className="btn btn-outline-primary btn-sm">
+      <button
+        className="btn btn-outline-primary btn-sm"
+        onClick={onClearFilters}
+      >
         {t("positionsPage.clearFilters")}
       </button>
     </div>

@@ -60,6 +60,12 @@ const PositionPage = () => {
     if (!id) return;
     loadPosition(+id);
     loadPosts(+id);
+
+    const refresh = window.setInterval(() => {
+      void loadPosts(+id);
+    }, 3000);
+
+    return () => window.clearInterval(refresh);
   }, [id]);
 
   const loadPosition = async (positionId: number) => {
@@ -453,14 +459,29 @@ const PositionPage = () => {
                           <tr key={rule.id}>
                             <td className="px-4 py-3">
                               <div className="fw-semibold">
-                                {rule.attribute.name}
+                                {rule.attribute?.name ??
+                                  position.attributes.find(
+                                    (attribute) =>
+                                      attribute.id === rule.attributeId,
+                                  )?.name ??
+                                  t("positionPage.unknownAttribute")}
                               </div>
                             </td>
                             <td>
                               <span className="badge text-bg-light border">
-                                {t(
-                                  `attributeManagement.types.${AttributeType[rule.attribute.type]}`,
-                                )}
+                                {(() => {
+                                  const attribute =
+                                    rule.attribute ??
+                                    position.attributes.find(
+                                      (item) => item.id === rule.attributeId,
+                                    );
+
+                                  return attribute
+                                    ? t(
+                                        `attributeManagement.types.${AttributeType[attribute.attributeType as AttributeType]}`,
+                                      )
+                                    : "-";
+                                })()}
                               </span>
                             </td>
                             <td>

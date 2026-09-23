@@ -26,17 +26,18 @@ namespace backend.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? search = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _positionService.GetAll();
-            return Ok(CommonResponse<List<PositionSummaryDto>>.Ok(result));
+            var result = await _positionService.GetAll(search, page, pageSize);
+            return Ok(CommonResponse<PagedResponse<PositionSummaryDto>>.Ok(result));
         }
 
         [HttpGet("{positionId:int}")]
-        [Authorize(Roles = "Recruiter,Administrator,Candidate")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int positionId)
         {
-            var result = await _positionService.GetById(positionId, CurrentUserId);
+            int? userId = User.Identity?.IsAuthenticated == true ? CurrentUserId : null;
+            var result = await _positionService.GetById(positionId, userId);
             return Ok(CommonResponse<PositionDto>.Ok(result));
         }
 
@@ -76,7 +77,7 @@ namespace backend.Controllers
         [Authorize(Roles = "Candidate")]
         public async Task<IActionResult> Apply(int positionId)
         {
-            var result = await _positionService.Apply(positionId, 1);
+            var result = await _positionService.Apply(positionId, CurrentUserId);
             return Ok(CommonResponse<object>.Ok(result));
         }
     }

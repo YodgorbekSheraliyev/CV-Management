@@ -25,9 +25,14 @@ namespace backend.Controllers
             _userService = userService;
             _localizer = localizer;
         }
+
         [HttpGet("{userId:int}")]
         public async Task<IActionResult> GetUserProfile(int userId)
         {
+            if (CurrentUserId != userId && User.IsInRole("Candidate"))
+            {
+                throw new ForbiddenException(_localizer["ProfileAccessDenied"]);
+            }
             var user = await _userService.GetUserById(userId);
             return Ok(CommonResponse<UserDto>.Ok(user));
         }
@@ -38,6 +43,40 @@ namespace backend.Controllers
         {
             var user = await _userService.Update(CurrentUserId, updateUserDto);
             return Ok(CommonResponse<UserDto>.Ok(user));
+        }
+
+        [HttpGet("admin/all")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetAllForAdmin()
+        {
+            var users = await _userService.GetAllForAdmin();
+            return Ok(CommonResponse<List<AdminUserDto>>.Ok(users));
+        }
+
+
+        [HttpPut("admin/role")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> UpdateRole(UpdateUserRoleDto dto)
+        {
+            var result = await _userService.UpdateRole(dto);
+            return Ok(CommonResponse<AdminUserDto>.Ok(result));
+        }
+
+
+        [HttpPut("admin/block")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> UpdateBlocked(UpdateUserBlockDto dto)
+        {
+            var result = await _userService.UpdateBlocked(dto);
+            return Ok(CommonResponse<AdminUserDto>.Ok(result));
+        }
+
+        [HttpDelete("admin/{userId:int}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            await _userService.DeleteUser(userId);
+            return NoContent();
         }
     }
 }

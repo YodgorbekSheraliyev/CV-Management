@@ -1,9 +1,20 @@
 import type { CVSummary, Position, PositionSummary } from "../models";
 import api, { type CommonResponse } from "./axios";
 
-export const getPositions = async () => {
-  const { data: response } =
-    await api.get<CommonResponse<PositionSummary[]>>("/positions/all");
+export interface PagedPositions {
+  items: PositionSummary[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export const getPositions = async (search = "", page = 1, pageSize = 10) => {
+  const { data: response } = await api.get<CommonResponse<PagedPositions>>(
+    "/positions/all",
+    {
+      params: { search: search || undefined, page, pageSize },
+    },
+  );
   return response.data;
 };
 
@@ -29,7 +40,10 @@ export const createPosition = async (
 };
 
 export const updatePosition = async (
-  position: Pick<Position, "id" | "version" | "title" | "description" | "maxProjects"> & {
+  position: Pick<
+    Position,
+    "id" | "version" | "title" | "description" | "maxProjects"
+  > & {
     attributeIds: number[];
     accessRules: unknown[];
     tagIds: number[];

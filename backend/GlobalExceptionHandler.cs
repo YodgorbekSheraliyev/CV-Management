@@ -13,8 +13,10 @@ namespace backend
                 NotFoundException => StatusCodes.Status404NotFound,
                 InvalidDataException => StatusCodes.Status400BadRequest,
                 ArgumentException => StatusCodes.Status400BadRequest,
+                BadRequestException => StatusCodes.Status400BadRequest,
                 InvalidOperationException => StatusCodes.Status400BadRequest,
                 ForbiddenException => StatusCodes.Status403Forbidden,
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
                 ConflictException => StatusCodes.Status409Conflict,
                 _ => StatusCodes.Status500InternalServerError
             };

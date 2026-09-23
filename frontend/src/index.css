@@ -33,3 +33,41 @@
     display: block;
     transition: all 2.2s ease;
 }
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bs-body-bg: #15171a;
+  --bs-body-color: #e7e9ec;
+  --bs-light: #24282d;
+  --bs-white: #1d2024;
+  --bs-border-color: #3b4148;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .bg-light {
+  background-color: #15171a !important;
+  color: #e7e9ec;
+}
+
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .list-group-item,
+:root[data-theme="dark"] .table {
+  background-color: #1d2024 !important;
+  color: #e7e9ec;
+}
+
+:root[data-theme="dark"] .text-dark,
+:root[data-theme="dark"] .navbar-brand,
+:root[data-theme="dark"] .nav-link {
+  color: #e7e9ec !important;
+}
+
+:root[data-theme="dark"] .text-muted {
+  color: #adb5bd !important;
+}

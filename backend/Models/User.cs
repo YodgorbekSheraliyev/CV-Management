@@ -8,6 +8,8 @@ namespace backend.Models
         public string Email { get; set; }
         public string? Password { get; set; }
         public UserRole Role { get; set; }
+        public bool IsBlocked { get; set; }
+        public int Version { get; set; } = 1;
         public List<AttributeValue> AttributeValues { get; set; }
         public List<Project>? Projects { get; set; }
         public List<CV>? CVs { get; set; }

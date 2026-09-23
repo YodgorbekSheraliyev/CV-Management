@@ -89,6 +89,7 @@ builder.Services.AddScoped<AttributeValueService>();
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<PositionService>();
 builder.Services.AddScoped<CvService>();
+builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ApplicationService>();

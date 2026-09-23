@@ -16,6 +16,7 @@ import ToastNotification from "../components/notifications/ToastNotification";
 type Tab = "me" | "info" | "projects" | "cvs";
 
 interface UpdateUserData {
+  version: number;
   firstName: string;
   lastName: string;
   location: string;

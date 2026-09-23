@@ -219,6 +219,9 @@
   <data name="CvNotFound" xml:space="preserve">
     <value>CV not found.</value>
   </data>
+  <data name="CvAccessDenied" xml:space="preserve">
+    <value>You do not have access to this CV.</value>
+  </data>
   <data name="CvNotPublished" xml:space="preserve">
     <value>This CV has not been published.</value>
   </data>
@@ -279,6 +282,9 @@
   <data name="PositionVersionNotMatch" xml:space="preserve">
     <value>This position was changed by someone else. Reload it and try again.</value>
   </data>
+  <data name="UserVersionNotMatch" xml:space="preserve">
+    <value>This user was changed by someone else. Reload the data and try again.</value>
+  </data>
   <data name="ProjectNotFound" xml:space="preserve">
     <value>Project not found.</value>
   </data>
@@ -323,5 +329,8 @@
   </data>
   <data name="VersionRequired" xml:space="preserve">
     <value>Version is required.</value>
+  </data>
+  <data name="ProfileAccessDenied" xml:space="preserve">
+    <value>You do not have permission to access this profile.</value>
   </data>
 </root>

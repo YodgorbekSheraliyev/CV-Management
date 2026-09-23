@@ -8,6 +8,7 @@ import ImageField from "../fields/ImageField";
 interface MeSectionProps {
   user: User;
   onSave: (data: {
+    version: number;
     firstName: string;
     lastName: string;
     location: string;
@@ -29,6 +30,7 @@ const MeSection = ({ user, onSave, readOnly = false }: MeSectionProps) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [error, setError] = useState("");
 
   const [formValues, setFormValues] = useState<FormValues>({
@@ -52,7 +54,18 @@ const MeSection = ({ user, onSave, readOnly = false }: MeSectionProps) => {
       ...current,
       [field]: value,
     }));
+    setHasUnsavedChanges(true);
   };
+
+  useEffect(() => {
+    if (readOnly || !isEditing || !hasUnsavedChanges) return;
+
+    const timer = window.setTimeout(() => {
+      void handleSave();
+    }, 5000);
+
+    return () => window.clearTimeout(timer);
+  }, [formValues, hasUnsavedChanges, isEditing, readOnly]);
 
   const handleEdit = () => {
     setError("");
@@ -96,12 +109,14 @@ const MeSection = ({ user, onSave, readOnly = false }: MeSectionProps) => {
       setIsSaving(true);
 
       await onSave({
+        version: user.version,
         firstName: formValues.firstName.trim(),
         lastName: formValues.lastName.trim(),
         location: formValues.location.trim(),
         imageUrl: formValues.imageUrl?.trim(),
       });
 
+      setHasUnsavedChanges(false);
       setIsEditing(false);
     } catch {
       setError(t("meSection.saveFailed"));

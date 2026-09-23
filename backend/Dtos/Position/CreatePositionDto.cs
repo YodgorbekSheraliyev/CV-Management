@@ -9,8 +9,7 @@ namespace backend.Dtos.Position
         [Required(ErrorMessage = "TitleRequired")]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "DescriptionRequired")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public List<int> AttributeIds { get; set; } = new();
         public List<CreateAccessRuleDto> AccessRules { get; set; } = new();

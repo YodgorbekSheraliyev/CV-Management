@@ -71,7 +71,7 @@ namespace backend.Services
         public async Task<string> Login(LoginDto loginDto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-            if (user is null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
+            if (user is null || user.IsBlocked || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
                 throw new InvalidDataException(_localizer["EmailOrPasswordWrong"]);
             }
@@ -291,6 +291,11 @@ namespace backend.Services
 
         private string GenerateToken(User user)
         {
+            if (user.IsBlocked)
+            {
+                throw new ForbiddenException(_localizer["UserBlocked"]);
+            }
+
             var claims = new Claim[] {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),

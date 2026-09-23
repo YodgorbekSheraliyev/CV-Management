@@ -96,6 +96,11 @@ namespace backend.Data
                 .OnDelete(DeleteBehavior.SetNull);
             });
 
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(x => x.Version).IsConcurrencyToken();
+            });
+
             modelBuilder.Entity<Position>(entity =>
             {
                 entity.HasMany(x => x.Tags).WithMany(x => x.Positions);

@@ -22,10 +22,27 @@ namespace backend.Services
             _localizer = localizer;
         }
 
-        public async Task<List<PositionSummaryDto>> GetAll()
+        public async Task<PagedResponse<PositionSummaryDto>> GetAll(string? search = null, int page = 1, int pageSize = 10)
         {
-            return await _db.Positions
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
+            var query = _db.Positions.AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+                query = query.Where(position =>
+                    position.Title.Contains(term) ||
+                    position.Description.Contains(term) ||
+                    position.Tags.Any(tag => tag.Name.Contains(term)));
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
                 .AsNoTracking()
+                .OrderByDescending(position => position.UpdatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(p => new PositionSummaryDto
                 {
                     Id = p.Id,
@@ -37,8 +54,16 @@ namespace backend.Services
                     CVsCount = p.CVs.Count
                 })
                 .ToListAsync();
+
+            return new PagedResponse<PositionSummaryDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
-        public async Task<PositionDto> GetById(int positionId, int userId)
+        public async Task<PositionDto> GetById(int positionId, int? userId)
         {
             var dto = await _db.Positions
                 .AsNoTracking()
@@ -65,7 +90,15 @@ namespace backend.Services
                         Description = a.Description,
                         IsBuiltIn = a.IsBuiltIn
                     }).ToList(),
-                    PositionAccessRules = p.PositionAccessRules,
+                    PositionAccessRules = p.PositionAccessRules.Select(r => new PositionAccessRule
+                    {
+                        Id = r.Id,
+                        PositionId = r.PositionId,
+                        AttributeId = r.AttributeId,
+                        ComparisonType = r.ComparisonType,
+                        Value = r.Value,
+                        Attribute = r.Attribute
+                    }).ToList(),
                     CVsCount = p.CVs.Count,
                     Version = p.Version
                 })
@@ -101,7 +134,7 @@ namespace backend.Services
                 MaxProjects = dto.MaxProjects,
                 Attributes = attributes,
                 Tags = tags,
-                PositionAccessRules = dto.AccessRules.Select(r => new PositionAccessRule
+                PositionAccessRules = dto.IsPublic ? new List<PositionAccessRule>() : dto.AccessRules.Select(r => new PositionAccessRule
                 {
                     AttributeId = r.AttributeId,
                     ComparisonType = r.ComparisonType,
@@ -129,7 +162,7 @@ namespace backend.Services
             {
                 throw new NotFoundException(_localizer["PositionNotFound"]);
             }
-            if(position.Version != dto.Version)
+            if (position.Version != dto.Version)
             {
                 throw new ConflictException(_localizer["PositionVersionNotMatch"]);
             }
@@ -149,7 +182,7 @@ namespace backend.Services
             position.MaxProjects = dto.MaxProjects;
 
             position.PositionAccessRules.Clear();
-            foreach(var rule in dto.AccessRules)
+            foreach (var rule in dto.IsPublic ? new List<CreateAccessRuleDto>() : dto.AccessRules)
             {
                 position.PositionAccessRules.Add(new PositionAccessRule
                 {
@@ -218,12 +251,30 @@ namespace backend.Services
         }
         public async Task<object> Apply(int positionId, int userId)
         {
+            var position = await _db.Positions
+                .Include(p => p.PositionAccessRules)
+                .FirstOrDefaultAsync(p => p.Id == positionId);
+            if (position is null)
+            {
+                throw new NotFoundException(_localizer["PositionNotFound"]);
+            }
 
-            throw new NotImplementedException();
+            if (!await CanAccess(userId, position.PositionAccessRules ?? new List<PositionAccessRule>()))
+            {
+                throw new ForbiddenException(_localizer["PositionAccessDenied"]);
+            }
+
+            return new { PositionId = positionId, CanCreateCv = true };
         }
-        private async Task<bool> CanAccess(int userId, List<PositionAccessRule> accessRules)
+
+        public async Task<bool> CanAccess(int? userId, List<PositionAccessRule> accessRules)
         {
-            var user = await _db.Users.FindAsync(userId);
+            if (userId is null)
+            {
+                return accessRules is null || accessRules.Count == 0;
+            }
+
+            var user = await _db.Users.FindAsync(userId.Value);
             if (user is { Role: UserRole.Administrator or UserRole.Recruiter })
             {
                 return true;
@@ -241,7 +292,7 @@ namespace backend.Services
 
             var attributeValues = await _db.AttributeValues
                 .AsNoTracking()
-                .Where(x => x.UserId == userId && attributeIds.Contains(x.AttributeId))
+                .Where(x => x.UserId == userId.Value && attributeIds.Contains(x.AttributeId))
                 .ToListAsync();
 
             foreach (var rule in accessRules)

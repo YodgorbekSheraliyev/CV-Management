@@ -219,6 +219,9 @@
   <data name="CvNotFound" xml:space="preserve">
     <value>CV topilmadi.</value>
   </data>
+  <data name="CvAccessDenied" xml:space="preserve">
+    <value>Sizda bu CVni ko'rish huquqi yo'q.</value>
+  </data>
   <data name="CvNotPublished" xml:space="preserve">
     <value>Bu CV e'lon qilinmagan.</value>
   </data>
@@ -279,6 +282,9 @@
   <data name="PositionVersionNotMatch" xml:space="preserve">
     <value>Bu lavozim boshqa foydalanuvchi tomonidan o'zgartirilgan. Qayta yuklab, yana urinib ko'ring.</value>
   </data>
+  <data name="UserVersionNotMatch" xml:space="preserve">
+    <value>Bu foydalanuvchi boshqa foydalanuvchi tomonidan o'zgartirilgan. Ma'lumotlarni qayta yuklab, yana urinib ko'ring.</value>
+  </data>
   <data name="ProjectNotFound" xml:space="preserve">
     <value>Loyiha topilmadi.</value>
   </data>
@@ -323,5 +329,8 @@
   </data>
   <data name="VersionRequired" xml:space="preserve">
     <value>Versiya kiritilishi shart.</value>
+  </data>
+  <data name="ProfileAccessDenied" xml:space="preserve">
+    <value>Sizda ushbu profilga kirish uchun ruxsat yo‘q.</value>
   </data>
 </root>

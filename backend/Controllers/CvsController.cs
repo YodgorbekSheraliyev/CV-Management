@@ -25,6 +25,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = "Recruiter,Administrator")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _cvService.GetAll();
@@ -54,6 +55,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("like/{cvId}")]
+        [Authorize(Roles = "Recruiter")]
         public async Task<IActionResult> Like(int cvId)
         {
             var result = await _cvService.Like(cvId, CurrentUserId);
@@ -61,6 +63,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("unlike/{cvId}")]
+        [Authorize(Roles = "Recruiter")]
         public async Task<IActionResult> Unlike(int cvId)
         {
             var result = await _cvService.Unlike(cvId, CurrentUserId);
@@ -84,6 +87,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Candidate,Administrator")]
         public async Task<IActionResult> Delete(DeleteCvDto dto)
         {
             await _cvService.Delete(dto, CurrentUserId);

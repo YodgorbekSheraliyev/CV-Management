@@ -12,8 +12,17 @@ export interface User {
   lastName: string;
   email: string;
   role: UserRole;
+  version: number;
   location?: string;
   imageUrl?: string;
+}
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  role: string;
+  isBlocked: boolean;
+  version: number;
 }
 
 export interface Attribute {
@@ -134,4 +143,27 @@ export interface Application {
   positionTitle: string;
   level: string | null;
   createdAt: string;
+}
+
+
+export interface DashboardData {
+  latestPositions: DashboardPosition[];
+  popularPositions: DashboardPosition[];
+  tags: { name: string; usageCount: number }[];
+  statistics: {
+    newCvsLast24Hours: number;
+    totalPositions: number;
+    totalCandidates: number;
+    totalRecruiters: number;
+    totalPublishedCvs: number;
+  };
+}
+
+export interface DashboardPosition {
+  id: number;
+  title: string;
+  description: string;
+  isPublic: boolean;
+  cvCount: number;
+  tags: string[];
 }

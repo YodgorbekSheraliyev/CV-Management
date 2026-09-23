@@ -3,17 +3,18 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
-import type { PositionSummary } from "../models";
-import { getPositions } from "../api/positionApi";
+import { getDashboard } from "../api/dashboardApi";
 import { UserRole } from "../enums/enums";
 import ToastNotification from "../components/notifications/ToastNotification";
+import type { DashboardData, DashboardPosition } from "../models";
 
 const MainPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isCandidate = user?.role === UserRole.Candidate;
 
-  const [positions, setPositions] = useState<PositionSummary[]>([]);
+  const [positions, setPositions] = useState<DashboardPosition[]>([]);
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
     message: string;
@@ -26,8 +27,9 @@ const MainPage = () => {
 
   const loadPositions = async () => {
     try {
-      const res = await getPositions();
-      setPositions(res);
+      const res = await getDashboard();
+      setDashboard(res);
+      setPositions(res.latestPositions);
     } catch (error: any) {
       setToast({
         message: error.message,
@@ -38,11 +40,9 @@ const MainPage = () => {
     }
   };
 
-  const latestPositions = positions.slice(0, 5);
+  const latestPositions = dashboard?.latestPositions ?? positions.slice(0, 5);
 
-  const popularPositions = [...positions]
-    .sort((a, b) => (b.cVsCount ?? 0) - (a.cVsCount ?? 0))
-    .slice(0, 5);
+  const popularPositions = dashboard?.popularPositions ?? [];
 
   return (
     <div className="min-vh-100 bg-light">
@@ -262,7 +262,7 @@ const MainPage = () => {
 
                             <div className="text-end">
                               <div className="fw-bold small">
-                                {position.cVsCount}
+                                {position.cvCount}
                               </div>
 
                               <div className="text-muted small">
@@ -288,6 +288,59 @@ const MainPage = () => {
             </div>
           </section>
         )}
+
+        {dashboard && (
+          <section className="row g-3 mb-5">
+            {[
+              [
+                t("mainPage.statisticsNewCvs"),
+                dashboard.statistics.newCvsLast24Hours,
+              ],
+              [
+                t("mainPage.statisticsPositions"),
+                dashboard.statistics.totalPositions,
+              ],
+              [
+                t("mainPage.statisticsCandidates"),
+                dashboard.statistics.totalCandidates,
+              ],
+              [
+                t("mainPage.statisticsRecruiters"),
+                dashboard.statistics.totalRecruiters,
+              ],
+              [
+                t("mainPage.statisticsPublishedCvs"),
+                dashboard.statistics.totalPublishedCvs,
+              ],
+            ].map(([label, value]) => (
+              <div className="col-6 col-lg" key={label as string}>
+                <div className="card border-0 shadow-sm h-100">
+                  <div className="card-body">
+                    <div className="h4 fw-bold mb-1">{value}</div>
+                    <div className="text-muted small">{label}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {dashboard?.tags.length ? (
+          <section className="mb-5">
+            <h2 className="h5 fw-bold mb-3">{t("mainPage.tagCloud")}</h2>
+            <div className="d-flex flex-wrap gap-2">
+              {dashboard.tags.map((tag) => (
+                <Link
+                  key={tag.name}
+                  to={`/positions?tag=${encodeURIComponent(tag.name)}`}
+                  className="badge rounded-pill text-bg-light border text-decoration-none"
+                >
+                  {tag.name} ({tag.usageCount})
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {/* Candidate CTA */}
         {isCandidate && (

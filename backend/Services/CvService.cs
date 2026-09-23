@@ -15,11 +15,13 @@ namespace backend.Services
     {
         private readonly DataContext _db;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly PositionService _positionService;
 
-        public CvService(DataContext db, IStringLocalizer<SharedResource> localizer)
+        public CvService(DataContext db, IStringLocalizer<SharedResource> localizer, PositionService positionService)
         {
             _db = db;
             _localizer = localizer;
+            _positionService = positionService;
         }
 
         public async Task<List<CvSummaryDto>> GetAll()
@@ -117,6 +119,14 @@ namespace backend.Services
             if (position is null)
             {
                 throw new NotFoundException(_localizer["PositionNotFound"]);
+            }
+
+            var positionRules = await _db.PositionAccessRules
+                .Where(rule => rule.PositionId == dto.PositionId)
+                .ToListAsync();
+            if (!await _positionService.CanAccess(userId, positionRules))
+            {
+                throw new ForbiddenException(_localizer["PositionAccessDenied"]);
             }
 
             if (await _db.CVs.AnyAsync(c => c.UserId == userId && c.PositionId == dto.PositionId))
@@ -259,13 +269,13 @@ namespace backend.Services
                 throw new ForbiddenException(_localizer["NotYourCv"]);
             }
 
-            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(v => v.UserId == userId && v.AttributeId == dto.AttributeId);
+            var attributeValue = await _db.AttributeValues.FirstOrDefaultAsync(v => v.UserId == cv.UserId && v.AttributeId == dto.AttributeId);
 
             if (attributeValue is null)
             {
                 attributeValue = new AttributeValue
                 {
-                    UserId = userId,
+                    UserId = cv.UserId,
                     AttributeId = dto.AttributeId,
                     Value = dto.Value,
                 };
@@ -465,11 +475,14 @@ namespace backend.Services
             {
                 return;
             }
-            if (user.Role == UserRole.Recruiter && cv.Status != CVStatus.Published)
+            if (user.Role == UserRole.Recruiter && cv.Status == CVStatus.Published)
             {
-                throw new ForbiddenException(_localizer["CvNotPublished"]);
+                return;
             }
+
+            throw new ForbiddenException(_localizer["CvAccessDenied"]);
         }
+
         private sealed class PeriodValue
         {
             public string? Start { get; set; }

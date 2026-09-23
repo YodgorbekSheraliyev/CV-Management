@@ -4,12 +4,21 @@ import { useAuth } from "../../hooks/auth";
 import { UserRole } from "../../enums/enums";
 import LanguageSelector from "../LanguageSelector";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 const NavBar = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark",
+  );
   const isRecruiterOrAdmin =
     user?.role == UserRole.Recruiter || user?.role == UserRole.Administrator;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = darkMode ? "dark" : "light";
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   return (
     <nav className="navbar navbar-expand-lg bg-white border-bottom sticky-top">
@@ -77,6 +86,18 @@ const NavBar = () => {
                     {t("navbar.applications")}
                   </NavLink>
                 </li>
+                {user?.role === UserRole.Administrator && (
+                  <li className="nav-item">
+                    <NavLink
+                      to="/admin/users"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active fw-semibold" : "nav-link"
+                      }
+                    >
+                      {t("navbar.users")}
+                    </NavLink>
+                  </li>
+                )}
                 <li className="nav-item">
                   <NavLink
                     to="/attribute"
@@ -93,6 +114,20 @@ const NavBar = () => {
 
           <div className="d-flex align-items-center gap-3">
             <LanguageSelector />
+
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => setDarkMode((current) => !current)}
+              aria-label={t(
+                darkMode ? "navbar.useLightTheme" : "navbar.useDarkTheme",
+              )}
+              title={t(
+                darkMode ? "navbar.useLightTheme" : "navbar.useDarkTheme",
+              )}
+            >
+              <i className={`bi ${darkMode ? "bi-sun" : "bi-moon"}`} />
+            </button>
 
             {user ? (
               <>
