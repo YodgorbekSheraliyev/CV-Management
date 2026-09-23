@@ -126,6 +126,9 @@
   <data name="UserAlreadyExists" xml:space="preserve">
     <value>Foydalanuvchi allaqachon mavjud</value>
   </data>
+  <data name="UserBlocked" xml:space="preserve">
+    <value>Sizning hisobingiz bloklangan.</value>
+  </data>
   <data name="BuiltInAttributesNotFound" xml:space="preserve">
     <value>Attributlar topilmadi. Avval database migration qiling</value>
   </data>

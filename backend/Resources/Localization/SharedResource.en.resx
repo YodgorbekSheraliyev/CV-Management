@@ -126,6 +126,9 @@
   <data name="UserAlreadyExists" xml:space="preserve">
     <value>User already exists</value>
   </data>
+  <data name="UserBlocked" xml:space="preserve">
+    <value>Your account has been blocked.</value>
+  </data>
   <data name="BuiltInAttributesNotFound" xml:space="preserve">
     <value>Built in attributes not found. Run database seed first.</value>
   </data>
