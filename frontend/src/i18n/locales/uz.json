@@ -684,6 +684,22 @@
     "readOnly": {
       "backToApplications": "Arizalarga qaytish",
       "noPermission": "Ushbu profilni ko'rish huquqiga ega emassiz."
+    },
+    "integrations": {
+      "actions": "Integratsiyalar",
+      "salesforce": "Salesforce'ga qo‘shish"
+    },
+    "salesforce": {
+      "title": "Salesforce'ga qo‘shish",
+      "description": "Profil ma’lumotlaringiz Salesforce'ga qo‘shiladi. Quyida qo‘shimcha ma’lumotlarni kiritishingiz mumkin.",
+      "profileInformation": "Profil ma’lumotlari",
+      "additionalInformation": "Qo‘shimcha ma’lumotlar",
+      "phone": "Telefon",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "notes": "Izohlar",
+      "submit": "Salesforce'ga qo‘shish",
+      "notesPlaceholder": "Qo‘shimcha ma’lumot kiriting..."
     }
   },
   "positionCvsPage": {

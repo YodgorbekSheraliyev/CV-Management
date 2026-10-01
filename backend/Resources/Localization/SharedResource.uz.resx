@@ -336,4 +336,28 @@
   <data name="ProfileAccessDenied" xml:space="preserve">
     <value>Sizda ushbu profilga kirish uchun ruxsat yo‘q.</value>
   </data>
+  <data name="SalesForceClientIdOrClientSecretNotConfigured" xml:space="preserve">
+    <value>SalesForce ClientId yoki ClientSecret sozlanmagan.</value>
+  </data>
+  <data name="SalesforceAuthenticationFailed" xml:space="preserve">
+    <value>Salesforce autentifikatsiyasi muvaffaqiyatsiz tugadi: {0}</value>
+  </data>
+  <data name="SalesforceAccessTokenNotReturned" xml:space="preserve">
+    <value>Salesforce access tokeni qaytarilmadi.</value>
+  </data>
+  <data name="SalesForceAccountIdNotConfigured" xml:space="preserve">
+    <value>SalesForce AccountId sozlanmagan.</value>
+  </data>
+  <data name="SalesforceContactIdNotReturned" xml:space="preserve">
+    <value>Salesforce yaratilgan Contact IDni qaytarmadi.</value>
+  </data>
+  <data name="SalesforceContactCreationFailed" xml:space="preserve">
+    <value>Salesforce kontaktini yaratishda xatolik yuz berdi: {0}</value>
+  </data>
+  <data name="SalesforceContactUpdateFailed" xml:space="preserve">
+    <value>Salesforce kontaktini yangilashda xatolik yuz berdi: {0}</value>
+  </data>
+  <data name="SalesForceApiVersionNotConfigured" xml:space="preserve">
+    <value>SalesForce ApiVersion sozlanmagan.</value>
+  </data>
 </root>

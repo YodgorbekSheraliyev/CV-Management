@@ -14,5 +14,6 @@ namespace backend.Models
         public List<Project>? Projects { get; set; }
         public List<CV>? CVs { get; set; }
         public List<CV>? LikedCVs { get; set; }
+        public string? SalesforceContactId { get; set; }
     }
 }

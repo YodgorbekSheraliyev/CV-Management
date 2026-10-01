@@ -336,4 +336,28 @@
   <data name="ProfileAccessDenied" xml:space="preserve">
     <value>You do not have permission to access this profile.</value>
   </data>
+  <data name="SalesForceClientIdOrClientSecretNotConfigured" xml:space="preserve">
+    <value>SalesForce ClientId or ClientSecret is not configured.</value>
+  </data>
+  <data name="SalesforceAuthenticationFailed" xml:space="preserve">
+    <value>Salesforce authentication failed: {0}</value>
+  </data>
+  <data name="SalesforceAccessTokenNotReturned" xml:space="preserve">
+    <value>Salesforce access token was not returned.</value>
+  </data>
+  <data name="SalesForceAccountIdNotConfigured" xml:space="preserve">
+    <value>SalesForce AccountId is not configured.</value>
+  </data>
+  <data name="SalesforceContactIdNotReturned" xml:space="preserve">
+    <value>Salesforce did not return the created Contact ID.</value>
+  </data>
+  <data name="SalesforceContactCreationFailed" xml:space="preserve">
+    <value>Salesforce contact creation failed: {0}</value>
+  </data>
+  <data name="SalesforceContactUpdateFailed" xml:space="preserve">
+    <value>Salesforce contact update failed: {0}</value>
+  </data>
+  <data name="SalesForceApiVersionNotConfigured" xml:space="preserve">
+    <value>SalesForce ApiVersion is not configured.</value>
+  </data>
 </root>

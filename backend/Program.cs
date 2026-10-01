@@ -92,6 +92,17 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         UIQueryStringKey = "lang"
     });
 });
+builder.Services.AddHttpClient<SalesForceService>((client) =>
+{
+    var baseUrl = builder.Configuration["SalesForce:InstanceUrl"];
+
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        throw new InvalidOperationException("SalesForce InstanceUrl is not configured.");
+    }
+
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();

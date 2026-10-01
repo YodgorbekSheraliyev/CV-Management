@@ -684,6 +684,22 @@
     "readOnly": {
       "backToApplications": "Back to applications",
       "noPermission": "You do not have permission to view this profile."
+    },
+    "integrations": {
+      "actions": "Integrations",
+      "salesforce": "Add to Salesforce"
+    },
+    "salesforce": {
+      "title": "Add to Salesforce",
+      "description": "Your profile information will be added to Salesforce. You can provide additional information below.",
+      "profileInformation": "Profile information",
+      "additionalInformation": "Additional information",
+      "phone": "Phone",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "notes": "Notes",
+      "submit": "Add to Salesforce",
+      "notesPlaceholder": "Add any additional information..."
     }
   },
   "positionCvsPage": {

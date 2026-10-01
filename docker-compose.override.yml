@@ -21,6 +21,11 @@ services:
       Facebook__AppSecret: "${FACEBOOK_APP_SECRET}"
       Facebook__GraphApiVersion: "${FACEBOOK_GRAPH_API_VERSION}"
 
+      SalesForce__ClientId: "${SALES_FORCE_CLIENT_ID}"
+      SalesForce__ClientSecret: "${SALES_FORCE_CLIENT_SECRET}"
+      SalesForce__InstanceUrl: "${SALES_FORCE_INSTANCE_URL}"
+      SalesForce__AccountId: "${SALES_FORCE_ACCOUNT_ID}"
+      SalesForce__ApiVersion: "${SALES_FORCE_API_VERSION}"
       AllowedOrigins__0: "https://cvmanagement.uz"
       AllowedOrigins__1: "https://www.cvmanagement.uz"
 

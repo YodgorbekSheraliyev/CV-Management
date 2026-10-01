@@ -1,17 +1,20 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
 import NavBar from "../components/navbar/NavBar";
 import { useAuth } from "../hooks/auth";
 import MeSection from "../components/sections/MeSection";
 import InfoSection from "../components/sections/InfoSection";
 import ProjectsSection from "../components/sections/ProjectsSection";
 import CvsSection from "../components/sections/CvsSection";
-import { updateUser } from "../api/userApi";
-import { getUser } from "../api/userApi";
+import { updateUser, getUser } from "../api/userApi";
+import { createOrUpdateSalesforceContact } from "../api/salesforceApi";
 import { UserRole } from "../enums/enums";
 import ToastNotification from "../components/notifications/ToastNotification";
+import SalesforceModal, {
+  type SalesforceContactForm,
+} from "../components/modals/SalesforceModal";
 
 type Tab = "me" | "info" | "projects" | "cvs";
 
@@ -26,13 +29,17 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   const { user: currentUser, setUser } = useAuth();
   const { id } = useParams();
+
   const [profileUser, setProfileUser] = useState<typeof currentUser>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("me");
+  const [showSalesforceModal, setShowSalesforceModal] = useState(false);
+  const [salesforceLoading, setSalesforceLoading] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "danger";
   } | null>(null);
+
   const STATIC_PATH = import.meta.env.VITE_API_STATIC_API;
   const isReadOnly = Boolean(id);
 
@@ -56,6 +63,9 @@ const ProfilePage = () => {
 
   const user = isReadOnly ? profileUser : currentUser;
 
+  const canAccessSalesforce =
+    !isReadOnly || currentUser?.role === UserRole.Administrator;
+
   const handleUpdateUser = async (data: UpdateUserData): Promise<void> => {
     if (!currentUser || isReadOnly) {
       return;
@@ -63,11 +73,9 @@ const ProfilePage = () => {
 
     try {
       const updatedUser = await updateUser(data);
-      setToast({
-        message: t("profilePage.success.changesSaved"),
-        type: "success",
-      });
+
       setUser?.(updatedUser);
+
       setToast({
         message: t("profilePage.success.profileUpdated"),
         type: "success",
@@ -80,12 +88,50 @@ const ProfilePage = () => {
     }
   };
 
-  if (isReadOnly && currentUser?.role !== UserRole.Recruiter && currentUser?.role !== UserRole.Administrator) {
+  const handleSalesforceSubmit = async (
+    data: SalesforceContactForm,
+  ): Promise<void> => {
+    if (!user || salesforceLoading) {
+      return;
+    }
+
+    try {
+      setSalesforceLoading(true);
+
+      await createOrUpdateSalesforceContact(data);
+
+      setShowSalesforceModal(false);
+
+      setToast({
+        message: t("profilePage.salesforce.success"),
+        type: "success",
+      });
+    } catch (err: any) {
+      console.error("Salesforce integration failed:", err);
+
+      setToast({
+        message: err?.message ?? t("profilePage.salesforce.error"),
+        type: "danger",
+      });
+    } finally {
+      setSalesforceLoading(false);
+    }
+  };
+
+  if (
+    isReadOnly &&
+    currentUser?.role !== UserRole.Recruiter &&
+    currentUser?.role !== UserRole.Administrator
+  ) {
     return (
       <div className="min-vh-100 bg-light">
         <NavBar />
+
         <main className="container py-5">
-          <div className="alert alert-danger">{t("profilePage.readOnly.noPermission")}</div>
+          <div className="alert alert-danger">
+            {t("profilePage.readOnly.noPermission")}
+          </div>
+
           <Link to="/applications" className="btn btn-outline-secondary">
             {t("profilePage.readOnly.backToApplications")}
           </Link>
@@ -99,8 +145,10 @@ const ProfilePage = () => {
       return (
         <div className="min-vh-100 bg-light">
           <NavBar />
+
           <main className="container py-5">
             <div className="alert alert-danger mb-3">{profileError}</div>
+
             <Link to="/applications" className="btn btn-outline-secondary">
               {t("profilePage.readOnly.backToApplications")}
             </Link>
@@ -143,7 +191,7 @@ const ProfilePage = () => {
     },
   ];
 
-  if (!isReadOnly && user.role != UserRole.Recruiter) {
+  if (!isReadOnly && user.role !== UserRole.Recruiter) {
     tabs.push(
       {
         value: "projects",
@@ -167,6 +215,7 @@ const ProfilePage = () => {
       <main className="container py-4 py-md-5">
         <div className="mb-4">
           <h1 className="h3 fw-bold mb-1">{t("profilePage.title")}</h1>
+
           <p className="text-muted mb-0">{t("profilePage.description")}</p>
         </div>
 
@@ -182,7 +231,7 @@ const ProfilePage = () => {
               >
                 {user.imageUrl ? (
                   <img
-                    src={`${STATIC_PATH}` + user.imageUrl}
+                    src={`${STATIC_PATH}${user.imageUrl}`}
                     alt={t("profilePage.profileImage")}
                     className="w-100 h-100 object-fit-cover"
                   />
@@ -208,6 +257,19 @@ const ProfilePage = () => {
                   </span>
                 </div>
               </div>
+
+              {canAccessSalesforce && (
+                <div className="flex-shrink-0">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => setShowSalesforceModal(true)}
+                  >
+                    <i className="bi bi-cloud-arrow-up me-2" />
+                    {t("profilePage.integrations.salesforce")}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -233,7 +295,11 @@ const ProfilePage = () => {
         </section>
 
         {activeTab === "me" && (
-          <MeSection user={user} onSave={handleUpdateUser} readOnly={isReadOnly} />
+          <MeSection
+            user={user}
+            onSave={handleUpdateUser}
+            readOnly={isReadOnly}
+          />
         )}
 
         {!isReadOnly && activeTab === "info" && <InfoSection user={user} />}
@@ -242,6 +308,20 @@ const ProfilePage = () => {
 
         {!isReadOnly && activeTab === "cvs" && <CvsSection />}
       </main>
+
+      {showSalesforceModal && user && (
+        <SalesforceModal
+          profile={{
+            firstName: user.firstName ?? null,
+            lastName: user.lastName ?? null,
+            email: user.email ?? null,
+            location: user.location ?? null,
+          }}
+          onClose={() => setShowSalesforceModal(false)}
+          onSubmit={handleSalesforceSubmit}
+          loading={salesforceLoading}
+        />
+      )}
     </div>
   );
 };

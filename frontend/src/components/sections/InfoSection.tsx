@@ -6,7 +6,6 @@ import ToastNotification from "../notifications/ToastNotification";
 import type { Attribute, AttributeValue, User } from "../../models";
 import { getAttributes } from "../../api/attributeApi";
 import {
-  createAttributeValue,
   deleteAttributeValue,
   getAttributeValuesByUserId,
 } from "../../api/attributeValueApi";
@@ -76,18 +75,16 @@ const InfoSection = ({ user }: InfoSectionProps) => {
       return;
     }
 
-    const temporaryAttributeValue = {
+    const draftAttributeValue: AttributeValue = {
+      id: -Date.now(),
       attributeId: attribute.id,
       userId: user.id,
       value: "",
       attribute,
-    } as AttributeValue;
+    };
 
-    const newAttributeValue = await createAttributeValue(
-      temporaryAttributeValue,
-    );
-    setAttributeValues((current) => [...current, newAttributeValue]);
-    setOpenId(temporaryAttributeValue.id);
+    setAttributeValues((current) => [...current, draftAttributeValue]);
+    setOpenId(draftAttributeValue.id);
     setIsAttributeModalOpen(false);
   };
 
