@@ -115,6 +115,8 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ApplicationService>();
+builder.Services.AddScoped<SupportTicketService>();
+builder.Services.AddScoped<DropboxService>();
 
 var app = builder.Build();
 app.UseCors(CorsPolicy);

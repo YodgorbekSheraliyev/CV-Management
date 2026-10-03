@@ -360,4 +360,22 @@
   <data name="SalesForceApiVersionNotConfigured" xml:space="preserve">
     <value>SalesForce ApiVersion is not configured.</value>
   </data>
+  <data name="SupportTicketCreatedSuccessfully" xml:space="preserve">
+    <value>Ticket created successfully.</value>
+  </data>
+  <data name="SupportTicketSummaryRequired" xml:space="preserve">
+    <value>Summary is required.</value>
+  </data>
+  <data name="SupportTicketInvalidPriority" xml:space="preserve">
+    <value>Invalid priority.</value>
+  </data>
+  <data name="SupportTicketLinkRequired" xml:space="preserve">
+    <value>Link is required.</value>
+  </data>
+  <data name="DropboxAccessTokenNotConfigured" xml:space="preserve">
+    <value>Dropbox access token is not configured.</value>
+  </data>
+  <data name="DropboxUploadFailed" xml:space="preserve">
+    <value>Dropbox upload failed: {0}. {1}</value>
+  </data>
 </root>

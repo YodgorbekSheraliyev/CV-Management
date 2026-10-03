@@ -360,4 +360,22 @@
   <data name="SalesForceApiVersionNotConfigured" xml:space="preserve">
     <value>SalesForce ApiVersion sozlanmagan.</value>
   </data>
+  <data name="SupportTicketCreatedSuccessfully" xml:space="preserve">
+    <value>Yordam chiptasi muvaffaqiyatli yaratildi.</value>
+  </data>
+  <data name="SupportTicketSummaryRequired" xml:space="preserve">
+    <value>Qisqacha mazmun kiritilishi shart.</value>
+  </data>
+  <data name="SupportTicketInvalidPriority" xml:space="preserve">
+    <value>Muhimlik darajasi noto‘g‘ri.</value>
+  </data>
+  <data name="SupportTicketLinkRequired" xml:space="preserve">
+    <value>Havola kiritilishi shart.</value>
+  </data>
+  <data name="DropboxAccessTokenNotConfigured" xml:space="preserve">
+    <value>Dropbox access tokeni sozlanmagan.</value>
+  </data>
+  <data name="DropboxUploadFailed" xml:space="preserve">
+    <value>Dropbox'ga yuklash amalga oshmadi: {0}. {1}</value>
+  </data>
 </root>
