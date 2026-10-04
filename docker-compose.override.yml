@@ -27,7 +27,9 @@ services:
       SalesForce__AccountId: "${SALES_FORCE_ACCOUNT_ID}"
       SalesForce__ApiVersion: "${SALES_FORCE_API_VERSION}"
 
-      Dropbox__AccessToken: "${DROPBOX_ACCESS_TOKEN}"
+      Dropbox__AppKey: "${DROPBOX_APP_KEY}"
+      Dropbox__AppSecret: "${DROPBOX_APP_SECRET}"
+      Dropbox__RefreshToken: "${DROPBOX_REFRESH_TOKEN}"
       Dropbox__Folder: "${DROPBOX_FOLDER}"
 
       AllowedOrigins__0: "https://cvmanagement.uz"

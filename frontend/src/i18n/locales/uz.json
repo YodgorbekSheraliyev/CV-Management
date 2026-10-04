@@ -11,6 +11,22 @@
     "logout": "Chiqish",
     "login": "Kirish"
   },
+  "supportTicket": {
+    "help": "Yordam",
+    "title": "Qo‘llab-quvvatlash so‘rovini yaratish",
+    "summary": "Muammo tavsifi",
+    "summaryPlaceholder": "Muammo yoki so‘rovingizni yozing...",
+    "summaryRequired": "Muammo tavsifi kiritilishi shart.",
+    "priority": "Muhimlik darajasi",
+    "high": "Yuqori",
+    "average": "O‘rtacha",
+    "low": "Past",
+    "linkInfo": "Joriy sahifa havolasi qo‘llab-quvvatlash so‘roviga qo‘shiladi.",
+    "submit": "So‘rovni yuborish",
+    "sending": "Yuborilmoqda...",
+    "createFailed": "Qo‘llab-quvvatlash so‘rovini yaratib bo‘lmadi.",
+    "createdSuccessfully": "Qo‘llab-quvvatlash so‘rovi muvaffaqiyatli yuborildi."
+  },
   "adminUsers": {
     "administratorAccessRequired": "Administrator huquqi talab qilinadi.",
     "title": "Foydalanuvchilarni boshqarish",

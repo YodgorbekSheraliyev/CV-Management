@@ -14,19 +14,14 @@ public class SupportTicketService
     private readonly DropboxService _dropboxService;
     private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public SupportTicketService(
-        DataContext context,
-        DropboxService dropboxService,
-        IStringLocalizer<SharedResource> localizer)
+    public SupportTicketService(DataContext context, DropboxService dropboxService, IStringLocalizer<SharedResource> localizer)
     {
         _context = context;
         _dropboxService = dropboxService;
         _localizer = localizer;
     }
 
-    public async Task CreateTicketAsync(
-        int userId,
-        CreateSupportTicketDto dto)
+    public async Task CreateTicketAsync(int userId, CreateSupportTicketDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Summary))
             throw new BadRequestException(_localizer["SupportTicketSummaryRequired"]);
@@ -62,32 +57,20 @@ public class SupportTicketService
                 WriteIndented = true
             });
 
-        var fileName =
-            $"support-ticket-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}.json";
+        var fileName = $"support-ticket-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}.json";
 
         await _dropboxService.UploadJsonAsync(fileName, json);
     }
 
     private async Task<Models.Position?> GetPositionFromLinkAsync(string link)
     {
-        if (!Uri.TryCreate(link, UriKind.Absolute, out var uri))
-            return null;
+        if (!Uri.TryCreate(link, UriKind.Absolute, out var uri)) return null;
+        var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var positionIndex = Array.FindIndex(segments, x => x.Equals("positions", StringComparison.OrdinalIgnoreCase));
+        if (positionIndex < 0 || positionIndex + 1 >= segments.Length) return null;
+        if (!int.TryParse(segments[positionIndex + 1], out var positionId)) return null;
 
-        var segments = uri.AbsolutePath
-            .Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-        var positionIndex = Array.FindIndex(
-            segments,
-            x => x.Equals("positions", StringComparison.OrdinalIgnoreCase));
-
-        if (positionIndex < 0 || positionIndex + 1 >= segments.Length)
-            return null;
-
-        if (!int.TryParse(segments[positionIndex + 1], out var positionId))
-            return null;
-
-        return await _context.Positions
-            .FirstOrDefaultAsync(x => x.Id == positionId);
+        return await _context.Positions.FirstOrDefaultAsync(x => x.Id == positionId);
     }
 
     private async Task<List<string>> GetAdminEmailsAsync()

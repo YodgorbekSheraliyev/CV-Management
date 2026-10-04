@@ -11,6 +11,22 @@
     "logout": "Logout",
     "login": "Login"
   },
+  "supportTicket": {
+    "help": "Help",
+    "title": "Create Support Ticket",
+    "summary": "Summary",
+    "summaryPlaceholder": "Describe your problem or request...",
+    "summaryRequired": "Summary is required.",
+    "priority": "Priority",
+    "high": "High",
+    "average": "Average",
+    "low": "Low",
+    "linkInfo": "The current page will be included with your support ticket.",
+    "submit": "Submit Ticket",
+    "sending": "Sending...",
+    "createFailed": "Failed to create support ticket.",
+    "createdSuccessfully": "Support ticket submitted successfully."
+  },
   "adminUsers": {
     "administratorAccessRequired": "Administrator access required.",
     "title": "User management",
